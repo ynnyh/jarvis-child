@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "extract-chars": "node scripts/extract-char-data.mjs"
+    "extract-chars": "node scripts/extract-char-data.mjs",
+    "generate-audio": "node scripts/generate-audio.mjs"
   },
   "dependencies": {
     "hanzi-writer": "^3.5.0",
