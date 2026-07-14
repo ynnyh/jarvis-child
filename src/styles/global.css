@@ -1,0 +1,459 @@
+/* 宝宝识字 - 全局样式
+   面向 3-6 岁儿童：大按钮、亮色、圆角、清晰对比。
+   移动优先，兼顾平板/桌面。 */
+
+:root {
+  --bg: #FFF7EF;
+  --ink: #3A3A4A;
+  --pink: #FF8FB1;
+  --theme-color: #FF8FB1;
+  font-family: 'PingFang SC', 'Microsoft YaHei', -apple-system, 'Segoe UI', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  /* 防止小朋友双击缩放/长按选中造成困惑 */
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  color: inherit;
+}
+
+/* ============ 页面容器 ============ */
+.page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 16px 16px 48px;
+  min-height: 100vh;
+}
+
+/* ============ 首页 ============ */
+.home-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.app-title {
+  font-size: 28px;
+  margin: 8px 0;
+}
+
+.star-count {
+  background: #fff;
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #F5A623;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.home-subtitle {
+  font-size: 18px;
+  color: #7A7A8C;
+  margin: 8px 0 20px;
+}
+
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.theme-card {
+  border-radius: 28px;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: #fff;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  transition: transform 0.12s ease;
+  min-height: 150px;
+  justify-content: center;
+}
+
+.theme-card:active {
+  transform: scale(0.95);
+}
+
+.theme-emoji {
+  font-size: 52px;
+  line-height: 1;
+}
+
+.theme-name {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.theme-progress {
+  font-size: 15px;
+  opacity: 0.9;
+  background: rgba(255, 255, 255, 0.25);
+  padding: 2px 12px;
+  border-radius: 999px;
+}
+
+/* ============ 子页头部（主题/学习/游戏通用）============ */
+.sub-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.btn-back {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #fff;
+  font-size: 24px;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  flex-shrink: 0;
+}
+
+.btn-back:active {
+  transform: scale(0.92);
+}
+
+.sub-title {
+  flex: 1;
+  font-size: 22px;
+  margin: 0;
+  text-align: center;
+}
+
+.sub-progress {
+  min-width: 48px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--theme-color);
+}
+
+/* ============ 主题页：字卡网格 ============ */
+.char-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.char-card {
+  background: #fff;
+  border-radius: 24px;
+  padding: 16px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.07);
+  border: 3px solid transparent;
+  transition: transform 0.12s ease;
+}
+
+.char-card:active {
+  transform: scale(0.94);
+}
+
+.char-card.learned {
+  border-color: var(--theme-color);
+}
+
+.char-emoji {
+  font-size: 34px;
+  line-height: 1;
+}
+
+.char-big {
+  font-size: 40px;
+  font-weight: 700;
+}
+
+.char-pinyin {
+  font-size: 15px;
+  color: #9A9AAC;
+}
+
+.char-stars {
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+
+.btn-game {
+  display: block;
+  width: 100%;
+  margin-top: 28px;
+  padding: 18px;
+  border-radius: 24px;
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--theme-color);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.btn-game:active {
+  transform: scale(0.97);
+}
+
+/* ============ 学习页 ============ */
+.learn-card,
+.write-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.learn-emoji {
+  font-size: 80px;
+  line-height: 1;
+}
+
+.learn-char {
+  font-size: 120px;
+  font-weight: 700;
+  background: #fff;
+  border-radius: 32px;
+  width: 200px;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.1);
+  color: var(--ink);
+}
+
+.learn-char:active {
+  transform: scale(0.96);
+}
+
+.learn-pinyin {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--pink);
+  cursor: pointer;
+}
+
+.learn-hint {
+  font-size: 18px;
+  color: #7A7A8C;
+  text-align: center;
+  max-width: 360px;
+  line-height: 1.5;
+}
+
+.learn-words {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.word-chip {
+  background: #fff;
+  border-radius: 999px;
+  padding: 10px 20px;
+  font-size: 22px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
+}
+
+.word-chip:active {
+  transform: scale(0.95);
+}
+
+/* ============ 写字页动作按钮 ============ */
+.write-actions {
+  display: flex;
+  gap: 14px;
+  margin-top: 8px;
+}
+
+/* ============ 通用按钮 ============ */
+.btn-primary {
+  background: var(--pink);
+  color: #fff;
+  border-radius: 20px;
+  padding: 14px 28px;
+  font-size: 20px;
+  font-weight: 700;
+  box-shadow: 0 6px 16px rgba(255, 143, 177, 0.4);
+}
+
+.btn-primary.big {
+  padding: 18px 44px;
+  font-size: 24px;
+  margin-top: 8px;
+}
+
+.btn-primary:active {
+  transform: scale(0.96);
+}
+
+.btn-secondary {
+  background: #fff;
+  color: var(--ink);
+  border-radius: 20px;
+  padding: 14px 28px;
+  font-size: 20px;
+  font-weight: 700;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.btn-secondary:active {
+  transform: scale(0.96);
+}
+
+/* ============ 复习游戏 ============ */
+.game-prompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin: 24px 0 36px;
+}
+
+.speaker-btn {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: var(--theme-color);
+  font-size: 56px;
+  color: #fff;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.15);
+}
+
+.speaker-btn:active {
+  transform: scale(0.94);
+}
+
+.game-tip {
+  font-size: 18px;
+  color: #7A7A8C;
+  margin: 0;
+}
+
+.game-options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.game-option {
+  background: #fff;
+  border-radius: 24px;
+  padding: 28px;
+  font-size: 64px;
+  font-weight: 700;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  transition: transform 0.12s ease;
+}
+
+.game-option:active {
+  transform: scale(0.95);
+}
+
+.game-option.wrong {
+  background: #FFE0E0;
+}
+
+/* 答错抖动 */
+.shake {
+  animation: shake 0.4s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-6px); }
+  80% { transform: translateX(6px); }
+}
+
+/* ============ 星奖励弹层 ============ */
+.reward-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  animation: fade-in 0.25s ease;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.reward-card {
+  background: #fff;
+  border-radius: 32px;
+  padding: 36px 44px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+}
+
+.reward-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--pink);
+}
+
+.reward-stars {
+  display: flex;
+  gap: 8px;
+}
+
+.reward-star {
+  font-size: 56px;
+  transform: scale(0);
+  animation: pop 0.4s ease forwards;
+}
+
+.reward-star.empty {
+  opacity: 0.4;
+}
+
+@keyframes pop {
+  0% { transform: scale(0); }
+  70% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+
+/* ============ 桌面适配 ============ */
+@media (min-width: 600px) {
+  .theme-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
