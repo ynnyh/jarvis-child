@@ -29,19 +29,11 @@ const RATE = '-10%';
 
 const FORCE = process.argv.includes('--force');
 
-const { THEMES, ALL_CHARS } = await import('../src/data/characters.js');
-
-// 代码里用到的反馈语（Learn/Game 页面）。集中在这里，方便和 UI 保持一致。
-const FEEDBACK = ['太棒啦', '对啦', '再试试'];
+// 待朗读文本由内容合并管线（build-content.mjs）统一算好：主题名 + 字 + 组词 + 例句 + 反馈语。
+const { AUDIO_TEXTS } = await import('../src/data/content.generated.js');
 
 // 收集所有需要朗读的文本，去重。
-const texts = new Set();
-for (const t of THEMES) texts.add(t.name);
-for (const c of ALL_CHARS) {
-  texts.add(c.char);
-  for (const w of c.words) texts.add(w);
-}
-for (const f of FEEDBACK) texts.add(f);
+const texts = new Set(AUDIO_TEXTS);
 
 // 文本 -> 稳定短文件名（sha1 前 12 位），避免中文/长词做文件名的跨平台隐患。
 function fileIdFor(text) {

@@ -8,13 +8,18 @@
     "build": "vite build",
     "preview": "vite preview",
     "extract-chars": "node scripts/extract-char-data.mjs",
-    "generate-audio": "node scripts/generate-audio.mjs"
+    "generate-audio": "node scripts/generate-audio.mjs",
+    "gen-linguistic": "node scripts/export-charlist.mjs && python scripts/gen-linguistic.py",
+    "validate-curriculum": "node scripts/validate-curriculum.mjs",
+    "build-content": "node scripts/build-content.mjs"
   },
   "dependencies": {
+    "framer-motion": "^12.42.2",
     "hanzi-writer": "^3.5.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.26.2"
+    "react-router-dom": "^6.26.2",
+    "zustand": "^5.0.14"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.1",

@@ -1,0 +1,72 @@
+/* 设计令牌：全局设计系统的单一数据源。
+ * 所有颜色/圆角/间距/字号/阴影/动效时长都在这里定义，组件只引用变量，
+ * 保证视觉一致（这是「不简陋」的地基）。改一处即可全局调整风格。 */
+
+:root {
+  /* ---- 主题色（五大主题各一色，与 curriculum 对应）---- */
+  --c-first: #ff8fb1; /* 我的第一课 · 珊瑚粉 */
+  --c-nature: #5cc9a7; /* 大自然 · 薄荷绿 */
+  --c-myself: #6fa8ff; /* 我自己 · 天蓝 */
+  --c-things: #ffb454; /* 万物 · 暖橙 */
+  --c-life: #c08cff; /* 我的生活 · 葡萄紫 */
+
+  /* ---- 品牌与功能色 ---- */
+  --c-brand: #fd9d2b; /* 主品牌 · 暖黄橙 */
+  --c-brand-deep: #f57c1f;
+  --c-accent: #ffd166; /* 点缀 · 明黄（星星/金币）*/
+  --c-success: #4caf7d;
+  --c-error: #ff6b6b;
+  --c-ink: #3a3a4a; /* 主文字 · 墨色 */
+  --c-ink-soft: #6b6b7b; /* 次要文字 */
+  --c-paper: #fffaf2; /* 页面底色 · 暖纸白 */
+  --c-card: #ffffff;
+  --c-line: #f0e6da; /* 分隔线/描边 */
+
+  /* ---- 圆角 ---- */
+  --r-sm: 12px;
+  --r-md: 18px;
+  --r-lg: 24px;
+  --r-xl: 32px;
+  --r-pill: 999px;
+
+  /* ---- 间距（4 的倍数）---- */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 48px;
+  --s-8: 64px;
+
+  /* ---- 字号 ---- */
+  --f-xs: 13px;
+  --f-sm: 15px;
+  --f-md: 18px;
+  --f-lg: 24px;
+  --f-xl: 32px;
+  --f-2xl: 48px;
+  --f-huge: 96px; /* 学习页的大字 */
+
+  /* ---- 字体：优先圆体，回退系统无衬线 ---- */
+  --font-round: 'Baloo 2', ' M PLUS Rounded 1c', 'PingFang SC', 'Microsoft YaHei',
+    'Nunito', system-ui, -apple-system, sans-serif;
+
+  /* ---- 阴影（厚、软，卡通感）---- */
+  --sh-sm: 0 2px 8px rgba(120, 90, 40, 0.08);
+  --sh-md: 0 6px 18px rgba(120, 90, 40, 0.12);
+  --sh-lg: 0 12px 32px rgba(120, 90, 40, 0.16);
+  --sh-btn: 0 4px 0; /* 配合具体颜色用作按钮底部厚边 */
+
+  /* ---- 动效时长/缓动 ---- */
+  --t-fast: 0.15s;
+  --t-mid: 0.28s;
+  --t-slow: 0.5s;
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1); /* 回弹，卡通感 */
+  --ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ---- 层级 ---- */
+  --z-nav: 100;
+  --z-overlay: 900;
+  --z-toast: 1000;
+}

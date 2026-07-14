@@ -11,8 +11,8 @@ import { createRequire } from 'node:module';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const require = createRequire(import.meta.url);
 
-// 从字库数据里读出需要的字列表。characters.js 是 ESM，直接 import。
-const { CHAR_LIST } = await import('../src/data/characters.js');
+// 从字库数据里读出需要的字列表。content.generated.js 由 build-content 生成，是 ESM，直接 import。
+const { CHAR_LIST } = await import('../src/data/content.generated.js');
 
 // 定位 hanzi-writer-data 包目录。
 const dataPkgJson = require.resolve('hanzi-writer-data/package.json');

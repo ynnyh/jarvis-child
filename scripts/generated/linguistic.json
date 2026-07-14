@@ -1,0 +1,2211 @@
+{
+  "一": {
+    "pinyin": "yī",
+    "components": [
+      "一"
+    ]
+  },
+  "二": {
+    "pinyin": "èr",
+    "components": [
+      "一",
+      "一"
+    ]
+  },
+  "三": {
+    "pinyin": "sān",
+    "components": [
+      "一",
+      "二"
+    ]
+  },
+  "四": {
+    "pinyin": "sì",
+    "components": [
+      "囗",
+      "儿"
+    ]
+  },
+  "五": {
+    "pinyin": "wǔ",
+    "components": [
+      "二",
+      "丨",
+      "㇆"
+    ]
+  },
+  "六": {
+    "pinyin": "liù",
+    "components": [
+      "亠",
+      "八"
+    ]
+  },
+  "七": {
+    "pinyin": "qī",
+    "components": [
+      "一",
+      "乚"
+    ]
+  },
+  "八": {
+    "pinyin": "bā",
+    "components": [
+      "丿",
+      "乁"
+    ]
+  },
+  "九": {
+    "pinyin": "jiǔ",
+    "components": [
+      "丿",
+      "乙"
+    ]
+  },
+  "十": {
+    "pinyin": "shí",
+    "components": [
+      "一",
+      "丨"
+    ]
+  },
+  "零": {
+    "pinyin": "líng",
+    "components": [
+      "雨",
+      "令"
+    ]
+  },
+  "百": {
+    "pinyin": "bǎi",
+    "components": [
+      "一",
+      "白"
+    ]
+  },
+  "千": {
+    "pinyin": "qiān",
+    "components": [
+      "丿",
+      "十"
+    ]
+  },
+  "万": {
+    "pinyin": "wàn",
+    "components": [
+      "一",
+      "勹"
+    ]
+  },
+  "半": {
+    "pinyin": "bàn",
+    "components": [
+      "丷",
+      "一",
+      "十"
+    ]
+  },
+  "双": {
+    "pinyin": "shuāng",
+    "components": [
+      "又",
+      "又"
+    ]
+  },
+  "两": {
+    "pinyin": "liǎng",
+    "components": [
+      "一",
+      "冂",
+      "丨",
+      "人",
+      "人"
+    ]
+  },
+  "个": {
+    "pinyin": "gè",
+    "components": [
+      "人",
+      "丨"
+    ]
+  },
+  "第": {
+    "pinyin": "dì",
+    "components": [
+      "竹",
+      "弔",
+      "丿"
+    ]
+  },
+  "名": {
+    "pinyin": "míng",
+    "components": [
+      "夕",
+      "口"
+    ]
+  },
+  "上": {
+    "pinyin": "shàng",
+    "components": [
+      "一",
+      "丨",
+      "一"
+    ]
+  },
+  "下": {
+    "pinyin": "xià",
+    "components": [
+      "一",
+      "卜"
+    ]
+  },
+  "左": {
+    "pinyin": "zuǒ",
+    "components": [
+      "一",
+      "丿",
+      "工"
+    ]
+  },
+  "右": {
+    "pinyin": "yòu",
+    "components": [
+      "一",
+      "丿",
+      "口"
+    ]
+  },
+  "前": {
+    "pinyin": "qián",
+    "components": [
+      "丷",
+      "一",
+      "肉",
+      "刀"
+    ]
+  },
+  "后": {
+    "pinyin": "hòu",
+    "components": [
+      "厂",
+      "一",
+      "口"
+    ]
+  },
+  "中": {
+    "pinyin": "zhōng",
+    "components": [
+      "口",
+      "丨"
+    ]
+  },
+  "里": {
+    "pinyin": "lǐ",
+    "components": [
+      "甲",
+      "二"
+    ]
+  },
+  "外": {
+    "pinyin": "wài",
+    "components": [
+      "夕",
+      "卜"
+    ]
+  },
+  "边": {
+    "pinyin": "biān",
+    "components": [
+      "辵",
+      "力"
+    ]
+  },
+  "大": {
+    "pinyin": "dà",
+    "components": [
+      "人",
+      "一"
+    ]
+  },
+  "小": {
+    "pinyin": "xiǎo",
+    "components": [
+      "八",
+      "亅"
+    ]
+  },
+  "多": {
+    "pinyin": "duō",
+    "components": [
+      "夕",
+      "夕"
+    ]
+  },
+  "少": {
+    "pinyin": "shǎo",
+    "components": [
+      "小",
+      "丿"
+    ]
+  },
+  "长": {
+    "pinyin": "zhǎng",
+    "components": [
+      "长"
+    ]
+  },
+  "短": {
+    "pinyin": "duǎn",
+    "components": [
+      "矢",
+      "豆"
+    ]
+  },
+  "高": {
+    "pinyin": "gāo",
+    "components": [
+      "亠",
+      "口",
+      "冂",
+      "口"
+    ]
+  },
+  "矮": {
+    "pinyin": "ǎi",
+    "components": [
+      "矢",
+      "委"
+    ]
+  },
+  "宽": {
+    "pinyin": "kuān",
+    "components": [
+      "宀",
+      "草",
+      "见"
+    ]
+  },
+  "窄": {
+    "pinyin": "zhǎi",
+    "components": [
+      "穴",
+      "乍"
+    ]
+  },
+  "圆": {
+    "pinyin": "yuán",
+    "components": [
+      "囗",
+      "员"
+    ]
+  },
+  "方": {
+    "pinyin": "fāng",
+    "components": [
+      "亠",
+      "勹"
+    ]
+  },
+  "尖": {
+    "pinyin": "jiān",
+    "components": [
+      "小",
+      "大"
+    ]
+  },
+  "平": {
+    "pinyin": "píng",
+    "components": [
+      "干",
+      "丷"
+    ]
+  },
+  "直": {
+    "pinyin": "zhí",
+    "components": [
+      "十",
+      "目",
+      "丨",
+      "一"
+    ]
+  },
+  "弯": {
+    "pinyin": "wān",
+    "components": [
+      "亦",
+      "弓"
+    ]
+  },
+  "厚": {
+    "pinyin": "hòu",
+    "components": [
+      "厂",
+      "日",
+      "子"
+    ]
+  },
+  "薄": {
+    "pinyin": "báo",
+    "components": [
+      "草",
+      "水",
+      "甫",
+      "寸"
+    ]
+  },
+  "粗": {
+    "pinyin": "cū",
+    "components": [
+      "米",
+      "且"
+    ]
+  },
+  "细": {
+    "pinyin": "xì",
+    "components": [
+      "丝",
+      "田"
+    ]
+  },
+  "轻": {
+    "pinyin": "qīng",
+    "components": [
+      "车",
+      "圣"
+    ]
+  },
+  "重": {
+    "pinyin": "zhòng",
+    "components": [
+      "丿",
+      "一",
+      "里"
+    ]
+  },
+  "快": {
+    "pinyin": "kuài",
+    "components": [
+      "心",
+      "夬"
+    ]
+  },
+  "慢": {
+    "pinyin": "màn",
+    "components": [
+      "心",
+      "曼"
+    ]
+  },
+  "新": {
+    "pinyin": "xīn",
+    "components": [
+      "亲",
+      "斤"
+    ]
+  },
+  "旧": {
+    "pinyin": "jiù",
+    "components": [
+      "丨",
+      "日"
+    ]
+  },
+  "空": {
+    "pinyin": "kōng",
+    "components": [
+      "穴",
+      "工"
+    ]
+  },
+  "满": {
+    "pinyin": "mǎn",
+    "components": [
+      "水",
+      "草",
+      "两"
+    ]
+  },
+  "干": {
+    "pinyin": "gàn",
+    "components": [
+      "一",
+      "十"
+    ]
+  },
+  "净": {
+    "pinyin": "jìng",
+    "components": [
+      "冰",
+      "争"
+    ]
+  },
+  "天": {
+    "pinyin": "tiān",
+    "components": [
+      "一",
+      "大"
+    ]
+  },
+  "日": {
+    "pinyin": "rì",
+    "components": [
+      "口",
+      "一"
+    ]
+  },
+  "月": {
+    "pinyin": "yuè",
+    "components": [
+      "冂",
+      "一",
+      "一"
+    ]
+  },
+  "星": {
+    "pinyin": "xīng",
+    "components": [
+      "生",
+      "日"
+    ]
+  },
+  "云": {
+    "pinyin": "yún",
+    "components": [
+      "二",
+      "厶"
+    ]
+  },
+  "风": {
+    "pinyin": "fēng",
+    "components": [
+      "几",
+      "乂"
+    ]
+  },
+  "雨": {
+    "pinyin": "yǔ",
+    "components": [
+      "一",
+      "冂",
+      "丨",
+      "丶",
+      "丶",
+      "丶",
+      "丶"
+    ]
+  },
+  "雪": {
+    "pinyin": "xuě",
+    "components": [
+      "雨",
+      "彐"
+    ]
+  },
+  "光": {
+    "pinyin": "guāng",
+    "components": [
+      "小",
+      "兀"
+    ]
+  },
+  "电": {
+    "pinyin": "diàn",
+    "components": [
+      "日",
+      "乚"
+    ]
+  },
+  "水": {
+    "pinyin": "shuǐ",
+    "components": [
+      "乛",
+      "亅",
+      "丶",
+      "乀"
+    ]
+  },
+  "火": {
+    "pinyin": "huǒ",
+    "components": [
+      "丷",
+      "人"
+    ]
+  },
+  "山": {
+    "pinyin": "shān",
+    "components": [
+      "凵",
+      "丨"
+    ]
+  },
+  "石": {
+    "pinyin": "shí",
+    "components": [
+      "一",
+      "丿",
+      "口"
+    ]
+  },
+  "土": {
+    "pinyin": "tǔ",
+    "components": [
+      "十",
+      "一"
+    ]
+  },
+  "冰": {
+    "pinyin": "bīng",
+    "components": [
+      "冰",
+      "水"
+    ]
+  },
+  "江": {
+    "pinyin": "jiāng",
+    "components": [
+      "水",
+      "工"
+    ]
+  },
+  "河": {
+    "pinyin": "hé",
+    "components": [
+      "水",
+      "可"
+    ]
+  },
+  "海": {
+    "pinyin": "hǎi",
+    "components": [
+      "水",
+      "每"
+    ]
+  },
+  "湖": {
+    "pinyin": "hú",
+    "components": [
+      "水",
+      "胡"
+    ]
+  },
+  "田": {
+    "pinyin": "tián",
+    "components": [
+      "囗",
+      "十"
+    ]
+  },
+  "地": {
+    "pinyin": "dì",
+    "components": [
+      "土",
+      "也"
+    ]
+  },
+  "林": {
+    "pinyin": "lín",
+    "components": [
+      "木",
+      "木"
+    ]
+  },
+  "森": {
+    "pinyin": "sēn",
+    "components": [
+      "木",
+      "木",
+      "木"
+    ]
+  },
+  "木": {
+    "pinyin": "mù",
+    "components": [
+      "十",
+      "人"
+    ]
+  },
+  "竹": {
+    "pinyin": "zhú",
+    "components": [
+      "丿",
+      "一",
+      "丨",
+      "丿",
+      "一",
+      "亅"
+    ]
+  },
+  "树": {
+    "pinyin": "shù",
+    "components": [
+      "木",
+      "又",
+      "寸"
+    ]
+  },
+  "草": {
+    "pinyin": "cǎo",
+    "components": [
+      "草",
+      "早"
+    ]
+  },
+  "花": {
+    "pinyin": "huā",
+    "components": [
+      "草",
+      "化"
+    ]
+  },
+  "叶": {
+    "pinyin": "yè",
+    "components": [
+      "口",
+      "十"
+    ]
+  },
+  "果": {
+    "pinyin": "guǒ",
+    "components": [
+      "日",
+      "木"
+    ]
+  },
+  "瓜": {
+    "pinyin": "guā",
+    "components": [
+      "爪",
+      "一",
+      "丶"
+    ]
+  },
+  "豆": {
+    "pinyin": "dòu",
+    "components": [
+      "一",
+      "口",
+      "丷",
+      "一"
+    ]
+  },
+  "苗": {
+    "pinyin": "miáo",
+    "components": [
+      "草",
+      "田"
+    ]
+  },
+  "根": {
+    "pinyin": "gēn",
+    "components": [
+      "木",
+      "艮"
+    ]
+  },
+  "枝": {
+    "pinyin": "zhī",
+    "components": [
+      "木",
+      "支"
+    ]
+  },
+  "米": {
+    "pinyin": "mǐ",
+    "components": [
+      "丷",
+      "木"
+    ]
+  },
+  "麦": {
+    "pinyin": "mài",
+    "components": [
+      "丰",
+      "夕"
+    ]
+  },
+  "谷": {
+    "pinyin": "gǔ",
+    "components": [
+      "八",
+      "人",
+      "口"
+    ]
+  },
+  "稻": {
+    "pinyin": "dào",
+    "components": [
+      "禾",
+      "舀"
+    ]
+  },
+  "阴": {
+    "pinyin": "yīn",
+    "components": [
+      "阜",
+      "月"
+    ]
+  },
+  "晴": {
+    "pinyin": "qíng",
+    "components": [
+      "日",
+      "青"
+    ]
+  },
+  "暖": {
+    "pinyin": "nuǎn",
+    "components": [
+      "日",
+      "爰"
+    ]
+  },
+  "热": {
+    "pinyin": "rè",
+    "components": [
+      "执",
+      "火"
+    ]
+  },
+  "冷": {
+    "pinyin": "lěng",
+    "components": [
+      "冰",
+      "令"
+    ]
+  },
+  "湿": {
+    "pinyin": "shī",
+    "components": [
+      "水",
+      "显"
+    ]
+  },
+  "春": {
+    "pinyin": "chūn",
+    "components": [
+      "手",
+      "乀",
+      "日"
+    ]
+  },
+  "夏": {
+    "pinyin": "xià",
+    "components": [
+      "一",
+      "自",
+      "夕"
+    ]
+  },
+  "秋": {
+    "pinyin": "qiū",
+    "components": [
+      "禾",
+      "火"
+    ]
+  },
+  "冬": {
+    "pinyin": "dōng",
+    "components": [
+      "夕",
+      "冰"
+    ]
+  },
+  "年": {
+    "pinyin": "nián",
+    "components": [
+      "丿",
+      "丰",
+      "丶"
+    ]
+  },
+  "早": {
+    "pinyin": "zǎo",
+    "components": [
+      "日",
+      "十"
+    ]
+  },
+  "晚": {
+    "pinyin": "wǎn",
+    "components": [
+      "日",
+      "免"
+    ]
+  },
+  "夜": {
+    "pinyin": "yè",
+    "components": [
+      "亠",
+      "人",
+      "夕",
+      "丶"
+    ]
+  },
+  "今": {
+    "pinyin": "jīn",
+    "components": [
+      "人",
+      "丶",
+      "乛"
+    ]
+  },
+  "明": {
+    "pinyin": "míng",
+    "components": [
+      "日",
+      "月"
+    ]
+  },
+  "昨": {
+    "pinyin": "zuó",
+    "components": [
+      "日",
+      "乍"
+    ]
+  },
+  "时": {
+    "pinyin": "shí",
+    "components": [
+      "日",
+      "寸"
+    ]
+  },
+  "分": {
+    "pinyin": "fēn",
+    "components": [
+      "八",
+      "刀"
+    ]
+  },
+  "刻": {
+    "pinyin": "kè",
+    "components": [
+      "亥",
+      "刀"
+    ]
+  },
+  "人": {
+    "pinyin": "rén",
+    "components": [
+      "丿",
+      "乀"
+    ]
+  },
+  "头": {
+    "pinyin": "tóu",
+    "components": [
+      "丶",
+      "丶",
+      "大"
+    ]
+  },
+  "手": {
+    "pinyin": "shǒu",
+    "components": [
+      "丿",
+      "二",
+      "亅"
+    ]
+  },
+  "足": {
+    "pinyin": "zú",
+    "components": [
+      "口",
+      "卜",
+      "人"
+    ]
+  },
+  "口": {
+    "pinyin": "kǒu",
+    "components": [
+      "丨",
+      "乛",
+      "一"
+    ]
+  },
+  "目": {
+    "pinyin": "mù",
+    "components": [
+      "囗",
+      "二"
+    ]
+  },
+  "耳": {
+    "pinyin": "ěr",
+    "components": [
+      "耳"
+    ]
+  },
+  "鼻": {
+    "pinyin": "bí",
+    "components": [
+      "自",
+      "田",
+      "廾"
+    ]
+  },
+  "牙": {
+    "pinyin": "yá",
+    "components": [
+      "丅",
+      "一",
+      "亅",
+      "丿"
+    ]
+  },
+  "舌": {
+    "pinyin": "shé",
+    "components": [
+      "千",
+      "口"
+    ]
+  },
+  "眼": {
+    "pinyin": "yǎn",
+    "components": [
+      "目",
+      "艮"
+    ]
+  },
+  "眉": {
+    "pinyin": "méi",
+    "components": [
+      "尸",
+      "丶",
+      "目"
+    ]
+  },
+  "脸": {
+    "pinyin": "liǎn",
+    "components": [
+      "肉",
+      "佥"
+    ]
+  },
+  "发": {
+    "pinyin": "fā",
+    "components": [
+      "丿",
+      "犮"
+    ]
+  },
+  "身": {
+    "pinyin": "shēn",
+    "components": [
+      "丶",
+      "且",
+      "丿"
+    ]
+  },
+  "心": {
+    "pinyin": "xīn",
+    "components": [
+      "丿",
+      "乚",
+      "丶",
+      "丶"
+    ]
+  },
+  "血": {
+    "pinyin": "xuè",
+    "components": [
+      "丶",
+      "皿"
+    ]
+  },
+  "骨": {
+    "pinyin": "gǔ",
+    "components": [
+      "骨"
+    ]
+  },
+  "肉": {
+    "pinyin": "ròu",
+    "components": [
+      "冂",
+      "人",
+      "人"
+    ]
+  },
+  "皮": {
+    "pinyin": "pí",
+    "components": [
+      "乛",
+      "丿",
+      "丨",
+      "又"
+    ]
+  },
+  "拿": {
+    "pinyin": "ná",
+    "components": [
+      "合",
+      "手"
+    ]
+  },
+  "拍": {
+    "pinyin": "pāi",
+    "components": [
+      "手",
+      "白"
+    ]
+  },
+  "打": {
+    "pinyin": "dǎ",
+    "components": [
+      "手",
+      "丁"
+    ]
+  },
+  "抱": {
+    "pinyin": "bào",
+    "components": [
+      "手",
+      "包"
+    ]
+  },
+  "推": {
+    "pinyin": "tuī",
+    "components": [
+      "手",
+      "隹"
+    ]
+  },
+  "拉": {
+    "pinyin": "lā",
+    "components": [
+      "手",
+      "立"
+    ]
+  },
+  "举": {
+    "pinyin": "jǔ",
+    "components": [
+      "兴",
+      "二",
+      "丨"
+    ]
+  },
+  "提": {
+    "pinyin": "tí",
+    "components": [
+      "手",
+      "是"
+    ]
+  },
+  "抓": {
+    "pinyin": "zhuā",
+    "components": [
+      "手",
+      "爪"
+    ]
+  },
+  "洗": {
+    "pinyin": "xǐ",
+    "components": [
+      "水",
+      "先"
+    ]
+  },
+  "走": {
+    "pinyin": "zǒu",
+    "components": [
+      "十",
+      "疋"
+    ]
+  },
+  "跑": {
+    "pinyin": "pǎo",
+    "components": [
+      "足",
+      "包"
+    ]
+  },
+  "跳": {
+    "pinyin": "tiào",
+    "components": [
+      "足",
+      "兆"
+    ]
+  },
+  "站": {
+    "pinyin": "zhàn",
+    "components": [
+      "立",
+      "占"
+    ]
+  },
+  "坐": {
+    "pinyin": "zuò",
+    "components": [
+      "人",
+      "人",
+      "土"
+    ]
+  },
+  "蹲": {
+    "pinyin": "dūn",
+    "components": [
+      "足",
+      "尊"
+    ]
+  },
+  "爬": {
+    "pinyin": "pá",
+    "components": [
+      "爪",
+      "巴"
+    ]
+  },
+  "踢": {
+    "pinyin": "tī",
+    "components": [
+      "足",
+      "易"
+    ]
+  },
+  "停": {
+    "pinyin": "tíng",
+    "components": [
+      "人",
+      "亭"
+    ]
+  },
+  "动": {
+    "pinyin": "dòng",
+    "components": [
+      "云",
+      "力"
+    ]
+  },
+  "看": {
+    "pinyin": "kàn",
+    "components": [
+      "手",
+      "目"
+    ]
+  },
+  "听": {
+    "pinyin": "tīng",
+    "components": [
+      "口",
+      "斤"
+    ]
+  },
+  "说": {
+    "pinyin": "shuō",
+    "components": [
+      "言",
+      "兑"
+    ]
+  },
+  "读": {
+    "pinyin": "dú",
+    "components": [
+      "言",
+      "卖"
+    ]
+  },
+  "写": {
+    "pinyin": "xiě",
+    "components": [
+      "冖",
+      "与"
+    ]
+  },
+  "吃": {
+    "pinyin": "chī",
+    "components": [
+      "口",
+      "乞"
+    ]
+  },
+  "喝": {
+    "pinyin": "hē",
+    "components": [
+      "口",
+      "曷"
+    ]
+  },
+  "笑": {
+    "pinyin": "xiào",
+    "components": [
+      "竹",
+      "夭"
+    ]
+  },
+  "哭": {
+    "pinyin": "kū",
+    "components": [
+      "口",
+      "口",
+      "犬"
+    ]
+  },
+  "想": {
+    "pinyin": "xiǎng",
+    "components": [
+      "相",
+      "心"
+    ]
+  },
+  "饿": {
+    "pinyin": "è",
+    "components": [
+      "食",
+      "我"
+    ]
+  },
+  "饱": {
+    "pinyin": "bǎo",
+    "components": [
+      "食",
+      "包"
+    ]
+  },
+  "困": {
+    "pinyin": "kùn",
+    "components": [
+      "囗",
+      "木"
+    ]
+  },
+  "累": {
+    "pinyin": "lèi",
+    "components": [
+      "田",
+      "糸"
+    ]
+  },
+  "病": {
+    "pinyin": "bìng",
+    "components": [
+      "病",
+      "丙"
+    ]
+  },
+  "疼": {
+    "pinyin": "téng",
+    "components": [
+      "病",
+      "冬"
+    ]
+  },
+  "乐": {
+    "pinyin": "lè",
+    "components": [
+      "丿",
+      "丨",
+      "木"
+    ]
+  },
+  "怒": {
+    "pinyin": "nù",
+    "components": [
+      "奴",
+      "心"
+    ]
+  },
+  "怕": {
+    "pinyin": "pà",
+    "components": [
+      "心",
+      "白"
+    ]
+  },
+  "爱": {
+    "pinyin": "ài",
+    "components": [
+      "爪",
+      "冖",
+      "友"
+    ]
+  },
+  "猫": {
+    "pinyin": "māo",
+    "components": [
+      "犬",
+      "苗"
+    ]
+  },
+  "狗": {
+    "pinyin": "gǒu",
+    "components": [
+      "犬",
+      "句"
+    ]
+  },
+  "鸟": {
+    "pinyin": "niǎo",
+    "components": [
+      "勹",
+      "丶",
+      "㇉",
+      "一"
+    ]
+  },
+  "鱼": {
+    "pinyin": "yú",
+    "components": [
+      "刀",
+      "田",
+      "一"
+    ]
+  },
+  "马": {
+    "pinyin": "mǎ",
+    "components": [
+      "马"
+    ]
+  },
+  "牛": {
+    "pinyin": "niú",
+    "components": [
+      "丿",
+      "一",
+      "十"
+    ]
+  },
+  "羊": {
+    "pinyin": "yáng",
+    "components": [
+      "丷",
+      "三",
+      "丨"
+    ]
+  },
+  "猪": {
+    "pinyin": "zhū",
+    "components": [
+      "犬",
+      "者"
+    ]
+  },
+  "鸡": {
+    "pinyin": "jī",
+    "components": [
+      "又",
+      "鸟"
+    ]
+  },
+  "鸭": {
+    "pinyin": "yā",
+    "components": [
+      "甲",
+      "鸟"
+    ]
+  },
+  "虎": {
+    "pinyin": "hǔ",
+    "components": [
+      "虎",
+      "儿"
+    ]
+  },
+  "兔": {
+    "pinyin": "tù",
+    "components": [
+      "刀",
+      "口",
+      "丨",
+      "儿",
+      "丶"
+    ]
+  },
+  "龙": {
+    "pinyin": "lóng",
+    "components": [
+      "尤",
+      "丿"
+    ]
+  },
+  "蛇": {
+    "pinyin": "shé",
+    "components": [
+      "虫",
+      "它"
+    ]
+  },
+  "猴": {
+    "pinyin": "hóu",
+    "components": [
+      "犬",
+      "侯"
+    ]
+  },
+  "鼠": {
+    "pinyin": "shǔ",
+    "components": [
+      "臼",
+      "𠄌",
+      "丶",
+      "丶",
+      "𠄌",
+      "丶",
+      "丶",
+      "乀"
+    ]
+  },
+  "象": {
+    "pinyin": "xiàng",
+    "components": [
+      "刀",
+      "口",
+      "丨",
+      "豕"
+    ]
+  },
+  "熊": {
+    "pinyin": "xióng",
+    "components": [
+      "能",
+      "火"
+    ]
+  },
+  "鹿": {
+    "pinyin": "lù",
+    "components": [
+      "广",
+      "乛",
+      "一",
+      "丨",
+      "丨",
+      "比"
+    ]
+  },
+  "虫": {
+    "pinyin": "chóng",
+    "components": [
+      "口",
+      "厶"
+    ]
+  },
+  "饭": {
+    "pinyin": "fàn",
+    "components": [
+      "食",
+      "反"
+    ]
+  },
+  "菜": {
+    "pinyin": "cài",
+    "components": [
+      "草",
+      "采"
+    ]
+  },
+  "面": {
+    "pinyin": "miàn",
+    "components": [
+      "一",
+      "丶",
+      "囬"
+    ]
+  },
+  "汤": {
+    "pinyin": "tāng",
+    "components": [
+      "水",
+      "弓",
+      "丿",
+      "丿"
+    ]
+  },
+  "蛋": {
+    "pinyin": "dàn",
+    "components": [
+      "疋",
+      "虫"
+    ]
+  },
+  "粥": {
+    "pinyin": "zhōu",
+    "components": [
+      "弓",
+      "米",
+      "弓"
+    ]
+  },
+  "茶": {
+    "pinyin": "chá",
+    "components": [
+      "草",
+      "人",
+      "一",
+      "小"
+    ]
+  },
+  "糖": {
+    "pinyin": "táng",
+    "components": [
+      "米",
+      "唐"
+    ]
+  },
+  "盐": {
+    "pinyin": "yán",
+    "components": [
+      "土",
+      "卜",
+      "皿"
+    ]
+  },
+  "油": {
+    "pinyin": "yóu",
+    "components": [
+      "水",
+      "由"
+    ]
+  },
+  "苹": {
+    "pinyin": "píng",
+    "components": [
+      "草",
+      "平"
+    ]
+  },
+  "桃": {
+    "pinyin": "táo",
+    "components": [
+      "木",
+      "兆"
+    ]
+  },
+  "梨": {
+    "pinyin": "lí",
+    "components": [
+      "利",
+      "木"
+    ]
+  },
+  "橘": {
+    "pinyin": "jú",
+    "components": [
+      "木",
+      "矞"
+    ]
+  },
+  "蕉": {
+    "pinyin": "jiāo",
+    "components": [
+      "草",
+      "焦"
+    ]
+  },
+  "枣": {
+    "pinyin": "zǎo",
+    "components": [
+      "朿",
+      "冰"
+    ]
+  },
+  "杏": {
+    "pinyin": "xìng",
+    "components": [
+      "木",
+      "口"
+    ]
+  },
+  "葡": {
+    "pinyin": "pú",
+    "components": [
+      "草",
+      "匍"
+    ]
+  },
+  "萄": {
+    "pinyin": "táo",
+    "components": [
+      "草",
+      "匋"
+    ]
+  },
+  "橙": {
+    "pinyin": "chéng",
+    "components": [
+      "木",
+      "登"
+    ]
+  },
+  "门": {
+    "pinyin": "mén",
+    "components": [
+      "丶",
+      "丨",
+      "㇆"
+    ]
+  },
+  "窗": {
+    "pinyin": "chuāng",
+    "components": [
+      "穴",
+      "囱"
+    ]
+  },
+  "桌": {
+    "pinyin": "zhuō",
+    "components": [
+      "木",
+      "卜",
+      "日"
+    ]
+  },
+  "椅": {
+    "pinyin": "yǐ",
+    "components": [
+      "木",
+      "奇"
+    ]
+  },
+  "床": {
+    "pinyin": "chuáng",
+    "components": [
+      "广",
+      "木"
+    ]
+  },
+  "灯": {
+    "pinyin": "dēng",
+    "components": [
+      "火",
+      "丁"
+    ]
+  },
+  "杯": {
+    "pinyin": "bēi",
+    "components": [
+      "木",
+      "不"
+    ]
+  },
+  "碗": {
+    "pinyin": "wǎn",
+    "components": [
+      "石",
+      "宛"
+    ]
+  },
+  "筷": {
+    "pinyin": "kuài",
+    "components": [
+      "竹",
+      "快"
+    ]
+  },
+  "勺": {
+    "pinyin": "sháo",
+    "components": [
+      "勹",
+      "丶"
+    ]
+  },
+  "车": {
+    "pinyin": "chē",
+    "components": [
+      "一",
+      "𠃋",
+      "十"
+    ]
+  },
+  "船": {
+    "pinyin": "chuán",
+    "components": [
+      "舟",
+      "八",
+      "口"
+    ]
+  },
+  "桥": {
+    "pinyin": "qiáo",
+    "components": [
+      "木",
+      "乔"
+    ]
+  },
+  "路": {
+    "pinyin": "lù",
+    "components": [
+      "足",
+      "各"
+    ]
+  },
+  "房": {
+    "pinyin": "fáng",
+    "components": [
+      "戶",
+      "方"
+    ]
+  },
+  "屋": {
+    "pinyin": "wū",
+    "components": [
+      "尸",
+      "至"
+    ]
+  },
+  "伞": {
+    "pinyin": "sǎn",
+    "components": [
+      "人",
+      "丷",
+      "十"
+    ]
+  },
+  "包": {
+    "pinyin": "bāo",
+    "components": [
+      "勹",
+      "己"
+    ]
+  },
+  "书": {
+    "pinyin": "shū",
+    "components": [
+      "㇆",
+      "㇆",
+      "丨",
+      "丶"
+    ]
+  },
+  "笔": {
+    "pinyin": "bǐ",
+    "components": [
+      "竹",
+      "毛"
+    ]
+  },
+  "爸": {
+    "pinyin": "bà",
+    "components": [
+      "父",
+      "巴"
+    ]
+  },
+  "妈": {
+    "pinyin": "mā",
+    "components": [
+      "女",
+      "马"
+    ]
+  },
+  "哥": {
+    "pinyin": "gē",
+    "components": [
+      "可",
+      "可"
+    ]
+  },
+  "姐": {
+    "pinyin": "jiě",
+    "components": [
+      "女",
+      "且"
+    ]
+  },
+  "弟": {
+    "pinyin": "dì",
+    "components": [
+      "丷",
+      "弔",
+      "丿"
+    ]
+  },
+  "妹": {
+    "pinyin": "mèi",
+    "components": [
+      "女",
+      "未"
+    ]
+  },
+  "爷": {
+    "pinyin": "yé",
+    "components": [
+      "父",
+      "卩"
+    ]
+  },
+  "奶": {
+    "pinyin": "nǎi",
+    "components": [
+      "女",
+      "乃"
+    ]
+  },
+  "叔": {
+    "pinyin": "shū",
+    "components": [
+      "上",
+      "小",
+      "又"
+    ]
+  },
+  "姨": {
+    "pinyin": "yí",
+    "components": [
+      "女",
+      "夷"
+    ]
+  },
+  "你": {
+    "pinyin": "nǐ",
+    "components": [
+      "人",
+      "尔"
+    ]
+  },
+  "我": {
+    "pinyin": "wǒ",
+    "components": [
+      "手",
+      "戈"
+    ]
+  },
+  "他": {
+    "pinyin": "tā",
+    "components": [
+      "人",
+      "也"
+    ]
+  },
+  "她": {
+    "pinyin": "tā",
+    "components": [
+      "女",
+      "也"
+    ]
+  },
+  "们": {
+    "pinyin": "men",
+    "components": [
+      "人",
+      "门"
+    ]
+  },
+  "谁": {
+    "pinyin": "shuí",
+    "components": [
+      "言",
+      "隹"
+    ]
+  },
+  "家": {
+    "pinyin": "jiā",
+    "components": [
+      "宀",
+      "豕"
+    ]
+  },
+  "朋": {
+    "pinyin": "péng",
+    "components": [
+      "月",
+      "月"
+    ]
+  },
+  "友": {
+    "pinyin": "yǒu",
+    "components": [
+      "一",
+      "丿",
+      "又"
+    ]
+  },
+  "客": {
+    "pinyin": "kè",
+    "components": [
+      "宀",
+      "各"
+    ]
+  },
+  "红": {
+    "pinyin": "hóng",
+    "components": [
+      "丝",
+      "工"
+    ]
+  },
+  "黄": {
+    "pinyin": "huáng",
+    "components": [
+      "艹",
+      "一",
+      "田",
+      "八"
+    ]
+  },
+  "蓝": {
+    "pinyin": "lán",
+    "components": [
+      "草",
+      "监"
+    ]
+  },
+  "绿": {
+    "pinyin": "lǜ",
+    "components": [
+      "丝",
+      "录"
+    ]
+  },
+  "白": {
+    "pinyin": "bái",
+    "components": [
+      "丿",
+      "日"
+    ]
+  },
+  "黑": {
+    "pinyin": "hēi",
+    "components": [
+      "口",
+      "丷",
+      "土",
+      "火"
+    ]
+  },
+  "紫": {
+    "pinyin": "zǐ",
+    "components": [
+      "此",
+      "丝"
+    ]
+  },
+  "粉": {
+    "pinyin": "fěn",
+    "components": [
+      "米",
+      "分"
+    ]
+  },
+  "灰": {
+    "pinyin": "huī",
+    "components": [
+      "厂",
+      "火"
+    ]
+  },
+  "青": {
+    "pinyin": "qīng",
+    "components": [
+      "丰",
+      "月"
+    ]
+  },
+  "好": {
+    "pinyin": "hǎo",
+    "components": [
+      "女",
+      "子"
+    ]
+  },
+  "坏": {
+    "pinyin": "huài",
+    "components": [
+      "土",
+      "不"
+    ]
+  },
+  "美": {
+    "pinyin": "měi",
+    "components": [
+      "羊",
+      "大"
+    ]
+  },
+  "丑": {
+    "pinyin": "chǒu",
+    "components": [
+      "㇆",
+      "一",
+      "丨",
+      "一"
+    ]
+  },
+  "香": {
+    "pinyin": "xiāng",
+    "components": [
+      "禾",
+      "日"
+    ]
+  },
+  "臭": {
+    "pinyin": "chòu",
+    "components": [
+      "自",
+      "犬"
+    ]
+  },
+  "甜": {
+    "pinyin": "tián",
+    "components": [
+      "舌",
+      "甘"
+    ]
+  },
+  "苦": {
+    "pinyin": "kǔ",
+    "components": [
+      "草",
+      "古"
+    ]
+  },
+  "酸": {
+    "pinyin": "suān",
+    "components": [
+      "酉",
+      "夋"
+    ]
+  },
+  "辣": {
+    "pinyin": "là",
+    "components": [
+      "辛",
+      "束"
+    ]
+  },
+  "是": {
+    "pinyin": "shì",
+    "components": [
+      "日",
+      "疋"
+    ]
+  },
+  "不": {
+    "pinyin": "bù",
+    "components": [
+      "一",
+      "丿",
+      "丨",
+      "丶"
+    ]
+  },
+  "有": {
+    "pinyin": "yǒu",
+    "components": [
+      "一",
+      "丿",
+      "月"
+    ]
+  },
+  "没": {
+    "pinyin": "méi",
+    "components": [
+      "水",
+      "殳"
+    ]
+  },
+  "要": {
+    "pinyin": "yào",
+    "components": [
+      "西",
+      "女"
+    ]
+  },
+  "会": {
+    "pinyin": "huì",
+    "components": [
+      "人",
+      "云"
+    ]
+  },
+  "能": {
+    "pinyin": "néng",
+    "components": [
+      "厶",
+      "肉",
+      "匕",
+      "匕"
+    ]
+  },
+  "用": {
+    "pinyin": "yòng",
+    "components": [
+      "月",
+      "丨"
+    ]
+  },
+  "做": {
+    "pinyin": "zuò",
+    "components": [
+      "人",
+      "故"
+    ]
+  },
+  "给": {
+    "pinyin": "gěi",
+    "components": [
+      "丝",
+      "合"
+    ]
+  },
+  "来": {
+    "pinyin": "lái",
+    "components": [
+      "一",
+      "米"
+    ]
+  },
+  "去": {
+    "pinyin": "qù",
+    "components": [
+      "土",
+      "厶"
+    ]
+  },
+  "回": {
+    "pinyin": "huí",
+    "components": [
+      "囗",
+      "口"
+    ]
+  },
+  "到": {
+    "pinyin": "dào",
+    "components": [
+      "至",
+      "刀"
+    ]
+  },
+  "开": {
+    "pinyin": "kāi",
+    "components": [
+      "一",
+      "廾"
+    ]
+  },
+  "关": {
+    "pinyin": "guān",
+    "components": [
+      "丷",
+      "天"
+    ]
+  },
+  "进": {
+    "pinyin": "jìn",
+    "components": [
+      "辵",
+      "井"
+    ]
+  },
+  "出": {
+    "pinyin": "chū",
+    "components": [
+      "山",
+      "凵"
+    ]
+  },
+  "找": {
+    "pinyin": "zhǎo",
+    "components": [
+      "手",
+      "戈"
+    ]
+  },
+  "玩": {
+    "pinyin": "wán",
+    "components": [
+      "玉",
+      "元"
+    ]
+  }
+}
