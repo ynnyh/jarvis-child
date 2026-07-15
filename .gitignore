@@ -12,6 +12,9 @@ public/char-data/
 .vite/
 .DS_Store
 
+# 设计参考截图（工作素材，不入库）
+.design-frames/
+
 # 环境变量
 .env
 .env.*

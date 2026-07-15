@@ -10,6 +10,7 @@ import { useSound } from '../hooks/useSound.js';
 import Button from '../components/ui/Button.jsx';
 import StarRating from '../components/ui/StarRating.jsx';
 import PageTransition from '../components/ui/PageTransition.jsx';
+import PlayfulBackground from '../components/PlayfulBackground.jsx';
 
 export default function Lesson() {
   const { lessonId } = useParams();
@@ -46,8 +47,9 @@ export default function Lesson() {
   return (
     <PageTransition>
       <div className="page lesson-page" style={{ '--theme-color': themeColor }}>
+        <PlayfulBackground variant="sky" />
         <header className="sub-header">
-          <button className="btn-back" onClick={() => navigate('/')} aria-label="返回地图">
+          <button className="btn-back" onClick={() => navigate(`/world/${lesson.themeId}`)} aria-label="返回小世界">
             ←
           </button>
           <h2 className="sub-title">

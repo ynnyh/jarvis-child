@@ -69,79 +69,78 @@
       "丨"
     ]
   },
-  "零": {
-    "pinyin": "líng",
+  "娃": {
+    "pinyin": "wá",
     "components": [
-      "雨",
-      "令"
+      "女",
+      "圭"
     ]
   },
-  "百": {
-    "pinyin": "bǎi",
+  "球": {
+    "pinyin": "qiú",
+    "components": [
+      "玉",
+      "求"
+    ]
+  },
+  "积": {
+    "pinyin": "jī",
+    "components": [
+      "禾",
+      "只"
+    ]
+  },
+  "琴": {
+    "pinyin": "qín",
+    "components": [
+      "玉",
+      "玉",
+      "今"
+    ]
+  },
+  "鼓": {
+    "pinyin": "gǔ",
+    "components": [
+      "十",
+      "豆",
+      "支"
+    ]
+  },
+  "衣": {
+    "pinyin": "yī",
+    "components": [
+      "丶",
+      "一",
+      ""
+    ]
+  },
+  "鞋": {
+    "pinyin": "xié",
+    "components": [
+      "革",
+      "圭"
+    ]
+  },
+  "帽": {
+    "pinyin": "mào",
+    "components": [
+      "巾",
+      "冒"
+    ]
+  },
+  "脚": {
+    "pinyin": "jiǎo",
+    "components": [
+      "肉",
+      "却"
+    ]
+  },
+  "画": {
+    "pinyin": "huà",
     "components": [
       "一",
-      "白"
-    ]
-  },
-  "千": {
-    "pinyin": "qiān",
-    "components": [
-      "丿",
-      "十"
-    ]
-  },
-  "万": {
-    "pinyin": "wàn",
-    "components": [
-      "一",
-      "勹"
-    ]
-  },
-  "半": {
-    "pinyin": "bàn",
-    "components": [
-      "丷",
-      "一",
-      "十"
-    ]
-  },
-  "双": {
-    "pinyin": "shuāng",
-    "components": [
-      "又",
-      "又"
-    ]
-  },
-  "两": {
-    "pinyin": "liǎng",
-    "components": [
-      "一",
-      "冂",
-      "丨",
-      "人",
-      "人"
-    ]
-  },
-  "个": {
-    "pinyin": "gè",
-    "components": [
-      "人",
-      "丨"
-    ]
-  },
-  "第": {
-    "pinyin": "dì",
-    "components": [
-      "竹",
-      "弔",
-      "丿"
-    ]
-  },
-  "名": {
-    "pinyin": "míng",
-    "components": [
-      "夕",
-      "口"
+      "由",
+      "凵"
     ]
   },
   "上": {

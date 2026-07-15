@@ -1,6 +1,6 @@
 // 封装 hanzi-writer：支持“笔顺动画演示”和“描红测评”两种模式。
 // 笔画数据从本地 public/char-data/ 加载，完全离线。
-import { useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
+import { useEffect, useRef, useImperativeHandle, forwardRef, useState, useLayoutEffect } from 'react';
 import HanziWriterLib from 'hanzi-writer';
 
 // 从本地抽取的数据加载，避免走网络 CDN。
@@ -23,14 +23,30 @@ const HanziWriterView = forwardRef(function HanziWriterView(
 ) {
   const containerRef = useRef(null);
   const writerRef = useRef(null);
+  // 实际尺寸：不超过请求尺寸，也不超过可用宽度（窄屏手机上自动缩小，避免溢出）。
+  const [actualSize, setActualSize] = useState(size);
 
-  // 创建 writer 实例；char 或 size 变化时重建。
+  // 挂载/窗口变化时测量可用宽度。用外层包裹元素测量，画布用较小值。
+  useLayoutEffect(() => {
+    function measure() {
+      const parent = containerRef.current?.parentElement;
+      if (!parent) return;
+      // 可用宽度：父容器宽度（已含页面 padding），再留 8px 余量。
+      const avail = Math.max(200, Math.min(size, parent.clientWidth - 8));
+      setActualSize(avail);
+    }
+    measure();
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  }, [size]);
+
+  // 创建 writer 实例；char 或尺寸变化时重建。
   useEffect(() => {
     if (!containerRef.current) return;
     containerRef.current.innerHTML = '';
     const writer = HanziWriterLib.create(containerRef.current, char, {
-      width: size,
-      height: size,
+      width: actualSize,
+      height: actualSize,
       padding: 8,
       showCharacter: false,
       showOutline: true,
@@ -46,7 +62,7 @@ const HanziWriterView = forwardRef(function HanziWriterView(
     return () => {
       writerRef.current = null;
     };
-  }, [char, size]);
+  }, [char, actualSize]);
 
   // 暴露命令式方法给父组件调用。
   useImperativeHandle(ref, () => ({
@@ -73,14 +89,15 @@ const HanziWriterView = forwardRef(function HanziWriterView(
     <div
       ref={containerRef}
       style={{
-        width: size,
-        height: size,
+        width: actualSize,
+        height: actualSize,
+        maxWidth: '100%',
         background: '#fff',
         borderRadius: 24,
         // 田字格背景，帮助小朋友定位笔画。
         backgroundImage:
           'linear-gradient(#f0f0f0 1px, transparent 1px), linear-gradient(90deg, #f0f0f0 1px, transparent 1px), linear-gradient(#ffd9e6 1px, transparent 1px), linear-gradient(90deg, #ffd9e6 1px, transparent 1px)',
-        backgroundSize: `${size / 2}px ${size / 2}px, ${size / 2}px ${size / 2}px, 100% 100%, 100% 100%`,
+        backgroundSize: `${actualSize / 2}px ${actualSize / 2}px, ${actualSize / 2}px ${actualSize / 2}px, 100% 100%, 100% 100%`,
         backgroundPosition: 'center',
         boxShadow: '0 6px 20px rgba(0,0,0,0.08)',
       }}

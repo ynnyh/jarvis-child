@@ -19,6 +19,8 @@ import HanziWriter from '../components/HanziWriter.jsx';
 import StarReward from '../components/StarReward.jsx';
 import Xiaomo from '../components/mascot/Xiaomo.jsx';
 import MatchGame from '../components/games/MatchGame.jsx';
+import MascotReaction from '../components/MascotReaction.jsx';
+import PlayfulBackground from '../components/PlayfulBackground.jsx';
 import { syncSoon } from '../api/sync.js';
 
 // Fisher-Yates 洗牌
@@ -87,6 +89,7 @@ export default function GamePlay({ mode = 'lesson' }) {
   const [correct, setCorrect] = useState(0);
   const [wrong, setWrong] = useState(null); // 本题答错标记
   const [finished, setFinished] = useState(false);
+  const [reaction, setReaction] = useState(null); // 小墨反应 'correct'|'wrong'|null
   const answeredRef = useRef(false);
 
   const current = questions[idx];
@@ -116,11 +119,15 @@ export default function GamePlay({ mode = 'lesson' }) {
         setWrong(charForReview ?? true);
         play('wrong');
         speak('再试试');
+        setReaction(null);
+        requestAnimationFrame(() => setReaction('wrong'));
         return; // 答错不推进，允许重试
       }
       answeredRef.current = true;
       setCorrect((n) => n + 1);
       play('correct');
+      setReaction(null);
+      requestAnimationFrame(() => setReaction('correct'));
       reviewChar(current.target.char, true);
       setTimeout(goNext, 650);
     },
@@ -166,6 +173,7 @@ export default function GamePlay({ mode = 'lesson' }) {
 
   return (
     <div className="page game-play" style={{ '--theme-color': isReview ? 'var(--c-brand)' : lesson.themeColor }}>
+      <PlayfulBackground variant="sky" />
       <header className="sub-header">
         <button className="btn-icon" onClick={() => navigate(-1)} aria-label="返回">←</button>
         <div className="game-progress-bar">
@@ -195,6 +203,7 @@ export default function GamePlay({ mode = 'lesson' }) {
           )}
         </motion.div>
       </AnimatePresence>
+      <MascotReaction type={reaction} onHide={() => setReaction(null)} />
     </div>
   );
 }
@@ -286,11 +295,11 @@ function TraceQuestion({ target, onSpeak, onAnswer }) {
         onQuizComplete={() => onAnswer(true, target.char)}
       />
       <div className="q-trace-actions">
-        <button className="ui-btn ui-btn--secondary" onClick={() => { onSpeak(target.char); writerRef.current?.animate(); }}>
+        <button className="ui-btn ui-btn--secondary ui-btn--lg" onClick={() => { onSpeak(target.char); writerRef.current?.animate(); }}>
           👀 看笔顺
         </button>
         {!started && (
-          <button className="ui-btn ui-btn--primary" onClick={() => { setStarted(true); writerRef.current?.startQuiz(); }}>
+          <button className="ui-btn ui-btn--primary ui-btn--lg" onClick={() => { setStarted(true); writerRef.current?.startQuiz(); }}>
             ✍️ 我来描
           </button>
         )}

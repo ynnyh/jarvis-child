@@ -8,6 +8,7 @@
 import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSound } from '../hooks/useSound.js';
+import Confetti from './Confetti.jsx';
 
 export default function Chest({ coins = 10, bonus = null, onOpen }) {
   const [state, setState] = useState('closed'); // closed | shaking | open
@@ -52,6 +53,7 @@ export default function Chest({ coins = 10, bonus = null, onOpen }) {
               animate={{ scale: 1, opacity: 1 }}
               transition={{ type: 'spring', stiffness: 300, damping: 16 }}
             >
+              <Confetti count={32} />
               <div className="chest-burst">✨🎉✨</div>
               <div className="chest-coins">🪙 +{coins}</div>
               {bonus && <div className="chest-bonus">{bonus}</div>}

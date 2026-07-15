@@ -20,6 +20,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const require = createRequire(import.meta.url);
 
 const { CURRICULUM } = await import('./curriculum.mjs');
+const { STORIES } = await import('./stories.mjs');
 
 // --- 1) 读语言学数据（拼音 + 部件）---
 const linguisticPath = join(__dirname, 'generated', 'linguistic.json');
@@ -90,6 +91,7 @@ for (const theme of CURRICULUM) {
       audioTexts.add(char);
       words.forEach((w) => audioTexts.add(w.word));
       if (meta.sentence) audioTexts.add(meta.sentence);
+      if (meta.hint) audioTexts.add(meta.hint); // hint 也要发声（情境导入时朗读）
 
       charsOut.push({
         char,
@@ -116,6 +118,14 @@ for (const theme of CURRICULUM) {
     color: theme.color,
     lessons: lessonsOut,
   });
+}
+
+// --- 4.5) 收集绘本朗读文本（书名 + 每页句子）---
+for (const story of STORIES) {
+  audioTexts.add(story.title);
+  for (const page of story.pages) {
+    if (page.text) audioTexts.add(page.text);
+  }
 }
 
 // --- 5) 生成前端数据文件 ---
@@ -153,6 +163,17 @@ export function getLesson(lessonId) {
 
 export function getChar(char) {
   return ALL_CHARS.find((c) => c.char === char);
+}
+
+// 绘本故事库（原样透传，供绘本阅读页使用）。
+export const STORIES = ${JSON.stringify(STORIES, null, 2)};
+
+export function getStory(storyId) {
+  return STORIES.find((s) => s.id === storyId);
+}
+
+export function getStoryByTheme(themeId) {
+  return STORIES.find((s) => s.themeId === themeId);
 }
 
 // 供 extract-chars 使用：所有需要笔画数据的字。

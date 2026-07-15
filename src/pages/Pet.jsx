@@ -13,6 +13,8 @@ import PageTransition from '../components/ui/PageTransition.jsx';
 import { useGameStore } from '../store/useGameStore.js';
 import { useSound } from '../hooks/useSound.js';
 import { useSpeech } from '../hooks/useSpeech.js';
+import Confetti from '../components/Confetti.jsx';
+import PlayfulBackground from '../components/PlayfulBackground.jsx';
 
 // 食物：价格 + 经验值。价格越高，长得越快。
 const FOODS = [
@@ -75,6 +77,7 @@ export default function Pet() {
 
   return (
     <PageTransition>
+      <PlayfulBackground variant="cozy" />
       <div className="page pet-page">
         <header className="sub-header">
           <button className="btn-icon" onClick={() => navigate('/')} aria-label="返回">←</button>
@@ -146,6 +149,7 @@ export default function Pet() {
             exit={{ opacity: 0 }}
             onClick={() => setLevelUp(false)}
           >
+            <Confetti count={32} />
             <motion.div
               className="reward-card"
               initial={{ scale: 0.6, y: 30 }}

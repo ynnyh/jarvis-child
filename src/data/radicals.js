@@ -1,0 +1,67 @@
+// 常用部首/部件含义小词典（儿童向），供「字理讲解」使用。
+// 只收对孩子有教育意义的部首；纯笔画（一、丿、丶、丨 等）不收，查不到就只展示组字过程。
+// 含常见变体（氵=水、扌=手、艹/草、亻=人、犭=犬、纟/丝、忄=心 等）。
+//
+// 每条：{ meaning: 一句话含义, emoji: 联想图 }
+
+export const RADICALS = {
+  口: { meaning: '像张开的嘴巴，和嘴、说话有关', emoji: '👄' },
+  人: { meaning: '像一个站着的人，和人有关', emoji: '🧍' },
+  亻: { meaning: '“人”的旁边写法，和人有关', emoji: '🧍' },
+  木: { meaning: '像一棵树，和树木、木头有关', emoji: '🌳' },
+  日: { meaning: '像太阳，和太阳、日子有关', emoji: '☀️' },
+  月: { meaning: '像月亮，也常和身体有关', emoji: '🌙' },
+  水: { meaning: '像流动的水，和水有关', emoji: '💧' },
+  氵: { meaning: '“三点水”，和水有关', emoji: '💧' },
+  火: { meaning: '像跳动的火苗，和火、热有关', emoji: '🔥' },
+  灬: { meaning: '“四点底”，也和火、热有关', emoji: '🔥' },
+  手: { meaning: '像一只手，和手的动作有关', emoji: '✋' },
+  扌: { meaning: '“提手旁”，和手的动作有关', emoji: '✋' },
+  女: { meaning: '像温柔的女性，和女性有关', emoji: '👩' },
+  心: { meaning: '像一颗心，和心情、想法有关', emoji: '❤️' },
+  忄: { meaning: '“竖心旁”，和心情有关', emoji: '❤️' },
+  目: { meaning: '像一只眼睛，和看、眼睛有关', emoji: '👁️' },
+  足: { meaning: '像一只脚，和脚、走路有关', emoji: '🦶' },
+  耳: { meaning: '像一只耳朵，和听、耳朵有关', emoji: '👂' },
+  口字旁: { meaning: '和嘴、说话有关', emoji: '👄' },
+  竹: { meaning: '像竹子，和竹子做的东西有关', emoji: '🎋' },
+  艹: { meaning: '“草字头”，和花草植物有关', emoji: '🌿' },
+  草: { meaning: '和花草植物有关', emoji: '🌿' },
+  米: { meaning: '像一粒粒米，和粮食有关', emoji: '🌾' },
+  禾: { meaning: '像一棵稻子，和庄稼有关', emoji: '🌾' },
+  雨: { meaning: '像天上落下的雨，和天气有关', emoji: '🌧️' },
+  虫: { meaning: '像一条小虫，和昆虫、动物有关', emoji: '🐛' },
+  鸟: { meaning: '像一只鸟，和鸟类有关', emoji: '🐦' },
+  马: { meaning: '像一匹马，和马有关', emoji: '🐴' },
+  犬: { meaning: '像一只狗，和动物有关', emoji: '🐶' },
+  犭: { meaning: '“反犬旁”，和动物有关', emoji: '🐶' },
+  言: { meaning: '和说话、语言有关', emoji: '💬' },
+  讠: { meaning: '“言字旁”，和说话有关', emoji: '💬' },
+  食: { meaning: '和吃、食物有关', emoji: '🍚' },
+  饣: { meaning: '“食字旁”，和吃有关', emoji: '🍚' },
+  土: { meaning: '像泥土，和土地有关', emoji: '🟫' },
+  田: { meaning: '像一块田地，和农田有关', emoji: '🌾' },
+  山: { meaning: '像高高的山，和山有关', emoji: '⛰️' },
+  石: { meaning: '像石头，和石头有关', emoji: '🪨' },
+  刀: { meaning: '像一把刀，和切、割有关', emoji: '🔪' },
+  刂: { meaning: '“立刀旁”，和刀有关', emoji: '🔪' },
+  力: { meaning: '像用力的样子，和力气有关', emoji: '💪' },
+  白: { meaning: '和白色、明亮有关', emoji: '⚪' },
+  肉: { meaning: '和身体、肉有关', emoji: '🍖' },
+  宀: { meaning: '“宝盖头”，像屋顶，和房子有关', emoji: '🏠' },
+  穴: { meaning: '像洞穴，和洞、孔有关', emoji: '🕳️' },
+  大: { meaning: '像张开手臂的人，表示大', emoji: '🙆' },
+  小: { meaning: '表示小小的', emoji: '🤏' },
+  子: { meaning: '像小宝宝，和孩子有关', emoji: '👶' },
+  父: { meaning: '和父亲、长辈有关', emoji: '👨' },
+  工: { meaning: '和做工、工具有关', emoji: '🔧' },
+  弓: { meaning: '像一把弓，和弓箭有关', emoji: '🏹' },
+  门: { meaning: '像一扇门，和门有关', emoji: '🚪' },
+  车: { meaning: '像一辆车，和车有关', emoji: '🚗' },
+  金: { meaning: '和金属、钱有关', emoji: '🪙' },
+  钅: { meaning: '“金字旁”，和金属有关', emoji: '🪙' },
+};
+
+export function getRadical(component) {
+  return RADICALS[component] ?? null;
+}

@@ -7,6 +7,9 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { CURRICULUM, ALL_CHARS } from '../data/content.generated.js';
 import { useGameStore } from '../store/useGameStore.js';
+import { useSettings } from '../hooks/useSettings.js';
+import { isBgmEnabled, setBgmEnabled } from '../hooks/useBgm.js';
+import { useSound } from '../hooks/useSound.js';
 import { api, isLoggedIn } from '../api/client.js';
 import {
   syncNow,
@@ -71,8 +74,8 @@ function AuthForm({ onDone }) {
   return (
     <div className="auth-form">
       <div className="auth-tabs">
-        <button className={mode === 'login' ? 'on' : ''} onClick={() => setMode('login')}>登录</button>
-        <button className={mode === 'register' ? 'on' : ''} onClick={() => setMode('register')}>注册</button>
+        <button className={mode === 'login' ? 'active' : ''} onClick={() => setMode('login')}>登录</button>
+        <button className={mode === 'register' ? 'active' : ''} onClick={() => setMode('register')}>注册</button>
       </div>
       <input
         className="auth-input"
@@ -145,6 +148,103 @@ function LocalReport() {
       </div>
       <p className="report-note">共 {ALL_CHARS.length} 字，继续加油！</p>
     </div>
+  );
+}
+
+// ---- 个性化设置面板（护眼模式 / 使用时长 / 声音）----
+// 对标参考图的「个性定制」四宫格：这里做护眼、使用时长、背景音乐、音效四块。
+const TIME_CAP_OPTIONS = [0, 15, 20, 30, 45, 60]; // 每日上限分钟，0=不限
+
+function SettingsPanel() {
+  const sound = useSound();
+  const { eyecare, setEyecare, timeCap, setTimeCap, usageSeconds, resetUsageToday } =
+    useSettings();
+  const [bgm, setBgm] = useState(() => isBgmEnabled());
+  // 音效开关沿用 useSound 的 localStorage（默认开）。
+  const [sfx, setSfx] = useState(() => {
+    try {
+      return localStorage.getItem('jarvis-child-sound') !== 'off';
+    } catch {
+      return true;
+    }
+  });
+
+  const usedMin = Math.floor(usageSeconds / 60);
+
+  return (
+    <section className="parent-settings">
+      <h3 className="report-subtitle">个性设置</h3>
+      <div className="settings-grid">
+        {/* 护眼模式 */}
+        <div className="setting-tile">
+          <span className="setting-icon">🌙</span>
+          <span className="setting-name">护眼模式</span>
+          <button
+            className={`toggle ${eyecare ? 'on' : ''}`}
+            role="switch"
+            aria-checked={eyecare}
+            aria-label="护眼模式"
+            onClick={() => { sound.tap(); setEyecare(!eyecare); }}
+          >
+            <span className="toggle-knob" />
+          </button>
+        </div>
+
+        {/* 背景音乐 */}
+        <div className="setting-tile">
+          <span className="setting-icon">🎵</span>
+          <span className="setting-name">背景音乐</span>
+          <button
+            className={`toggle ${bgm ? 'on' : ''}`}
+            role="switch"
+            aria-checked={bgm}
+            aria-label="背景音乐"
+            onClick={() => { sound.tap(); const v = !bgm; setBgm(v); setBgmEnabled(v); }}
+          >
+            <span className="toggle-knob" />
+          </button>
+        </div>
+
+        {/* 音效 */}
+        <div className="setting-tile">
+          <span className="setting-icon">🔔</span>
+          <span className="setting-name">音效</span>
+          <button
+            className={`toggle ${sfx ? 'on' : ''}`}
+            role="switch"
+            aria-checked={sfx}
+            aria-label="音效"
+            onClick={() => { const v = !sfx; setSfx(v); sound.setEnabled(v); if (v) sound.tap(); }}
+          >
+            <span className="toggle-knob" />
+          </button>
+        </div>
+
+        {/* 使用时长 */}
+        <div className="setting-tile wide">
+          <span className="setting-icon">⏰</span>
+          <span className="setting-name">
+            每日使用时长
+            <span className="setting-sub">今日已用 {usedMin} 分钟</span>
+          </span>
+          <select
+            className="setting-select"
+            value={timeCap}
+            onChange={(e) => { sound.tap(); setTimeCap(Number(e.target.value)); }}
+            aria-label="每日使用时长上限"
+          >
+            {TIME_CAP_OPTIONS.map((m) => (
+              <option key={m} value={m}>{m === 0 ? '不限' : `${m} 分钟`}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+      {timeCap > 0 && usedMin > 0 && (
+        <button className="link-btn" onClick={() => { sound.tap(); resetUsageToday(); }}>
+          重置今日用时
+        </button>
+      )}
+    </section>
   );
 }
 
@@ -232,6 +332,9 @@ export default function Parent() {
 
         {/* 学习报告：始终展示（基于本地进度）。 */}
         <LocalReport />
+
+        {/* 个性化设置：护眼模式 + 使用时长 */}
+        <SettingsPanel />
 
         {/* 账号区 */}
         <section className="parent-account">

@@ -9,6 +9,7 @@
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Xiaomo from './mascot/Xiaomo.jsx';
+import Confetti from './Confetti.jsx';
 
 export default function StarReward({
   stars = 0,
@@ -31,6 +32,7 @@ export default function StarReward({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
     >
+      {stars >= 2 && <Confetti />}
       <motion.div
         className="reward-card"
         initial={{ scale: 0.6, y: 40 }}
@@ -62,7 +64,7 @@ export default function StarReward({
             🪙 +{coins}
           </motion.div>
         )}
-        <button className="ui-btn ui-btn--primary" onClick={onDone}>
+        <button className="ui-btn ui-btn--primary ui-btn--lg" onClick={onDone}>
           继续 →
         </button>
       </motion.div>

@@ -2,6 +2,16 @@
  * 所有颜色/圆角/间距/字号/阴影/动效时长都在这里定义，组件只引用变量，
  * 保证视觉一致（这是「不简陋」的地基）。改一处即可全局调整风格。 */
 
+/* 自托管圆体 Baloo 2（拉丁子集，~33KB），用于 UI 数字/拼音/拉丁 */
+@font-face {
+  font-family: 'Baloo 2';
+  font-style: normal;
+  font-weight: 600 800;
+  font-display: swap;
+  src: url('/fonts/baloo2-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215;
+}
+
 :root {
   /* ---- 主题色（五大主题各一色，与 curriculum 对应）---- */
   --c-first: #ff8fb1; /* 我的第一课 · 珊瑚粉 */
@@ -48,9 +58,12 @@
   --f-2xl: 48px;
   --f-huge: 96px; /* 学习页的大字 */
 
-  /* ---- 字体：优先圆体，回退系统无衬线 ---- */
-  --font-round: 'Baloo 2', ' M PLUS Rounded 1c', 'PingFang SC', 'Microsoft YaHei',
-    'Nunito', system-ui, -apple-system, sans-serif;
+  /* ---- 字体 ---- */
+  /* UI 圆体：拉丁/数字用 Baloo 2（自托管），中文回退系统圆润无衬线 */
+  --font-ui: 'Baloo 2', 'PingFang SC', 'Microsoft YaHei', system-ui, -apple-system, sans-serif;
+  --font-round: var(--font-ui); /* 兼容旧引用 */
+  /* 学习用汉字：楷体，字形标准适合识字 */
+  --font-kai: 'Kaiti SC', 'STKaiti', 'KaiTi', 'PingFang SC', serif;
 
   /* ---- 阴影（厚、软，卡通感）---- */
   --sh-sm: 0 2px 8px rgba(120, 90, 40, 0.08);
