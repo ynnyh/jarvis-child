@@ -11,7 +11,8 @@
     "generate-audio": "node scripts/generate-audio.mjs",
     "gen-linguistic": "node scripts/export-charlist.mjs && python scripts/gen-linguistic.py",
     "validate-curriculum": "node scripts/validate-curriculum.mjs",
-    "build-content": "node scripts/build-content.mjs"
+    "build-content": "node scripts/build-content.mjs",
+    "verify-content": "node scripts/verify-content.mjs"
   },
   "dependencies": {
     "framer-motion": "^12.42.2",

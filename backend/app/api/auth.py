@@ -1,5 +1,6 @@
 # 认证路由：注册、登录。自用场景，用户名+密码即可。
 from fastapi import APIRouter, Depends, HTTPException, Request, status
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -29,7 +30,12 @@ def register(body: RegisterIn, request: Request, db: Session = Depends(get_db)):
         raise HTTPException(status.HTTP_409_CONFLICT, "用户名已被占用")
     user = User(username=body.username, password_hash=hash_password(body.password))
     db.add(user)
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:
+        # 并发注册同名：exists 检查与 commit 之间被别人抢先，唯一约束兜底。
+        db.rollback()
+        raise HTTPException(status.HTTP_409_CONFLICT, "用户名已被占用")
     db.refresh(user)
     return TokenOut(access_token=create_access_token(user.id))
 
