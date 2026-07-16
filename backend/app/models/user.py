@@ -40,6 +40,9 @@ class Profile(Base):
     progress: Mapped[list["Progress"]] = relationship(
         back_populates="profile", cascade="all, delete-orphan"
     )
+    lessons_progress: Mapped[list["LessonRecord"]] = relationship(
+        back_populates="profile", cascade="all, delete-orphan"
+    )
     economy: Mapped["Economy"] = relationship(
         back_populates="profile", cascade="all, delete-orphan", uselist=False
     )
@@ -63,6 +66,21 @@ class Progress(Base):
     reviewed_at: Mapped[float] = mapped_column(Float, default=0.0)
 
     profile: Mapped["Profile"] = relationship(back_populates="progress")
+
+
+class LessonRecord(Base):
+    """每个孩子对每一课的完成情况（星级 + 完成时间）。字进度之外单独存，
+    因为关卡地图的解锁判定依赖课星级，不能由字进度可靠推导。"""
+    __tablename__ = "lesson_progress"
+    __table_args__ = (UniqueConstraint("profile_id", "lesson_id", name="uq_profile_lesson"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    profile_id: Mapped[int] = mapped_column(ForeignKey("profiles.id"), index=True)
+    lesson_id: Mapped[str] = mapped_column(String(64), index=True)
+    stars: Mapped[int] = mapped_column(Integer, default=0)       # 最佳星级 0-3
+    completed_at: Mapped[float] = mapped_column(Float, default=0.0)
+
+    profile: Mapped["Profile"] = relationship(back_populates="lessons_progress")
 
 
 class Economy(Base):

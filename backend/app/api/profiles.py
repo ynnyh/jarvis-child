@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.models.user import User, Profile, Progress, Economy
+from app.models.user import User, Profile, Progress, LessonRecord, Economy
 from app.api.deps import get_current_user, get_owned_profile
 from app import schemas
 
@@ -74,6 +74,23 @@ def sync(
                 row.learned_at = cp.learned_at or row.learned_at
                 row.reviewed_at = cp.reviewed_at or row.reviewed_at
 
+    # 合并每课进度：星级取较大值，完成时间取较新（本地优先）。
+    existing_lessons = {
+        lp.lesson_id: lp
+        for lp in db.query(LessonRecord).filter(LessonRecord.profile_id == profile.id)
+    }
+    for lp in body.lessons:
+        row = existing_lessons.get(lp.lesson_id)
+        if row is None:
+            db.add(LessonRecord(
+                profile_id=profile.id, lesson_id=lp.lesson_id,
+                stars=lp.stars, completed_at=lp.completed_at or 0,
+            ))
+        else:
+            row.stars = max(row.stars, lp.stars)
+            if lp.completed_at and lp.completed_at >= (row.completed_at or 0):
+                row.completed_at = lp.completed_at
+
     # 合并经济：金币取较大值，宠物取较高等级/经验，打卡取较新。
     eco = profile.economy
     if eco is None:
@@ -91,6 +108,7 @@ def sync(
 
     # 回传权威状态。
     rows = db.query(Progress).filter(Progress.profile_id == profile.id).all()
+    lesson_rows = db.query(LessonRecord).filter(LessonRecord.profile_id == profile.id).all()
     return schemas.SyncOut(
         chars=[
             schemas.CharProgress(
@@ -99,7 +117,12 @@ def sync(
             )
             for r in rows
         ],
-        lessons=[],  # 课星级可由字进度推导，首版不单独存
+        lessons=[
+            schemas.LessonProgress(
+                lesson_id=r.lesson_id, stars=r.stars, completed_at=r.completed_at,
+            )
+            for r in lesson_rows
+        ],
         economy=schemas.EconomyState(
             coins=eco.coins, pet_exp=eco.pet_exp, pet_level=eco.pet_level,
             streak_count=eco.streak_count, streak_last_day=eco.streak_last_day,
