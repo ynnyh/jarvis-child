@@ -11,7 +11,7 @@ export const CURRICULUM = [
     id: 'first',
     name: '我的第一课',
     emoji: '🔢',
-    color: '#FF8FB1',
+    color: '#FF6F9F',
     lessons: [
       { id: 'f1', name: '数一数', chars: ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十'] },
       { id: 'f2', name: '玩具和衣服', chars: ['娃', '球', '积', '琴', '鼓', '衣', '鞋', '帽', '脚', '画'] },
@@ -25,7 +25,7 @@ export const CURRICULUM = [
     id: 'nature',
     name: '大自然',
     emoji: '🌳',
-    color: '#5CC9A7',
+    color: '#2FBD8B',
     lessons: [
       { id: 'n1', name: '看天空', chars: ['天', '日', '月', '星', '云', '风', '雨', '雪', '光', '电'] },
       { id: 'n2', name: '水和火', chars: ['水', '火', '山', '石', '土', '冰', '江', '河', '海', '湖'] },
@@ -39,7 +39,7 @@ export const CURRICULUM = [
     id: 'myself',
     name: '我自己',
     emoji: '👀',
-    color: '#6FA8FF',
+    color: '#4B90F5',
     lessons: [
       { id: 'm1', name: '我的脸', chars: ['人', '头', '手', '足', '口', '目', '耳', '鼻', '牙', '舌'] },
       { id: 'm2', name: '我的身体', chars: ['眼', '眉', '脸', '发', '身', '心', '血', '骨', '肉', '皮'] },
@@ -53,7 +53,7 @@ export const CURRICULUM = [
     id: 'things',
     name: '万物',
     emoji: '🐱',
-    color: '#FFB454',
+    color: '#FF9E2C',
     lessons: [
       { id: 't1', name: '小动物', chars: ['猫', '狗', '鸟', '鱼', '马', '牛', '羊', '猪', '鸡', '鸭'] },
       { id: 't2', name: '大动物', chars: ['虎', '兔', '龙', '蛇', '猴', '鼠', '象', '熊', '鹿', '虫'] },
@@ -67,7 +67,7 @@ export const CURRICULUM = [
     id: 'life',
     name: '我的生活',
     emoji: '❤️',
-    color: '#C08CFF',
+    color: '#A86BF5',
     lessons: [
       { id: 'l1', name: '我的家人', chars: ['爸', '妈', '哥', '姐', '弟', '妹', '爷', '奶', '叔', '姨'] },
       { id: 'l2', name: '你我他', chars: ['你', '我', '他', '她', '们', '谁', '家', '朋', '友', '客'] },

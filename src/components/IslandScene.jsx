@@ -22,20 +22,23 @@ function Cloud({ x, y, scale = 1, dur = 14, drift = 30 }) {
       transform={`translate(${x} ${y}) scale(${scale})`}
       opacity="0.95"
     >
-      <ellipse cx="0" cy="0" rx="46" ry="30" fill="#fff" />
-      <ellipse cx="34" cy="8" rx="34" ry="24" fill="#fff" />
-      <ellipse cx="-34" cy="8" rx="30" ry="22" fill="#fff" />
+      <g stroke="#cfe8f5" strokeWidth="2.5">
+        <ellipse cx="0" cy="0" rx="46" ry="30" fill="#fff" />
+        <ellipse cx="34" cy="8" rx="34" ry="24" fill="#fff" />
+        <ellipse cx="-34" cy="8" rx="30" ry="22" fill="#fff" />
+      </g>
       <rect x="-64" y="6" width="128" height="20" rx="10" fill="#fff" />
     </motion.g>
   );
 }
 
-// 棕榈树：弯曲树干 + 几片叶子（纯路径）。
+// 棕榈树：弯曲树干 + 几片叶子（纯路径）。厚涂：深青墨轮廓 + 深浅叶片。
 function Palm({ x, y, scale = 1, flip = false }) {
   return (
     <g transform={`translate(${x} ${y}) scale(${flip ? -scale : scale} ${scale})`}>
-      <path d="M0 0 Q -6 -34 4 -60" stroke="#8a5a3c" strokeWidth="7" fill="none" strokeLinecap="round" />
-      <g fill="#3fae7a">
+      <path d="M0 0 Q -6 -34 4 -60" stroke="#7a4a2c" strokeWidth="8" fill="none" strokeLinecap="round" />
+      <path d="M0 0 Q -6 -34 4 -60" stroke="#a06a42" strokeWidth="4" fill="none" strokeLinecap="round" />
+      <g fill="#39a06f" stroke="#217a52" strokeWidth="2.5" strokeLinejoin="round">
         <path d="M4 -60 Q -26 -74 -46 -60 Q -22 -58 4 -60 Z" />
         <path d="M4 -60 Q 30 -78 52 -62 Q 24 -58 4 -60 Z" />
         <path d="M4 -60 Q -14 -86 -34 -84 Q -8 -70 4 -60 Z" />
@@ -46,13 +49,13 @@ function Palm({ x, y, scale = 1, flip = false }) {
   );
 }
 
-// 一丛小树（学院/森林点缀）。
+// 一丛小树（学院/森林点缀）。厚涂：深青墨轮廓。
 function Bush({ x, y, scale = 1 }) {
   return (
-    <g transform={`translate(${x} ${y}) scale(${scale})`}>
+    <g transform={`translate(${x} ${y}) scale(${scale})`} stroke="#2f8a5c" strokeWidth="2.5" strokeLinejoin="round">
+      <ellipse cx="-16" cy="6" rx="18" ry="16" fill="#43a870" />
+      <ellipse cx="16" cy="6" rx="18" ry="16" fill="#43a870" />
       <ellipse cx="0" cy="0" rx="26" ry="22" fill="#57bd86" />
-      <ellipse cx="-16" cy="6" rx="18" ry="16" fill="#4bb079" />
-      <ellipse cx="16" cy="6" rx="18" ry="16" fill="#4bb079" />
     </g>
   );
 }
@@ -70,25 +73,30 @@ export default function IslandScene({ onEnter, worlds = [] }) {
       >
         <defs>
           <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#9fe0ff" />
-            <stop offset="55%" stopColor="#c8f0ff" />
-            <stop offset="100%" stopColor="#eafaff" />
+            <stop offset="0%" stopColor="#5fb8ee" />
+            <stop offset="45%" stopColor="#8fd4f5" />
+            <stop offset="100%" stopColor="#d8f2fc" />
           </linearGradient>
           <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#5cc6f2" />
-            <stop offset="100%" stopColor="#3aa8e0" />
+            <stop offset="0%" stopColor="#3fa9d6" />
+            <stop offset="55%" stopColor="#2f97c8" />
+            <stop offset="100%" stopColor="#217eb0" />
           </linearGradient>
           <radialGradient id="sun" cx="50%" cy="50%" r="50%">
             <stop offset="0%" stopColor="#fff6c8" />
             <stop offset="60%" stopColor="#ffe37a" />
-            <stop offset="100%" stopColor="#ffd85a" />
+            <stop offset="100%" stopColor="#ffcf4a" />
           </radialGradient>
           <linearGradient id="grass" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#8fe0a0" />
-            <stop offset="100%" stopColor="#5cc47f" />
+            <stop offset="0%" stopColor="#8fe07a" />
+            <stop offset="100%" stopColor="#4fae55" />
+          </linearGradient>
+          <linearGradient id="sand" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#f8e6ad" />
+            <stop offset="100%" stopColor="#e7c877" />
           </linearGradient>
           <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="0" dy="6" stdDeviation="8" floodColor="#2b6b8a" floodOpacity="0.18" />
+            <feDropShadow dx="0" dy="7" stdDeviation="9" floodColor="#1f5b78" floodOpacity="0.26" />
           </filter>
         </defs>
 
@@ -112,21 +120,22 @@ export default function IslandScene({ onEnter, worlds = [] }) {
           <line x1="220" y1="540" x2="300" y2="540" />
         </g>
 
-        {/* 3) 岛屿群 —— 三块主岛（中央大岛 + 左右两岛） */}
+        {/* 3) 岛屿群 —— 三块主岛（中央大岛 + 左右两岛）。
+             厚涂：沙滩渐变 + 深青墨轮廓，草地压深底色描边，做体积。 */}
         {/* 左岛（游乐园） */}
         <g filter="url(#soft)">
-          <ellipse cx="200" cy="470" rx="180" ry="70" fill="#f6e2a8" />
-          <ellipse cx="200" cy="452" rx="158" ry="58" fill="url(#grass)" />
+          <ellipse cx="200" cy="470" rx="180" ry="70" fill="url(#sand)" stroke="#c69a4e" strokeWidth="4" />
+          <ellipse cx="200" cy="452" rx="158" ry="58" fill="url(#grass)" stroke="#3f9147" strokeWidth="4" />
         </g>
         {/* 右岛（学院） */}
         <g filter="url(#soft)">
-          <ellipse cx="820" cy="486" rx="170" ry="66" fill="#f6e2a8" />
-          <ellipse cx="820" cy="468" rx="148" ry="54" fill="url(#grass)" />
+          <ellipse cx="820" cy="486" rx="170" ry="66" fill="url(#sand)" stroke="#c69a4e" strokeWidth="4" />
+          <ellipse cx="820" cy="468" rx="148" ry="54" fill="url(#grass)" stroke="#3f9147" strokeWidth="4" />
         </g>
         {/* 中央大岛（识字塔 + 绘本馆） */}
         <g filter="url(#soft)">
-          <ellipse cx="500" cy="500" rx="300" ry="96" fill="#f6e2a8" />
-          <ellipse cx="500" cy="476" rx="270" ry="80" fill="url(#grass)" />
+          <ellipse cx="500" cy="500" rx="300" ry="96" fill="url(#sand)" stroke="#c69a4e" strokeWidth="4" />
+          <ellipse cx="500" cy="476" rx="270" ry="80" fill="url(#grass)" stroke="#3f9147" strokeWidth="4" />
         </g>
 
         {/* 树木点缀 */}

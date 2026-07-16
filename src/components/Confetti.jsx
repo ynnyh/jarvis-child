@@ -4,7 +4,8 @@
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 
-const COLORS = ['#FF8FB1', '#FFD166', '#5CC9A7', '#6FA8FF', '#C08CFF', '#FFB454'];
+// 撒花配色：与新饱和海岛调色板一致（五主题 + 明黄点缀）。
+const COLORS = ['#ff6f9f', '#ffc636', '#2fbd8b', '#4b90f5', '#a86bf5', '#ff9e2c'];
 const SHAPES = ['🎉', '⭐', '✨', '🌟', '💖', '🎊'];
 
 // 生成 N 个粒子的随机飞散参数。
