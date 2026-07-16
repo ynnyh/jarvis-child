@@ -40,6 +40,11 @@ async function request(path, { method = 'GET', body, auth = true } = {}) {
     body: body != null ? JSON.stringify(body) : undefined,
   });
   if (!res.ok) {
+    // 鉴权请求收到 401：token 已过期/失效，清掉本地 token，让 UI 回到未登录态。
+    // 仅限带 token 的鉴权请求——login/register（auth:false）的 401 是密码错，不该清。
+    if (res.status === 401 && auth && getToken()) {
+      setToken(null);
+    }
     let detail = `HTTP ${res.status}`;
     try {
       const data = await res.json();
