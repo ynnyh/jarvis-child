@@ -19,9 +19,13 @@ export default function Lesson() {
   const { speak } = useSpeech();
   const { play } = useSound();
 
-  const getCharStars = useGameStore((s) => s.getCharStars);
-  const isCharLearned = useGameStore((s) => s.isCharLearned);
-  const getLessonStars = useGameStore((s) => s.getLessonStars);
+  // 订阅底层数据而非 getter 函数：函数引用永不变化，组件不会因进度更新而重渲染，
+  // 之前靠整页导航 remount 才读到新星级（脆）。直接订阅 chars/lessons 后派生。
+  const chars = useGameStore((s) => s.chars);
+  const lessons = useGameStore((s) => s.lessons);
+  const getCharStars = (char) => chars[char]?.stars ?? 0;
+  const isCharLearned = (char) => !!chars[char];
+  const getLessonStars = (id) => lessons[id]?.stars ?? 0;
 
   // 本课在全部课程中的序号，用于“下一课”提示。
   const lessonIndex = useMemo(

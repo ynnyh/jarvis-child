@@ -5,7 +5,7 @@
 //   coins: number       本次开箱的金币数（必给）
 //   bonus?: string       额外奖励文案（如 '🍎 小墨的食物 ×1'），可空
 //   onOpen?: () => void  开箱动画结束、点"收下"后回调（在这里发放奖励）
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSound } from '../hooks/useSound.js';
 import Confetti from './Confetti.jsx';
@@ -13,13 +13,17 @@ import Confetti from './Confetti.jsx';
 export default function Chest({ coins = 10, bonus = null, onOpen }) {
   const [state, setState] = useState('closed'); // closed | shaking | open
   const { play } = useSound();
+  const shakeTimer = useRef(null);
+
+  // 卸载时清掉开箱定时器，避免动画途中关闭浮层后 setState 警告。
+  useEffect(() => () => clearTimeout(shakeTimer.current), []);
 
   const open = useCallback(() => {
     if (state !== 'closed') return;
     setState('shaking');
     play('chest');
     // 抖动一下再打开。
-    setTimeout(() => setState('open'), 600);
+    shakeTimer.current = setTimeout(() => setState('open'), 600);
   }, [state, play]);
 
   return (

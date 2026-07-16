@@ -94,6 +94,10 @@ export default function GamePlay({ mode = 'lesson' }) {
   const answeredRef = useRef(false);
 
   const current = questions[idx];
+  const advanceTimer = useRef(null);
+
+  // 卸载时清掉"答对后推进"定时器，避免离开页面后 setState。
+  useEffect(() => () => clearTimeout(advanceTimer.current), []);
 
   // 进入听音题自动播音。
   useEffect(() => {
@@ -125,12 +129,13 @@ export default function GamePlay({ mode = 'lesson' }) {
         return; // 答错不推进，允许重试
       }
       answeredRef.current = true;
+      setWrong(null); // 清掉本题之前答错的红色高亮
       setCorrect((n) => n + 1);
       play('correct');
       setReaction(null);
       requestAnimationFrame(() => setReaction('correct'));
       reviewChar(current.target.char, true);
-      setTimeout(goNext, 650);
+      advanceTimer.current = setTimeout(goNext, 650);
     },
     [current, goNext, play, speak, reviewChar]
   );
@@ -178,7 +183,7 @@ export default function GamePlay({ mode = 'lesson' }) {
       <header className="sub-header">
         <button className="btn-icon" onClick={() => { play('tap'); navigate(-1); }} aria-label="返回">←</button>
         <div className="game-progress-bar">
-          <div className="game-progress-fill" style={{ width: `${(idx / questions.length) * 100}%` }} />
+          <div className="game-progress-fill" style={{ width: `${((idx + 1) / questions.length) * 100}%` }} />
         </div>
         <span className="game-count">{idx + 1}/{questions.length}</span>
       </header>

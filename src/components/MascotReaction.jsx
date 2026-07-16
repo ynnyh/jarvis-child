@@ -3,7 +3,7 @@
 // props:
 //   type: 'correct' | 'wrong' | null   反应类型（null 不显示）
 //   onHide: () => void                 自动消失回调
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import Xiaomo from './mascot/Xiaomo.jsx';
 
