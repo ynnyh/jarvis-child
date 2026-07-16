@@ -43,8 +43,10 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_DAYS: int = 30  # 自用，给长有效期省得频繁登录
 
-    # CORS：允许前端来源。自用放宽为 *。
-    CORS_ORIGINS: str = "*"
+    # CORS：允许的前端来源。真实前端经 nginx 同源反代 /api，本不触发 CORS；
+    # 这里收紧到实际部署域名，挡掉其他网站的跨站调用。多来源用逗号分隔，
+    # 需要时用环境变量 CORS_ORIGINS 覆盖（仍支持 "*"，仅建议本地开发用）。
+    CORS_ORIGINS: str = "http://111.228.10.230:712"
 
     class Config:
         env_file = ".env"

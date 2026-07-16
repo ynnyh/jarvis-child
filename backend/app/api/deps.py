@@ -19,7 +19,13 @@ def get_current_user(
     sub = decode_token(creds.credentials)
     if sub is None:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "登录已失效")
-    user = db.query(User).filter(User.id == int(sub)).first()
+    # sub 理应是数字 user id 字符串；畸形 token 里可能是任意值，
+    # int() 抛 ValueError 会变成未捕获的 500，这里兜成 401。
+    try:
+        uid = int(sub)
+    except (TypeError, ValueError):
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "登录已失效")
+    user = db.query(User).filter(User.id == uid).first()
     if user is None:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "用户不存在")
     return user

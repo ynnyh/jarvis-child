@@ -8,7 +8,7 @@ from pydantic import BaseModel, Field
 class RegisterIn(BaseModel):
     # 家长账号：用户名 + 密码即可（自用，不强制邮箱/手机）。
     username: str = Field(min_length=2, max_length=40)
-    password: str = Field(min_length=4, max_length=64)
+    password: str = Field(min_length=8, max_length=64)
 
 
 class LoginIn(BaseModel):
