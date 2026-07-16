@@ -51,6 +51,7 @@ function Gate({ onPass }) {
 
 // ---- 登录/注册表单 ----
 function AuthForm({ onDone }) {
+  const sound = useSound();
   const [mode, setMode] = useState('login'); // login | register
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -74,8 +75,8 @@ function AuthForm({ onDone }) {
   return (
     <div className="auth-form">
       <div className="auth-tabs">
-        <button className={mode === 'login' ? 'active' : ''} onClick={() => setMode('login')}>登录</button>
-        <button className={mode === 'register' ? 'active' : ''} onClick={() => setMode('register')}>注册</button>
+        <button className={mode === 'login' ? 'active' : ''} onClick={() => { sound.tap(); setMode('login'); }}>登录</button>
+        <button className={mode === 'register' ? 'active' : ''} onClick={() => { sound.tap(); setMode('register'); }}>注册</button>
       </div>
       <input
         className="auth-input"
@@ -244,11 +245,18 @@ function SettingsPanel() {
           重置今日用时
         </button>
       )}
+      {/* 背景音乐版权署名（CC-BY 4.0 要求标注来源）。 */}
+      <p className="credit-note">
+        背景音乐 “Carefree” · Kevin MacLeod（
+        <a href="https://incompetech.com" target="_blank" rel="noreferrer">incompetech.com</a>
+        ）· 授权 <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC BY 4.0</a>
+      </p>
     </section>
   );
 }
 
 export default function Parent() {
+  const sound = useSound();
   const navigate = useNavigate();
   const [passed, setPassed] = useState(false);
   const [logged, setLogged] = useState(isLoggedIn());
@@ -311,7 +319,7 @@ export default function Parent() {
       <PageTransition>
         <div className="page parent-page">
           <header className="sub-header">
-            <button className="btn-icon" onClick={() => navigate('/')} aria-label="返回">←</button>
+            <button className="btn-icon" onClick={() => { sound.tap(); navigate('/'); }} aria-label="返回">←</button>
             <h2 className="sub-title">家长中心</h2>
             <span style={{ width: 44 }} />
           </header>
@@ -325,7 +333,7 @@ export default function Parent() {
     <PageTransition>
       <div className="page parent-page">
         <header className="sub-header">
-          <button className="btn-icon" onClick={() => navigate('/')} aria-label="返回">←</button>
+          <button className="btn-icon" onClick={() => { sound.tap(); navigate('/'); }} aria-label="返回">←</button>
           <h2 className="sub-title">家长中心</h2>
           <span style={{ width: 44 }} />
         </header>
@@ -347,14 +355,14 @@ export default function Parent() {
                 <span>当前孩子档案：</span>
                 <select
                   value={activeId ?? ''}
-                  onChange={(e) => { setActiveProfileId(Number(e.target.value)); setActiveId(Number(e.target.value)); }}
+                  onChange={(e) => { sound.tap(); setActiveProfileId(Number(e.target.value)); setActiveId(Number(e.target.value)); }}
                 >
                   {profiles.length === 0 && <option value="">（无，请新建）</option>}
                   {profiles.map((p) => (
                     <option key={p.id} value={p.id}>{p.avatar} {p.nickname}</option>
                   ))}
                 </select>
-                <button className="link-btn" onClick={handleCreateProfile}>+ 新建</button>
+                <button className="link-btn" onClick={() => { sound.tap(); handleCreateProfile(); }}>+ 新建</button>
               </div>
               <div className="account-actions">
                 <Button variant="secondary" onClick={handleSync}>☁️ 立即同步</Button>
@@ -370,6 +378,7 @@ export default function Parent() {
           <button
             className="link-btn danger"
             onClick={() => {
+              sound.wrong();
               if (confirm('确定清空本机所有学习进度？此操作不可撤销。')) resetAll();
             }}
           >

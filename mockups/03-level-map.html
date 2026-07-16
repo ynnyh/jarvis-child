@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>关卡地图 · 大自然 — 软3D糖果风 mockup</title>
+
+<!--
+  ============================================================
+  Mockup 03 · 关卡地图（世界内部的关卡路径）
+  ------------------------------------------------------------
+  这是「大自然」世界内的关卡地图，做成一条糖果冒险小径
+  （类 Candy Crush / Duolingo path）：一条蜿蜒的虚线糖果
+  路径串起 6 个饱满光泽的糖果关卡圆盘，左右 zig-zag 排布，
+  竖向滚动。已通关=绿色带金星；当前关=更大 + 呼吸光环 +
+  小墨在旁指引「你在这里」；未解锁=灰化 + 挂锁。
+  主题色 = --c-nature（自然绿）。仅静态展示，直接浏览器打开。
+  ============================================================
+-->
+
+<link rel="stylesheet" href="_candy.css" />
+<style>
+  /* —— 仅本页样式；颜色/质感令牌全部复用 _candy.css —— */
+  body {
+    background: #e8eef5;
+    padding: 40px;
+    display: flex;
+    justify-content: center;
+  }
+
+  /* 本世界主题：自然绿 */
+  .phone { --theme-color: var(--c-nature); }
+
+  /* 世界背景：柔和薄荷天 → 草地绿的糖果氛围 */
+  .worldbg {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(140% 80% at 20% 6%, #eafff6 0%, rgba(234,255,246,0) 55%),
+      radial-gradient(120% 70% at 92% 20%, #d5f6ea 0%, rgba(213,246,234,0) 60%),
+      linear-gradient(180deg, #ecfbf5 0%, #d6f3e8 46%, #c6efdd 100%);
+  }
+  /* 飘浮的软云 / 圆点小装饰 */
+  .cloud {
+    position: absolute; border-radius: var(--r-pill);
+    background: rgba(255,255,255,0.72);
+    filter: blur(0.5px);
+    box-shadow: inset 0 3px 0 rgba(255,255,255,0.9);
+  }
+
+  /* ============ 顶部栏 ============ */
+  .topbar {
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 72px; z-index: 30;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 14px 0;
+    background: linear-gradient(180deg, rgba(236,251,245,0.96) 60%, rgba(236,251,245,0));
+  }
+  .icon-btn {
+    width: var(--tap-min); height: var(--tap-min);
+    border: none; border-radius: 50%; padding: 0; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff;
+    background: linear-gradient(180deg, #fff 0%, #fff 52%, #f2ece2 100%);
+    box-shadow: inset 0 3px 0 rgba(255,255,255,0.95), 0 6px 0 #e6dccb, 0 12px 18px rgba(90,110,90,0.18);
+  }
+  .icon-btn svg { width: 40%; height: 40%; }
+  .icon-btn .chev { stroke: var(--c-ink-soft); }
+
+  .world-title {
+    font-weight: 900; font-size: 22px; color: #2f7a63;
+    letter-spacing: 1px;
+    display: flex; align-items: center; gap: 7px;
+  }
+  .world-title .leaf { width: 22px; height: 22px; }
+
+  .stat-pill { padding: 8px 15px 8px 9px; font-size: 17px; }
+  .stat-pill .star-ic { width: 20px; height: 20px; }
+
+  /* ============ 可滚动地图区 ============ */
+  .map-scroll {
+    position: absolute; top: 72px; left: 0; right: 0; bottom: 78px;
+    overflow-y: auto; overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+  .map-canvas { position: relative; width: 390px; height: 1090px; }
+
+  /* 糖果虚线小径（画在节点之下） */
+  .trail { position: absolute; inset: 0; width: 390px; height: 1090px; z-index: 1; }
+
+  /* ============ 关卡圆盘节点 ============ */
+  .node {
+    position: absolute; z-index: 2;
+    width: 96px; height: 96px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    border: none; cursor: pointer;
+    font-family: var(--font-ui); font-weight: 900;
+    font-size: 42px; color: #fff;
+    text-shadow: 0 2px 3px rgba(20,70,55,0.35);
+    -webkit-user-select: none; user-select: none;
+  }
+
+  /* 已通关：绿色糖果盘（顶部高光 + 底部内暗 + 厚绿底座） */
+  .node--done {
+    background: radial-gradient(122% 108% at 50% 20%,
+      #c6f4e2 0%, var(--theme-color) 52%, #3aa082 100%);
+    box-shadow:
+      var(--gloss-hi),
+      inset 0 -11px 17px rgba(20,80,60,0.24),
+      0 9px 0 #2c8c71,
+      0 18px 26px rgba(40,110,85,0.30);
+  }
+
+  /* 当前关：更大 + 更亮 + 呼吸光环 */
+  .node--current {
+    width: 116px; height: 116px; font-size: 50px;
+    background: radial-gradient(122% 108% at 50% 18%,
+      #d6ffef 0%, #63d6b1 48%, #35a486 100%);
+    box-shadow:
+      var(--gloss-hi),
+      inset 0 -12px 18px rgba(20,80,60,0.22),
+      0 11px 0 #2c8c71,
+      0 22px 32px rgba(40,110,85,0.34);
+  }
+  /* 呼吸光环（在盘后扩散） */
+  .node--current::before {
+    content: ""; position: absolute; inset: 0; border-radius: 50%; z-index: -1;
+    animation: pulsering 2.2s var(--ease-soft) infinite;
+  }
+  @keyframes pulsering {
+    0%   { box-shadow: 0 0 0 0 rgba(92,201,167,0.55); }
+    70%  { box-shadow: 0 0 0 26px rgba(92,201,167,0); }
+    100% { box-shadow: 0 0 0 0 rgba(92,201,167,0); }
+  }
+  /* 当前关底部「开始玩」小三角徽章 */
+  .play-badge {
+    position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%);
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: radial-gradient(120% 100% at 50% 20%, #ffe9a8 0%, var(--c-accent) 60%, #f0b93c 100%);
+    box-shadow: inset 0 2px 0 rgba(255,255,255,0.9), 0 4px 0 #e0a52e, 0 8px 12px rgba(120,90,20,0.28);
+  }
+  .play-badge svg { width: 15px; height: 15px; margin-left: 2px; }
+
+  /* 未解锁：灰化糖果盘 + 挂锁 */
+  .node--locked {
+    background: radial-gradient(122% 108% at 50% 20%,
+      #f2f5f8 0%, #ccd2da 52%, #aab1bc 100%);
+    box-shadow:
+      var(--gloss-hi),
+      inset 0 -11px 16px rgba(60,70,90,0.16),
+      0 8px 0 #969da7,
+      0 14px 20px rgba(70,80,100,0.22);
+    cursor: default;
+  }
+  .node--locked .lock-ic { width: 40px; height: 40px; }
+
+  /* 三金星徽章（已通关，浮在盘上方） */
+  .stars-badge {
+    position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 3px; z-index: 3;
+    filter: drop-shadow(0 3px 3px rgba(90,110,60,0.28));
+  }
+  .stars-badge .star-ic { width: 22px; height: 22px; }
+  .stars-badge .star-ic.mid { width: 27px; height: 27px; margin-top: -5px; }
+
+  /* ============ 起点路牌（顶部装饰） ============ */
+  .signpost {
+    position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+    z-index: 2; width: 96px; height: 96px;
+  }
+
+  /* ============ 小墨 · 当前关向导 ============ */
+  .guide {
+    position: absolute; left: 96px; top: 604px; z-index: 5;
+    width: 78px; display: flex; flex-direction: column; align-items: center; gap: 6px;
+  }
+  .guide .mochi { width: 66px; height: 72px; }
+  .speech {
+    font-weight: 900; font-size: 14px; color: #2f7a63; white-space: nowrap;
+    padding: 6px 12px; border-radius: var(--r-pill);
+    background: #fff;
+    box-shadow: inset 0 2px 0 rgba(255,255,255,0.9), 0 4px 10px rgba(60,110,90,0.2);
+    position: relative;
+  }
+  .speech::after {
+    content: ""; position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%) rotate(45deg);
+    width: 10px; height: 10px; background: #fff; border-radius: 2px;
+  }
+
+  /* ============ 底部导航栏 ============ */
+  .bottomnav {
+    position: absolute; left: 0; right: 0; bottom: 0; z-index: 40;
+    height: 78px;
+    display: flex; justify-content: space-around; align-items: center;
+    padding: 0 8px;
+    background: linear-gradient(180deg, #ffffff 0%, #f4faf7 100%);
+    box-shadow: 0 -6px 20px rgba(60,110,90,0.12), inset 0 2px 0 rgba(255,255,255,0.9);
+    border-radius: 26px 26px 0 0;
+  }
+  .navitem {
+    flex: 1; min-height: var(--tap-min);
+    border: none; background: none; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+    color: var(--c-ink-soft); font-weight: 800; font-size: 12px;
+  }
+  .navitem svg { width: 27px; height: 27px; }
+  .navitem--active { color: #2f7a63; }
+  .navitem--active .nav-ic {
+    background: radial-gradient(120% 100% at 50% 20%, #d6f4e9 0%, #b6ecd7 100%);
+    box-shadow: inset 0 2px 0 rgba(255,255,255,0.9), 0 4px 10px rgba(60,140,105,0.28);
+  }
+  .nav-ic {
+    width: 46px; height: 34px; border-radius: var(--r-pill);
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* 交错弹入 */
+  .popin.d1 { animation-delay: .05s; }
+  .popin.d2 { animation-delay: .15s; }
+  .popin.d3 { animation-delay: .25s; }
+  .popin.d4 { animation-delay: .35s; }
+  .popin.d5 { animation-delay: .45s; }
+  .popin.d6 { animation-delay: .55s; }
+</style>
+</head>
+<body>
+
+<!-- 复用的 SVG 图形定义（金星 / 挂锁 / 图标） -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="goldStar" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffe27a"/>
+      <stop offset="0.55" stop-color="#ffc93c"/>
+      <stop offset="1" stop-color="#f0a91f"/>
+    </linearGradient>
+    <symbol id="star" viewBox="0 0 24 24">
+      <path d="M12 1.6l3.1 6.3 6.9 1-5 4.9 1.2 6.9L12 17.4 5.8 20.6 7 13.7l-5-4.9 6.9-1z"
+            fill="url(#goldStar)" stroke="#e79a12" stroke-width="1" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="lock" viewBox="0 0 24 24">
+      <path d="M7 10V7.5a5 5 0 0 1 10 0V10" fill="none" stroke="#7d8590" stroke-width="2.4" stroke-linecap="round"/>
+      <rect x="4.5" y="10" width="15" height="11" rx="3.4" fill="#8a929d" stroke="#6c7480" stroke-width="1.4"/>
+      <rect x="4.5" y="10" width="15" height="4" rx="2" fill="#9aa2ad"/>
+      <circle cx="12" cy="15" r="1.9" fill="#5f6774"/>
+      <rect x="11.1" y="15.4" width="1.8" height="3.4" rx="0.9" fill="#5f6774"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="phone">
+  <div class="phone__screen">
+    <div class="worldbg">
+      <span class="cloud" style="width:70px;height:22px;top:130px;left:26px;opacity:.8"></span>
+      <span class="cloud" style="width:54px;height:18px;top:360px;right:24px;opacity:.75"></span>
+      <span class="cloud" style="width:60px;height:20px;top:560px;left:18px;opacity:.7"></span>
+    </div>
+
+    <!-- ===== 顶部栏 ===== -->
+    <div class="topbar">
+      <button class="icon-btn" aria-label="返回">
+        <svg viewBox="0 0 24 24" fill="none"><path class="chev" d="M15 5l-7 7 7 7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+
+      <div class="world-title">
+        <svg class="leaf" viewBox="0 0 24 24"><path d="M4 20c0-9 7-16 16-16 0 9-7 16-16 16z" fill="#5cc9a7" stroke="#2f9d7c" stroke-width="1.4"/><path d="M6 18C10 12 14 9 18 7" stroke="#2f9d7c" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+        大自然
+      </div>
+
+      <span class="glass-pill stat-pill">
+        <svg class="star-ic" viewBox="0 0 24 24"><use href="#star"/></svg>
+        24
+      </span>
+    </div>
+
+    <!-- ===== 可滚动关卡地图 ===== -->
+    <div class="map-scroll">
+      <div class="map-canvas">
+
+        <!-- 糖果虚线小径 -->
+        <svg class="trail" viewBox="0 0 390 1090" fill="none" aria-hidden="true">
+          <!-- 底层柔和描边（阴影感） -->
+          <path d="M195 60 C160 100 120 118 120 158
+                   C120 232 270 246 270 318
+                   C270 392 120 406 120 478
+                   C120 558 270 578 270 656
+                   C270 732 120 748 120 818
+                   C120 892 270 900 270 968"
+                stroke="#a9e2cd" stroke-width="18" stroke-linecap="round"/>
+          <!-- 虚线糖果点 -->
+          <path d="M195 60 C160 100 120 118 120 158
+                   C120 232 270 246 270 318
+                   C270 392 120 406 120 478
+                   C270 578 270 656 270 656
+                   C270 732 120 748 120 818
+                   C120 892 270 900 270 968"
+                stroke="#ffffff" stroke-width="8" stroke-linecap="round"
+                stroke-dasharray="1 26" opacity="0.9"/>
+          <!-- 已完成段用金色点点，突出进度到当前关 -->
+          <path d="M195 60 C160 100 120 118 120 158
+                   C120 232 270 246 270 318
+                   C270 392 120 406 120 478
+                   C120 558 270 578 270 656"
+                stroke="#ffcf5c" stroke-width="8" stroke-linecap="round"
+                stroke-dasharray="1 26"/>
+        </svg>
+
+        <!-- 起点路牌 -->
+        <svg class="signpost popin" viewBox="0 0 96 96" aria-hidden="true">
+          <rect x="44" y="40" width="8" height="46" rx="4" fill="#c99a63"/>
+          <rect x="44" y="40" width="4" height="46" rx="2" fill="#e0b782"/>
+          <g transform="rotate(-4 48 30)">
+            <rect x="14" y="14" width="68" height="34" rx="12" fill="#5cc9a7" stroke="#2f9d7c" stroke-width="2"/>
+            <rect x="14" y="14" width="68" height="14" rx="9" fill="#7ad9bb"/>
+            <text x="48" y="38" text-anchor="middle" font-family="'Baloo 2','PingFang SC',sans-serif"
+                  font-size="20" font-weight="900" fill="#fff">出发</text>
+          </g>
+        </svg>
+
+        <!-- 关卡 1 · 已通关 -->
+        <button class="node node--done popin d1" style="left:72px; top:110px;" aria-label="第1关 已通关">
+          <span class="stars-badge">
+            <svg class="star-ic" viewBox="0 0 24 24"><use href="#star"/></svg>
+            <svg class="star-ic mid" viewBox="0 0 24 24"><use href="#star"/></svg>
+            <svg class="star-ic" viewBox="0 0 24 24"><use href="#star"/></svg>
+          </span>
+          1
+        </button>
+
+        <!-- 关卡 2 · 已通关 -->
+        <button class="node node--done popin d2" style="left:222px; top:270px;" aria-label="第2关 已通关">
+          <span class="stars-badge">
+            <svg class="star-ic" viewBox="0 0 24 24"><use href="#star"/></svg>
+            <svg class="star-ic mid" viewBox="0 0 24 24"><use href="#star"/></svg>
+            <svg class="star-ic" viewBox="0 0 24 24"><use href="#star"/></svg>
+          </span>
+          2
+        </button>
+
+        <!-- 关卡 3 · 已通关 -->
+        <button class="node node--done popin d3" style="left:72px; top:430px;" aria-label="第3关 已通关">
+          <span class="stars-badge">
+            <svg class="star-ic" viewBox="0 0 24 24"><use href="#star"/></svg>
+            <svg class="star-ic mid" viewBox="0 0 24 24"><use href="#star"/></svg>
+            <svg class="star-ic" viewBox="0 0 24 24"><use href="#star"/></svg>
+          </span>
+          3
+        </button>
+
+        <!-- 关卡 4 · 当前关 -->
+        <button class="node node--current popin d4" style="left:212px; top:598px;" aria-label="第4关 现在开始">
+          4
+          <span class="play-badge">
+            <svg viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z" fill="#fff"/></svg>
+          </span>
+        </button>
+
+        <!-- 小墨向导 -->
+        <div class="guide">
+          <span class="speech">来玩这一关！</span>
+          <svg class="mochi breathe" viewBox="0 0 72 78" aria-label="小墨">
+            <defs>
+              <radialGradient id="mochiBody" cx="42%" cy="26%" r="80%">
+                <stop offset="0" stop-color="#8f9bd0"/>
+                <stop offset="0.5" stop-color="#5a67a3"/>
+                <stop offset="1" stop-color="#37416f"/>
+              </radialGradient>
+            </defs>
+            <!-- 地面软影 -->
+            <ellipse cx="36" cy="72" rx="20" ry="5" fill="rgba(40,60,50,0.16)"/>
+            <!-- 墨滴身体（顶部尖尖） -->
+            <path d="M36 6 C40 16 44 20 48 26
+                     C58 34 60 48 54 58
+                     C48 68 24 68 18 58
+                     C12 48 14 34 24 26
+                     C28 20 32 16 36 6 Z"
+                  fill="url(#mochiBody)" stroke="#2c3660" stroke-width="2"/>
+            <!-- 顶部高光 -->
+            <path d="M30 22 C34 14 38 14 42 22 C38 20 34 20 30 22 Z" fill="rgba(255,255,255,0.5)"/>
+            <ellipse cx="27" cy="34" rx="6" ry="4" fill="rgba(255,255,255,0.28)"/>
+            <!-- 眼睛 -->
+            <circle cx="29" cy="44" r="6.5" fill="#fff"/>
+            <circle cx="45" cy="44" r="6.5" fill="#fff"/>
+            <circle cx="30" cy="45" r="3.4" fill="#2c3660"/>
+            <circle cx="44" cy="45" r="3.4" fill="#2c3660"/>
+            <circle cx="31.2" cy="43.6" r="1.2" fill="#fff"/>
+            <circle cx="45.2" cy="43.6" r="1.2" fill="#fff"/>
+            <!-- 腮红 -->
+            <ellipse cx="22" cy="52" rx="4" ry="2.6" fill="#ff9db4" opacity="0.8"/>
+            <ellipse cx="51" cy="52" rx="4" ry="2.6" fill="#ff9db4" opacity="0.8"/>
+            <!-- 微笑 -->
+            <path d="M31 54 Q36 59 42 54" stroke="#2c3660" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+          </svg>
+        </div>
+
+        <!-- 关卡 5 · 未解锁 -->
+        <button class="node node--locked popin d5" style="left:72px; top:770px;" aria-label="第5关 未解锁" disabled>
+          <svg class="lock-ic" viewBox="0 0 24 24"><use href="#lock"/></svg>
+        </button>
+
+        <!-- 关卡 6 · 未解锁 -->
+        <button class="node node--locked popin d6" style="left:222px; top:920px;" aria-label="第6关 未解锁" disabled>
+          <svg class="lock-ic" viewBox="0 0 24 24"><use href="#lock"/></svg>
+        </button>
+
+      </div>
+    </div>
+
+    <!-- ===== 底部导航栏 ===== -->
+    <nav class="bottomnav">
+      <button class="navitem navitem--active">
+        <span class="nav-ic">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z" fill="#5cc9a7" stroke="#2f9d7c" stroke-width="1.6"/><circle cx="12" cy="10" r="2.6" fill="#fff"/></svg>
+        </span>
+        地图
+      </button>
+      <button class="navitem">
+        <span class="nav-ic">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 6C9.5 4 5.5 4 3.5 5v13c2-1 6-1 8.5 1 2.5-2 6.5-2 8.5-1V5c-2-1-6-1-8.5 1z" fill="#e4e9ef" stroke="#98a2b0" stroke-width="1.5" stroke-linejoin="round"/><path d="M12 6v14" stroke="#98a2b0" stroke-width="1.5"/></svg>
+        </span>
+        绘本
+      </button>
+      <button class="navitem">
+        <span class="nav-ic">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 3c3 6 8 8 5 15-2 4-8 4-10 0C4 11 9 9 12 3z" fill="#c3cad6" stroke="#98a2b0" stroke-width="1.5"/><circle cx="10" cy="13" r="1.5" fill="#fff"/><circle cx="14" cy="13" r="1.5" fill="#fff"/></svg>
+        </span>
+        小墨
+      </button>
+      <button class="navitem">
+        <span class="nav-ic">
+          <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" fill="#e4e9ef" stroke="#98a2b0" stroke-width="1.5"/><path d="M4.5 20c0-4 3.5-6 7.5-6s7.5 2 7.5 6" fill="#e4e9ef" stroke="#98a2b0" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </span>
+        我的
+      </button>
+    </nav>
+
+  </div>
+</div>
+
+</body>
+</html>

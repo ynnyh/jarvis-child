@@ -21,6 +21,7 @@ import Xiaomo from '../components/mascot/Xiaomo.jsx';
 import MatchGame from '../components/games/MatchGame.jsx';
 import MascotReaction from '../components/MascotReaction.jsx';
 import PlayfulBackground from '../components/PlayfulBackground.jsx';
+import SpeakerButton from '../components/ui/SpeakerButton.jsx';
 import { syncSoon } from '../api/sync.js';
 
 // Fisher-Yates 洗牌
@@ -139,7 +140,7 @@ export default function GamePlay({ mode = 'lesson' }) {
     return (
       <div className="page center-col">
         <p>找不到这一课。</p>
-        <button className="ui-btn ui-btn--primary" onClick={() => navigate('/')}>回首页</button>
+        <button className="ui-btn ui-btn--primary ui-btn--lg" onClick={() => { play('tap'); navigate('/'); }}>🏠 回首页</button>
       </div>
     );
   }
@@ -148,7 +149,7 @@ export default function GamePlay({ mode = 'lesson' }) {
       <div className="page center-col">
         <Xiaomo expression="happy" size={140} />
         <p className="q-tip">今天没有要复习的字，太棒啦！</p>
-        <button className="ui-btn ui-btn--primary" onClick={() => navigate('/')}>回首页</button>
+        <button className="ui-btn ui-btn--primary ui-btn--lg" onClick={() => { play('tap'); navigate('/'); }}>🏠 回首页</button>
       </div>
     );
   }
@@ -175,7 +176,7 @@ export default function GamePlay({ mode = 'lesson' }) {
     <div className="page game-play" style={{ '--theme-color': isReview ? 'var(--c-brand)' : lesson.themeColor }}>
       <PlayfulBackground variant="sky" />
       <header className="sub-header">
-        <button className="btn-icon" onClick={() => navigate(-1)} aria-label="返回">←</button>
+        <button className="btn-icon" onClick={() => { play('tap'); navigate(-1); }} aria-label="返回">←</button>
         <div className="game-progress-bar">
           <div className="game-progress-fill" style={{ width: `${(idx / questions.length) * 100}%` }} />
         </div>
@@ -220,7 +221,7 @@ function Question({ q, pool, lessonChars, wrong, onAnswer, onSpeak, onSound }) {
   }, [target, type, pool]);
 
   if (type === 'trace') {
-    return <TraceQuestion target={target} onSpeak={onSpeak} onAnswer={onAnswer} />;
+    return <TraceQuestion target={target} onSpeak={onSpeak} onAnswer={onAnswer} onSound={onSound} />;
   }
 
   if (type === 'match') {
@@ -238,13 +239,13 @@ function Question({ q, pool, lessonChars, wrong, onAnswer, onSpeak, onSound }) {
 
   // 题干与选项内容随题型变化。
   const prompt = {
-    'listen-pick': { tip: '听一听，选出对的字', head: <SpeakerButton onClick={() => onSpeak(target.char)} /> },
+    'listen-pick': { tip: '听一听，选出对的字', head: <SpeakerButton size="lg" onClick={() => onSpeak(target.char)} /> },
     'pic-pick': { tip: '看图片，选出对的字', head: <div className="q-emoji">{target.emoji}</div> },
     'char-pick': { tip: '看这个字，选出对的图', head: <div className="q-char">{target.char}</div> },
     'find-friend': { tip: `找出「${target.char}」`, head: <div className="q-char small">{target.char}</div> },
   }[type];
 
-  const renderOption = (opt) => {
+  const renderOption = (opt, i) => {
     const isWrong = wrong === opt.char;
     // char-pick 选 emoji，其余选字
     const content = type === 'char-pick' ? opt.emoji : opt.char;
@@ -253,7 +254,10 @@ function Question({ q, pool, lessonChars, wrong, onAnswer, onSpeak, onSound }) {
       <motion.button
         key={opt.char}
         className={`q-option ${isWrong ? 'shake wrong' : ''}`}
-        whileTap={{ scale: 0.94 }}
+        initial={{ opacity: 0, y: 26, scale: 0.7 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ delay: i * 0.06, type: 'spring', stiffness: 320, damping: 16 }}
+        whileTap={{ scale: 0.9 }}
         onClick={() => onAnswer(ok, opt.char)}
       >
         {content}
@@ -272,16 +276,8 @@ function Question({ q, pool, lessonChars, wrong, onAnswer, onSpeak, onSound }) {
   );
 }
 
-function SpeakerButton({ onClick }) {
-  return (
-    <motion.button className="speaker-btn" whileTap={{ scale: 0.92 }} onClick={onClick} aria-label="播放读音">
-      🔊
-    </motion.button>
-  );
-}
-
 // 描红题：用 hanzi-writer 测评，完成即算对。
-function TraceQuestion({ target, onSpeak, onAnswer }) {
+function TraceQuestion({ target, onSpeak, onAnswer, onSound }) {
   const writerRef = useRef(null);
   const [started, setStarted] = useState(false);
 
@@ -295,11 +291,11 @@ function TraceQuestion({ target, onSpeak, onAnswer }) {
         onQuizComplete={() => onAnswer(true, target.char)}
       />
       <div className="q-trace-actions">
-        <button className="ui-btn ui-btn--secondary ui-btn--lg" onClick={() => { onSpeak(target.char); writerRef.current?.animate(); }}>
+        <button className="ui-btn ui-btn--secondary ui-btn--lg" onClick={() => { onSound?.('tap'); onSpeak(target.char); writerRef.current?.animate(); }}>
           👀 看笔顺
         </button>
         {!started && (
-          <button className="ui-btn ui-btn--primary ui-btn--lg" onClick={() => { setStarted(true); writerRef.current?.startQuiz(); }}>
+          <button className="ui-btn ui-btn--primary ui-btn--lg" onClick={() => { onSound?.('tap'); setStarted(true); writerRef.current?.startQuiz(); }}>
             ✍️ 我来描
           </button>
         )}

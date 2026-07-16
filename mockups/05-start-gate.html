@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>05 · 开场「点我开始」欢迎门 — 软3D糖果风 mockup</title>
+<!--
+  ============================================================
+  Mockup 05 · 开场欢迎门（tap-to-start）
+  ------------------------------------------------------------
+  解决「刚打开页面静悄悄、BGM 不响」的问题：浏览器自动播放策略
+  要求必须有一次用户手势才能出声。与其用隐形监听器去赌那一下，
+  不如明摆着放一个会抖动招手的大喇叭，让宝宝主动点——
+  这一点同时解锁 BGM + 全站音效，百分百可靠，且契合幼儿
+  「看见会动的东西就想戳」的天性。
+    · 暖色糖果背景 + 漂浮装饰（不与主角争对比度）
+    · 小墨在场（呼吸），举着「一起玩」的欢迎姿态
+    · C 位一个超大糖果喇叭钮：声波轻闪 + 周期招手抖动
+    · 一行大字提示 + 底部一句轻提示
+  纯视觉、零新增语音文案。点击后整屏果冻缩放淡出，进入首页。
+  ============================================================
+-->
+<link rel="stylesheet" href="_candy.css" />
+<style>
+  body { background: #e8eef5; padding: 40px; display: flex; justify-content: center; }
+
+  /* 开场门铺满整个取景框 */
+  .gate {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 26px;
+    overflow: hidden;
+    /* 暖色糖果氛围底：从顶部暖光到底部奶白 */
+    background:
+      radial-gradient(120% 80% at 50% 0%, #fff3d6 0%, transparent 55%),
+      radial-gradient(100% 70% at 50% 100%, #ffe6f0 0%, transparent 60%),
+      linear-gradient(180deg, #fff6e6 0%, #fff1e2 55%, #ffe9d6 100%);
+  }
+
+  /* ---- 漂浮装饰（置底、不拦点击、不与主角争对比度）---- */
+  .decor { position: absolute; pointer-events: none; opacity: 0.9; }
+  @keyframes floaty { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-12px);} }
+  .fl { animation: floaty 5s ease-in-out infinite; }
+  .fl.a { animation-delay: -1.2s; } .fl.b { animation-delay: -2.4s; }
+  .fl.c { animation-delay: -3.6s; }
+  /* 装饰用糖果小圆点/音符 */
+  .note { font-weight: 900; color: #ffc44d; opacity: 0.55; }
+
+  /* ---- 主内容栈 ---- */
+  .gate__inner {
+    position: relative; z-index: 2;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 22px;
+  }
+
+  /* 小墨（大、呼吸、举手欢迎） */
+  .mo { width: 150px; height: 158px; }
+
+  /* 大字标题 */
+  .gate__title {
+    font-weight: 900; font-size: 30px; color: var(--c-brand-deep);
+    text-shadow: 0 2px 0 rgba(255,255,255,0.9);
+    letter-spacing: 1px; margin: 0;
+  }
+
+  /* ---- C 位超大糖果喇叭钮 ---- */
+  .startbtn {
+    position: relative;
+    width: 150px; height: 150px;
+    border: none; padding: 0; cursor: pointer;
+    border-radius: 50%;
+    background: radial-gradient(120% 100% at 50% 18%, #a5e2ff 0%, #67c7f5 52%, #3a90cf 100%);
+    box-shadow:
+      inset 0 5px 0 rgba(255,255,255,0.75),
+      inset 0 -12px 20px rgba(30,90,140,0.28),
+      0 12px 0 #3a90cf,
+      0 26px 40px rgba(50,120,180,0.4);
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.12s var(--ease-juicy), box-shadow 0.12s var(--ease-juicy);
+    animation: wiggle 3.2s ease-in-out infinite;
+  }
+  .startbtn:active {
+    transform: translateY(9px);
+    box-shadow:
+      inset 0 5px 0 rgba(255,255,255,0.7),
+      inset 0 -12px 20px rgba(30,90,140,0.28),
+      0 3px 0 #3a90cf,
+      0 10px 18px rgba(50,120,180,0.34);
+    animation: none;
+  }
+  .startbtn svg { width: 56%; height: 56%; }
+  /* 周期招手抖动：吸引点按 */
+  @keyframes wiggle {
+    0%, 82%, 100% { transform: rotate(0); }
+    86% { transform: rotate(-8deg); }
+    90% { transform: rotate(8deg); }
+    94% { transform: rotate(-5deg); }
+  }
+  /* 喇叭外扩声波光环 */
+  .halo { position: absolute; inset: 0; border-radius: 50%; pointer-events: none; }
+  .halo::before, .halo::after {
+    content: ""; position: absolute; inset: -6px; border-radius: 50%;
+    border: 4px solid rgba(103,199,245,0.5);
+    animation: ring 2.6s ease-out infinite;
+  }
+  .halo::after { animation-delay: 1.3s; }
+  @keyframes ring {
+    0% { transform: scale(0.9); opacity: 0.75; }
+    100% { transform: scale(1.55); opacity: 0; }
+  }
+  /* 喇叭里的声波弧 */
+  .spk-wave { animation: spkwave 2.2s ease-in-out infinite; transform-origin: left center; }
+  .spk-wave.w2 { animation-delay: 0.3s; }
+  @keyframes spkwave { 0%,100%{opacity:0.4;} 40%{opacity:1;} }
+
+  /* 底部轻提示 pill */
+  .gate__hint {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 20px; border-radius: var(--r-pill);
+    font-weight: 800; font-size: var(--f-md); color: var(--c-ink-soft);
+    background: rgba(255,255,255,0.8);
+    box-shadow: inset 0 2px 0 rgba(255,255,255,0.9), 0 4px 12px rgba(160,120,60,0.16);
+  }
+  .gate__hint .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--c-success); }
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="phone__screen">
+    <div class="gate">
+
+      <!-- 漂浮装饰：糖果音符/圆点，柔和不抢戏 -->
+      <span class="decor fl a note" style="top:12%; left:16%; font-size:30px">♪</span>
+      <span class="decor fl b note" style="top:20%; right:14%; font-size:40px">♫</span>
+      <span class="decor fl c note" style="bottom:22%; left:12%; font-size:26px">♪</span>
+      <svg class="decor fl b" style="top:16%; left:60%;" width="34" height="34" viewBox="0 0 34 34" aria-hidden="true">
+        <circle cx="17" cy="17" r="10" fill="#ffd166" opacity="0.6"/>
+        <circle cx="14" cy="14" r="3" fill="#fff" opacity="0.8"/>
+      </svg>
+      <svg class="decor fl a" style="bottom:16%; right:16%;" width="40" height="40" viewBox="0 0 40 40" aria-hidden="true">
+        <circle cx="20" cy="20" r="12" fill="#ff9ec4" opacity="0.5"/>
+      </svg>
+      <svg class="decor fl c" style="bottom:30%; right:24%;" width="26" height="26" viewBox="0 0 26 26" aria-hidden="true">
+        <circle cx="13" cy="13" r="8" fill="#8fd0ff" opacity="0.55"/>
+      </svg>
+
+      <!-- 主内容 -->
+      <div class="gate__inner">
+
+        <!-- 小墨：举手欢迎、呼吸 -->
+        <svg class="mo breathe" viewBox="0 0 100 106" aria-label="小墨">
+          <defs>
+            <radialGradient id="moBody" cx="42%" cy="28%" r="80%">
+              <stop offset="0" stop-color="#8fb9ff"/>
+              <stop offset="55%" stop-color="#6fa8ff"/>
+              <stop offset="1" stop-color="#4d86e0"/>
+            </radialGradient>
+          </defs>
+          <!-- 地面软影 -->
+          <ellipse cx="50" cy="100" rx="28" ry="6" fill="rgba(60,80,120,0.16)"/>
+          <!-- 举起的小手 -->
+          <ellipse cx="12" cy="42" rx="7" ry="9" fill="#6fa8ff"/>
+          <ellipse cx="88" cy="38" rx="7" ry="9" fill="#6fa8ff"/>
+          <!-- 身体 -->
+          <path d="M50 10 C74 10 87 30 87 54 C87 78 71 92 50 92 C29 92 13 78 13 54 C13 30 26 10 50 10 Z" fill="url(#moBody)"/>
+          <!-- 顶部高光 -->
+          <ellipse cx="40" cy="30" rx="16" ry="11" fill="rgba(255,255,255,0.45)"/>
+          <!-- 眼睛 + 高光 -->
+          <circle cx="39" cy="52" r="8" fill="#2f3850"/>
+          <circle cx="61" cy="52" r="8" fill="#2f3850"/>
+          <circle cx="42" cy="49" r="2.6" fill="#fff"/>
+          <circle cx="64" cy="49" r="2.6" fill="#fff"/>
+          <!-- 腮红 -->
+          <ellipse cx="28" cy="64" rx="6" ry="4" fill="#ff9db3" opacity="0.8"/>
+          <ellipse cx="72" cy="64" rx="6" ry="4" fill="#ff9db3" opacity="0.8"/>
+          <!-- 张嘴笑 -->
+          <path d="M41 65 Q50 74 59 65 Q50 70 41 65 Z" fill="#3a2a3a"/>
+        </svg>
+
+        <h1 class="gate__title">点我，一起玩！</h1>
+
+        <!-- 大糖果喇叭钮 -->
+        <button class="startbtn" aria-label="开始，播放音乐">
+          <span class="halo"></span>
+          <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
+            <path d="M5 12 H10 L17 6 V26 L10 20 H5 Z" fill="#fff"/>
+            <path class="spk-wave" d="M21 10 Q25 16 21 22" stroke="#fff" stroke-width="2.6" stroke-linecap="round" fill="none"/>
+            <path class="spk-wave w2" d="M25 7 Q31 16 25 25" stroke="#fff" stroke-width="2.6" stroke-linecap="round" fill="none"/>
+          </svg>
+        </button>
+
+        <span class="gate__hint"><span class="dot"></span>点一下，音乐和声音就来啦</span>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

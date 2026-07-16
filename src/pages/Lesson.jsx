@@ -32,9 +32,9 @@ export default function Lesson() {
   if (!lesson) {
     return (
       <PageTransition>
-        <div className="page">
+        <div className="page center-col">
           <p>找不到这一课。</p>
-          <Button onClick={() => navigate('/')}>回地图</Button>
+          <Button size="lg" onClick={() => navigate('/')}>🏠 回首页</Button>
         </div>
       </PageTransition>
     );
@@ -49,7 +49,7 @@ export default function Lesson() {
       <div className="page lesson-page" style={{ '--theme-color': themeColor }}>
         <PlayfulBackground variant="sky" />
         <header className="sub-header">
-          <button className="btn-back" onClick={() => navigate(`/world/${lesson.themeId}`)} aria-label="返回小世界">
+          <button className="btn-back" onClick={() => { play('tap'); navigate(`/world/${lesson.themeId}`); }} aria-label="返回小世界">
             ←
           </button>
           <h2 className="sub-title">

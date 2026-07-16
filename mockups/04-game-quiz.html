@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>04 · 游戏答题（听音选字）</title>
+<!--
+  ============================================================
+  屏幕：游戏「答题」· 听一听，选出正确的字
+  ------------------------------------------------------------
+  流程：听音（喇叭球播放「shuǐ」）→ 从 2×2 四个候选糖果格中选字。
+  本稿为「静态演示」，同时展示两种反馈态，方便评审看质感：
+    · 正确态 —— 「水」绿色发光底座 + 白色对勾徽章
+    · 错误态 —— 「火」软红染色 + 轻微摇一摇
+  另两格「木」「土」为中性态。
+  已选中正确答案，故顶部有彩纸庆祝 + 小墨欢呼气泡「答对啦！」。
+  题干区做成独立的「听力舞台」（淡蓝糖果面板），
+  与其他题型（看图/看字）在气质上区分开。
+  软3D糖果风：光泽高光 + 渐变 + 饱满圆润 + 厚彩色底座。
+  ============================================================
+-->
+<link rel="stylesheet" href="_candy.css">
+<style>
+  /* —— 只加页面级样式，令牌全部复用 _candy.css —— */
+  body { background: #e8eef5; padding: 40px; }
+
+  .quiz {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    padding: 20px 20px 28px;
+    /* 暖橙品牌氛围底 */
+    background:
+      radial-gradient(120% 70% at 50% -10%, #fff3e0 0%, transparent 60%),
+      linear-gradient(180deg, #fffaf2 0%, #fff2e2 100%);
+    overflow: hidden;
+  }
+
+  /* ---------- 顶部：返回 + 进度条 + 计数 ---------- */
+  .topbar {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 14px;
+  }
+  .icon-btn {
+    width: 64px; height: 64px; min-height: 64px;
+    padding: 0; border-radius: 50%;
+    background: linear-gradient(180deg, #fff 0%, #fff 55%, #f4ece0 100%);
+    box-shadow: inset 0 3px 0 rgba(255,255,255,0.9), 0 5px 0 #e8dcc9,
+                0 10px 16px rgba(120, 90, 40, 0.16);
+  }
+  .icon-btn svg { width: 40%; height: 40%; }
+
+  /* 糖果进度条：圆润轨道 + 光泽绿填充 + 顶部高光条 */
+  .progress {
+    position: relative; flex: 1; height: 26px;
+    border-radius: var(--r-pill);
+    background: linear-gradient(180deg, #f0e2cf 0%, #fbeed9 100%);
+    box-shadow: inset 0 3px 6px rgba(150,110,50,0.28),
+                inset 0 -2px 0 rgba(255,255,255,0.6);
+  }
+  .progress__fill {
+    position: absolute; top: 0; left: 0; bottom: 0; width: 60%;
+    border-radius: var(--r-pill);
+    background: linear-gradient(180deg,
+      color-mix(in srgb, var(--c-success) 60%, #fff) 0%,
+      var(--c-success) 55%,
+      color-mix(in srgb, var(--c-success) 80%, #000) 100%);
+    box-shadow: inset 0 -4px 8px rgba(0,0,0,0.14),
+                0 2px 6px rgba(60,140,100,0.4);
+  }
+  .progress__fill::after {
+    content: ""; position: absolute; top: 4px; left: 8px; right: 10px; height: 7px;
+    border-radius: var(--r-pill);
+    background: linear-gradient(90deg, rgba(255,255,255,0.85), rgba(255,255,255,0.25));
+  }
+  .count {
+    font-weight: 900; font-size: var(--f-md); color: var(--c-brand-deep);
+    white-space: nowrap;
+  }
+
+  /* ---------- 题干区：听力舞台 ---------- */
+  .stage {
+    position: relative;
+    margin: 6px 2px 0;
+    padding: 22px 20px 26px;
+    border-radius: var(--r-xl);
+    /* 独立的「听力」气质：淡蓝糖果面 */
+    background:
+      radial-gradient(130% 90% at 50% 0%, #ffffff 0%, #e8f4ff 55%, #d5ecff 100%);
+    box-shadow:
+      inset 0 4px 0 rgba(255,255,255,0.95),
+      inset 0 -10px 18px rgba(80,140,210,0.16),
+      0 10px 0 #cfe6fb,
+      0 20px 34px rgba(70,120,180,0.2);
+    text-align: center;
+  }
+  .stage__hint {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-weight: 800; font-size: var(--f-md); color: #3d7fd6;
+    background: rgba(255,255,255,0.85);
+    padding: 5px 16px; border-radius: var(--r-pill);
+    box-shadow: inset 0 2px 0 rgba(255,255,255,0.9), 0 3px 8px rgba(70,120,180,0.18);
+  }
+  .stage__hint b { color: var(--c-brand-deep); font-size: 20px; }
+  .stage__spk {
+    display: flex; justify-content: center; align-items: center;
+    margin-top: 16px;
+  }
+  /* 喇叭球外围声波光环 */
+  .spk-halo { position: relative; }
+  .spk-halo::before, .spk-halo::after {
+    content: ""; position: absolute; inset: -12px; border-radius: 50%;
+    border: 3px solid rgba(103,199,245,0.45);
+    animation: halo 2.4s ease-out infinite;
+  }
+  .spk-halo::after { animation-delay: 1.2s; }
+  @keyframes halo {
+    0% { transform: scale(0.85); opacity: 0.7; }
+    100% { transform: scale(1.5); opacity: 0; }
+  }
+  /* 图片提示小药丸 */
+  .stage__pic {
+    display: inline-flex; align-items: center; gap: 6px;
+    margin-top: 16px;
+    font-weight: 800; font-size: var(--f-sm); color: var(--c-ink-soft);
+    background: rgba(255,255,255,0.9);
+    padding: 5px 14px; border-radius: var(--r-pill);
+    box-shadow: 0 3px 8px rgba(70,120,180,0.16);
+  }
+
+  /* ---------- 答案区：2×2 糖果格 ---------- */
+  .options {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    align-content: center;
+    padding: 8px 2px;
+  }
+  .opt {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    min-height: 64px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 30px;
+    font-family: var(--font-kai);
+    font-size: 72px; font-weight: 900;
+    color: var(--c-ink);
+    cursor: pointer;
+    /* 暖奶白糖果面：顶部高光 + 底部内暗 + 厚底座 */
+    background:
+      radial-gradient(120% 100% at 50% 0%, #fffef9 0%, var(--c-card-warm) 60%, #ffe7cf 100%);
+    box-shadow:
+      inset 0 4px 0 rgba(255,255,255,0.95),
+      inset 0 -9px 16px rgba(210,150,70,0.16),
+      0 9px 0 var(--c-card-warm-edge),
+      0 18px 30px rgba(120,90,40,0.16);
+    transition: transform 0.12s var(--ease-juicy);
+  }
+
+  /* 正确态：绿色发光糖果 */
+  .opt--correct {
+    color: #1f7a52;
+    background:
+      radial-gradient(120% 100% at 50% 0%, #f2fff8 0%, #d5f5e5 58%, #b6ecd0 100%);
+    box-shadow:
+      inset 0 4px 0 rgba(255,255,255,0.95),
+      inset 0 -9px 16px rgba(40,150,100,0.22),
+      0 9px 0 #a4e0c2,
+      0 0 0 4px rgba(76,175,125,0.35),
+      0 14px 30px rgba(60,160,110,0.4);
+    animation: correctPop 0.5s var(--ease-juicy) both;
+  }
+  @keyframes correctPop {
+    0% { transform: scale(1); }
+    45% { transform: scale(1.08); }
+    100% { transform: scale(1); }
+  }
+  /* 错误态：软红染色 + 摇一摇 */
+  .opt--wrong {
+    color: #c94848;
+    background:
+      radial-gradient(120% 100% at 50% 0%, #fff4f4 0%, #ffe0e0 60%, #ffc9c9 100%);
+    box-shadow:
+      inset 0 3px 0 rgba(255,255,255,0.85),
+      inset 0 -8px 14px rgba(200,70,70,0.2),
+      0 6px 0 #f3bcbc,
+      0 12px 22px rgba(200,90,90,0.28);
+    animation: shakeWrong 0.5s var(--ease-soft) both;
+  }
+  @keyframes shakeWrong {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-7px); }
+    40% { transform: translateX(6px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(3px); }
+  }
+
+  /* 对勾徽章 */
+  .badge {
+    position: absolute; top: -12px; right: -10px;
+    width: 44px; height: 44px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(180deg,
+      color-mix(in srgb, var(--c-success) 65%, #fff) 0%,
+      var(--c-success) 55%,
+      color-mix(in srgb, var(--c-success) 80%, #000) 100%);
+    box-shadow: inset 0 2px 0 rgba(255,255,255,0.7),
+                0 4px 0 color-mix(in srgb, var(--c-success) 70%, #000),
+                0 8px 14px rgba(60,140,100,0.4);
+    animation: popin 0.4s var(--ease-juicy) 0.25s both;
+  }
+  .badge svg { width: 56%; height: 56%; }
+  /* 错误叉徽章 */
+  .badge--x {
+    background: linear-gradient(180deg,
+      color-mix(in srgb, var(--c-error) 65%, #fff) 0%,
+      var(--c-error) 55%,
+      color-mix(in srgb, var(--c-error) 80%, #000) 100%);
+    box-shadow: inset 0 2px 0 rgba(255,255,255,0.7),
+                0 4px 0 color-mix(in srgb, var(--c-error) 70%, #000),
+                0 8px 14px rgba(200,90,90,0.4);
+    animation: none;
+  }
+
+  /* ---------- 小墨欢呼 + 气泡 ---------- */
+  .cheer {
+    position: absolute; left: 12px; bottom: 14px;
+    display: flex; align-items: flex-end; gap: 6px;
+    z-index: 5;
+  }
+  .cheer__bubble {
+    position: relative;
+    margin-bottom: 22px;
+    font-weight: 900; font-size: var(--f-md); color: var(--c-brand-deep);
+    background: #fff;
+    padding: 8px 16px; border-radius: 18px;
+    box-shadow: inset 0 2px 0 rgba(255,255,255,0.9), 0 5px 0 #ffe1b8,
+                0 12px 20px rgba(120,90,40,0.18);
+    animation: popin 0.5s var(--ease-juicy) 0.4s both;
+  }
+  .cheer__bubble::after {
+    content: ""; position: absolute; left: -8px; bottom: 14px;
+    width: 16px; height: 16px; background: #fff;
+    border-radius: 3px; transform: rotate(45deg);
+    box-shadow: -2px 2px 0 #ffe1b8;
+  }
+
+  /* ---------- 彩纸 ---------- */
+  .confetti { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 4; }
+  .confetti i {
+    position: absolute; top: -20px;
+    width: 12px; height: 12px; border-radius: 3px;
+    opacity: 0.95;
+    animation: fall 2.8s linear infinite;
+  }
+  @keyframes fall {
+    0% { transform: translateY(0) rotate(0); opacity: 0; }
+    12% { opacity: 1; }
+    100% { transform: translateY(360px) rotate(320deg); opacity: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="phone__screen">
+    <div class="quiz">
+
+      <!-- 顶部：返回 + 进度条 + 计数 -->
+      <div class="topbar">
+        <button class="candy-btn icon-btn" aria-label="返回">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M15 5 L8 12 L15 19" stroke="var(--c-ink-soft)" stroke-width="3.5"
+                  stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <div class="progress">
+          <div class="progress__fill"></div>
+        </div>
+        <span class="count">6/10</span>
+      </div>
+
+      <!-- 题干：听力舞台 -->
+      <div class="stage popin">
+        <span class="stage__hint">听一听，选出「<b>shuǐ</b>」</span>
+        <div class="stage__spk">
+          <div class="spk-halo">
+            <button class="spk spk--lg spk--wiggle" aria-label="播放读音">
+              <svg viewBox="0 0 32 32" fill="none">
+                <!-- 白色喇叭本体 -->
+                <path d="M5 12 H10 L17 6 V26 L10 20 H5 Z" fill="#fff"/>
+                <!-- 两道声波弧 -->
+                <path class="spk-wave" d="M21 10 Q25 16 21 22" stroke="#fff"
+                      stroke-width="2.6" stroke-linecap="round" fill="none"/>
+                <path class="spk-wave w2" d="M25 7 Q31 16 25 25" stroke="#fff"
+                      stroke-width="2.6" stroke-linecap="round" fill="none"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <span class="stage__pic">🖼️ 图片提示：一滴水</span>
+      </div>
+
+      <!-- 答案：2×2 糖果格 -->
+      <div class="options">
+        <div class="opt opt--correct kai popin" style="animation-delay:.08s">
+          水
+          <span class="badge" aria-label="正确">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M5 13 L10 18 L19 7" stroke="#fff" stroke-width="3.5"
+                    stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </div>
+        <div class="opt kai popin" style="animation-delay:.16s">木</div>
+        <div class="opt opt--wrong kai popin" style="animation-delay:.24s">
+          火
+          <span class="badge badge--x" aria-label="错误">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M7 7 L17 17 M17 7 L7 17" stroke="#fff" stroke-width="3.5"
+                    stroke-linecap="round"/>
+            </svg>
+          </span>
+        </div>
+        <div class="opt kai popin" style="animation-delay:.32s">土</div>
+      </div>
+
+      <!-- 小墨欢呼 -->
+      <div class="cheer">
+        <div class="cheer__bubble">答对啦！</div>
+        <!-- 小墨：开心张嘴 + 举起小手 + 星光 -->
+        <svg class="breathe" width="72" height="72" viewBox="0 0 72 72" fill="none" aria-label="小墨">
+          <defs>
+            <radialGradient id="moBody" cx="42%" cy="30%" r="75%">
+              <stop offset="0%" stop-color="#8fd0ff"/>
+              <stop offset="55%" stop-color="#6fa8ff"/>
+              <stop offset="100%" stop-color="#5a8fe6"/>
+            </radialGradient>
+          </defs>
+          <!-- 举起的小手 -->
+          <ellipse cx="13" cy="34" rx="7" ry="8" fill="#6fa8ff"/>
+          <ellipse cx="59" cy="34" rx="7" ry="8" fill="#6fa8ff"/>
+          <!-- 身体：软墨滴/麻薯 -->
+          <path d="M36 8
+                   C51 8 62 20 62 37
+                   C62 55 51 66 36 66
+                   C21 66 10 55 10 37
+                   C10 20 21 8 36 8 Z" fill="url(#moBody)"/>
+          <!-- 顶部高光 -->
+          <ellipse cx="29" cy="24" rx="12" ry="8" fill="rgba(255,255,255,0.5)"/>
+          <!-- 眼睛 + 高光 -->
+          <circle cx="28" cy="36" r="5.5" fill="#2f3a55"/>
+          <circle cx="46" cy="36" r="5.5" fill="#2f3a55"/>
+          <circle cx="30" cy="34" r="1.8" fill="#fff"/>
+          <circle cx="48" cy="34" r="1.8" fill="#fff"/>
+          <!-- 腮红 -->
+          <ellipse cx="21" cy="45" rx="4.5" ry="3" fill="#ff9ec2" opacity="0.75"/>
+          <ellipse cx="53" cy="45" rx="4.5" ry="3" fill="#ff9ec2" opacity="0.75"/>
+          <!-- 张嘴大笑 -->
+          <path d="M29 47 Q37 57 45 47 Q37 52 29 47 Z" fill="#3a2a3a"/>
+          <!-- 星光 -->
+          <path d="M60 14 l1.6 3.4 3.4 1.6 -3.4 1.6 -1.6 3.4 -1.6 -3.4 -3.4 -1.6 3.4 -1.6 Z"
+                fill="var(--c-accent)"/>
+        </svg>
+      </div>
+
+      <!-- 彩纸庆祝 -->
+      <div class="confetti">
+        <i style="left:14%; background:var(--c-first);   animation-delay:0s"></i>
+        <i style="left:28%; background:var(--c-accent);  animation-delay:.5s"></i>
+        <i style="left:44%; background:var(--c-nature);  border-radius:50%; animation-delay:.2s"></i>
+        <i style="left:60%; background:var(--c-myself);  animation-delay:.8s"></i>
+        <i style="left:74%; background:var(--c-life);    border-radius:50%; animation-delay:.35s"></i>
+        <i style="left:88%; background:var(--c-brand);   animation-delay:.65s"></i>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

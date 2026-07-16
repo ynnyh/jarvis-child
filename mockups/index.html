@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>软3D糖果风 · 设计预览</title>
+  <link rel="stylesheet" href="_candy.css" />
+  <style>
+    body {
+      background:
+        radial-gradient(120% 90% at 15% 0%, #fff4dd 0%, transparent 55%),
+        radial-gradient(120% 90% at 85% 10%, #ffe5ef 0%, transparent 50%),
+        var(--c-paper);
+      min-height: 100vh;
+      padding: var(--s-6) var(--s-4) var(--s-8);
+    }
+    .head {
+      max-width: 900px;
+      margin: 0 auto var(--s-6);
+      text-align: center;
+    }
+    .head h1 {
+      font-size: var(--f-2xl);
+      font-weight: 900;
+      margin: 0 0 var(--s-2);
+      color: var(--c-brand-deep);
+      letter-spacing: -0.5px;
+    }
+    .head p {
+      font-size: var(--f-md);
+      color: var(--c-ink-soft);
+      margin: 0 auto;
+      max-width: 560px;
+      line-height: 1.6;
+    }
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: var(--s-3);
+      margin-top: var(--s-4);
+    }
+    .legend .pill { font-size: var(--f-sm); }
+
+    /* 画廊：四台「手机」横向陈列，可整体缩放 */
+    .gallery {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--s-8) var(--s-7);
+      justify-content: center;
+      align-items: flex-start;
+    }
+    .frame {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--s-4);
+    }
+    .frame__label {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--s-2);
+      font-weight: 900;
+      font-size: var(--f-lg);
+      color: var(--c-ink);
+    }
+    .frame__num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, #ffc65c, var(--c-brand));
+      color: #fff;
+      font-size: var(--f-md);
+      box-shadow: inset 0 2px 0 rgba(255,255,255,0.6), 0 3px 0 var(--c-brand-deep);
+    }
+    .frame__desc {
+      font-size: var(--f-sm);
+      color: var(--c-ink-soft);
+      max-width: 360px;
+      text-align: center;
+      line-height: 1.5;
+      margin: 0;
+    }
+    /* 把每台手机等比缩小到 300 宽，便于一屏并排看 */
+    .frame__phone {
+      width: 320px;
+      height: 692px;
+      position: relative;
+      overflow: hidden;
+      border-radius: 40px;
+      box-shadow: 0 24px 60px rgba(40, 50, 80, 0.3),
+                  0 0 0 10px #1c2233, 0 0 0 12px #2f3850;
+    }
+    .frame__phone iframe {
+      position: absolute;
+      top: 0; left: 0;
+      width: 390px;
+      height: 844px;
+      border: 0;
+      transform: scale(0.8205);
+      transform-origin: top left;
+    }
+    .frame__open {
+      font-size: var(--f-sm);
+      font-weight: 800;
+      color: var(--c-brand-deep);
+      text-decoration: none;
+    }
+    .frame__open:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="head">
+    <h1>软 3D 糖果风 · 设计预览</h1>
+    <p>在现有色彩令牌与楷体大字的基础上，把执行升级为「光泽 + 渐变 + 拟物立体 + 饱满圆润」。
+       四屏为高保真效果图，确认风格后 1:1 落到真实组件。</p>
+    <div class="legend">
+      <span class="pill">🍬 光泽塑料质感</span>
+      <span class="pill">🎈 饱满圆润</span>
+      <span class="pill">📐 拟物厚投影</span>
+      <span class="pill">🖌️ 楷体大字 C 位</span>
+    </div>
+  </div>
+
+  <div class="gallery">
+    <div class="frame">
+      <div class="frame__label"><span class="frame__num">1</span> 首页 · 海岛乐园</div>
+      <p class="frame__desc">建筑即入口，软3D立体岛屿，小墨在场。</p>
+      <div class="frame__phone"><iframe src="home.html" title="首页海岛"></iframe></div>
+      <a class="frame__open" href="home.html" target="_blank">↗ 单独全屏打开</a>
+    </div>
+
+    <div class="frame">
+      <div class="frame__label"><span class="frame__num">2</span> 识字学习页</div>
+      <p class="frame__desc">目标汉字 C 位大字，喇叭朗读，字理组词。</p>
+      <div class="frame__phone"><iframe src="learn.html" title="识字学习页"></iframe></div>
+      <a class="frame__open" href="learn.html" target="_blank">↗ 单独全屏打开</a>
+    </div>
+
+    <div class="frame">
+      <div class="frame__label"><span class="frame__num">3</span> 关卡地图</div>
+      <p class="frame__desc">蜿蜒糖果路径，当前关脉冲，通关星星。</p>
+      <div class="frame__phone"><iframe src="map.html" title="关卡地图"></iframe></div>
+      <a class="frame__open" href="map.html" target="_blank">↗ 单独全屏打开</a>
+    </div>
+
+    <div class="frame">
+      <div class="frame__label"><span class="frame__num">4</span> 游戏答题页</div>
+      <p class="frame__desc">题干舞台化，胖选项卡，答对爆炸庆祝。</p>
+      <div class="frame__phone"><iframe src="game.html" title="游戏答题页"></iframe></div>
+      <a class="frame__open" href="game.html" target="_blank">↗ 单独全屏打开</a>
+    </div>
+  </div>
+</body>
+</html>

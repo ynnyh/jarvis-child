@@ -62,7 +62,13 @@ try {
 // --- 4) 合并 ---
 const missingMeta = [];
 const audioTexts = new Set(); // 需要生成音频的文本：主题名 + 字 + 组词 + 例句 + 反馈语
-const FEEDBACK = ['太棒啦', '真厉害', '对啦', '再试试', '加油'];
+// 反馈/界面口播语：所有 JSX 里 speak('字面量') 的短语都必须列在这里，
+// 否则运行时静音降级到不可靠的浏览器 TTS。新增口播文案后同步维护。
+const FEEDBACK = [
+  '太棒啦', '真厉害', '对啦', '再试试', '加油',
+  '选一个小世界', '绘本馆', '今天要复习啦', '先完成前面的关卡哦',
+  '写得好棒', '再看看哦', '金币不够啦', '小墨升级啦', '真好吃',
+];
 FEEDBACK.forEach((t) => audioTexts.add(t));
 
 const curriculumOut = [];

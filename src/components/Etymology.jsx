@@ -34,30 +34,42 @@ export default function Etymology({ data, onSpeak }) {
     );
   }
 
-  // 组合字：部件飞入组成字。
+  // 组合字：部件飞入组成字。部首含义的部件用珊瑚强调块，其余淡蓝块（skill §2 分色）。
   if (meaningfulComps.length >= 1) {
     return (
       <div className="etymology">
         <div className="etym-compose">
-          {/* 部件们 */}
+          {/* 部件们（之间插「+」，让"字由几块组成"一眼可见） */}
           <div className="etym-parts">
             {meaningfulComps.map((comp, i) => {
               const r = getRadical(comp);
               return (
-                <motion.div
-                  key={comp + i}
-                  className="etym-part"
-                  initial={{ opacity: 0, y: 20, scale: 0.6 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  transition={{ delay: i * 0.4, type: 'spring', stiffness: 300 }}
-                >
-                  <span className="etym-part-char">{comp}</span>
-                  {r && (
-                    <span className="etym-part-hint">
-                      {r.emoji} {r.meaning}
-                    </span>
+                <div className="etym-part-group" key={comp + i}>
+                  {i > 0 && (
+                    <motion.span
+                      className="etym-plus"
+                      initial={{ opacity: 0, scale: 0 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: i * 0.4 - 0.15, type: 'spring', stiffness: 300 }}
+                    >
+                      +
+                    </motion.span>
                   )}
-                </motion.div>
+                  <motion.div
+                    className={`etym-part ${r ? 'is-radical' : 'is-comp'}`}
+                    initial={{ opacity: 0, y: 20, scale: 0.6 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ delay: i * 0.4, type: 'spring', stiffness: 300 }}
+                    whileTap={{ scale: 0.92, rotate: -3 }}
+                  >
+                    <span className="etym-part-char">{comp}</span>
+                    {r && (
+                      <span className="etym-part-hint">
+                        {r.emoji} {r.meaning}
+                      </span>
+                    )}
+                  </motion.div>
+                </div>
               );
             })}
           </div>

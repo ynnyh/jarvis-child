@@ -14,6 +14,7 @@ import HanziWriter from '../components/HanziWriter.jsx';
 import Etymology from '../components/Etymology.jsx';
 import Xiaomo from '../components/mascot/Xiaomo.jsx';
 import Button from '../components/ui/Button.jsx';
+import SpeakerButton, { SpeakerGlyph } from '../components/ui/SpeakerButton.jsx';
 import PageTransition from '../components/ui/PageTransition.jsx';
 import PlayfulBackground from '../components/PlayfulBackground.jsx';
 import StarReward from '../components/StarReward.jsx';
@@ -167,7 +168,7 @@ export default function LearnFlow() {
       <div className="page learnflow" style={{ '--theme-color': lesson.themeColor }}>
         <PlayfulBackground variant="sky" />
         <header className="sub-header">
-          <button className="btn-back" onClick={() => navigate(-1)} aria-label="返回">
+          <button className="btn-back" onClick={() => { play('tap'); navigate(-1); }} aria-label="返回">
             ←
           </button>
           <h2 className="sub-title">{STEP_TITLE[step]}</h2>
@@ -204,9 +205,19 @@ export default function LearnFlow() {
               {char}
             </motion.button>
             <div className="intro-mascot">
-              <Xiaomo expression="happy" size={90} animate={false} />
-              <div className="speech-bubble" onClick={() => speak(data.hint)}>
-                {data.hint} 🔊
+              <Xiaomo expression="happy" size={90} />
+              <div className="intro-hint-row">
+                <div className="speech-bubble" onClick={() => speak(data.hint)}>
+                  {data.hint}
+                </div>
+                <SpeakerButton
+                  size="sm"
+                  label="听小墨说"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    speak(data.hint);
+                  }}
+                />
               </div>
             </div>
             <Button size="lg" onClick={next}>开始学「{char}」</Button>
@@ -224,12 +235,20 @@ export default function LearnFlow() {
         {/* 3. 认读 */}
         {step === 'read' && (
           <div className="flow-read">
-            <button className="read-char" onClick={() => speak(char)} aria-label={`朗读 ${char}`}>
+            <motion.button
+              className="read-char"
+              onClick={() => speak(char)}
+              aria-label={`朗读 ${char}`}
+              initial={{ scale: 0.4, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: 'spring', stiffness: 260, damping: 14 }}
+            >
               {char}
-            </button>
+            </motion.button>
             <div className="read-pinyin" onClick={() => speak(char)}>
-              {data.pinyin} 🔊
+              {data.pinyin}
             </div>
+            <SpeakerButton size="md" onClick={() => speak(char)} />
             <p className="flow-tip">点一点，听小墨怎么读</p>
             <Button size="lg" onClick={next}>会读啦 →</Button>
           </div>
@@ -239,15 +258,26 @@ export default function LearnFlow() {
         {step === 'words' && (
           <div className="flow-words">
             <div className="words-head">
-              <span className="words-char">{char}</span>
+              <button className="words-char" onClick={() => speak(char)} aria-label={`朗读 ${char}`}>
+                {char}
+              </button>
               <span className="words-tip">能组成这些词，点一点听一听</span>
             </div>
             <div className="read-words">
-              {data.words.map((w) => (
-                <button key={w.word} className="word-chip big" onClick={() => speak(w.word)}>
+              {data.words.map((w, i) => (
+                <motion.button
+                  key={w.word}
+                  className="word-chip big"
+                  onClick={() => speak(w.word)}
+                  initial={{ opacity: 0, y: 24, scale: 0.7 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ delay: i * 0.08, type: 'spring', stiffness: 320, damping: 16 }}
+                  whileTap={{ scale: 0.92 }}
+                >
                   {w.emoji ? <span className="wc-emoji">{w.emoji}</span> : null}
-                  {w.word} 🔊
-                </button>
+                  {w.word}
+                  <SpeakerGlyph className="wc-spk" />
+                </motion.button>
               ))}
             </div>
             <Button size="lg" onClick={next}>学会啦 →</Button>
@@ -257,13 +287,17 @@ export default function LearnFlow() {
         {/* 5. 例句情境 */}
         {step === 'sentence' && (
           <div className="flow-sentence">
-            <Xiaomo expression="happy" size={80} animate={false} />
-            <div className="sentence-box" onClick={() => speak(data.sentence)}>
+            <Xiaomo expression="happy" size={80} />
+            <motion.div
+              className="sentence-box"
+              onClick={() => speak(data.sentence)}
+              initial={{ opacity: 0, y: 24, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 18 }}
+            >
               {renderSentence(data.sentence, char, (c) => speak(c))}
-            </div>
-            <button className="sent-play" onClick={() => speak(data.sentence)}>
-              🔊 听一遍
-            </button>
+            </motion.div>
+            <SpeakerButton size="md" label="听句子" onClick={() => speak(data.sentence)} />
             <Button size="lg" onClick={next}>会读句子啦 →</Button>
           </div>
         )}
@@ -297,13 +331,16 @@ export default function LearnFlow() {
         {step === 'check' && (
           <div className="flow-check">
             <p className="check-q">哪个是「<span className="check-target" onClick={() => speak(char)}>{char}</span>」？</p>
-            <button className="check-speaker" onClick={() => speak(char)}>🔊 再听一次</button>
+            <SpeakerButton size="sm" label="再听一次" onClick={() => speak(char)} />
             <div className="check-options">
-              {checkOptions.map((opt) => (
+              {checkOptions.map((opt, i) => (
                 <motion.button
                   key={opt}
                   className={`check-option ${checkWrong === opt ? 'shake wrong' : ''}`}
-                  whileTap={{ scale: 0.92 }}
+                  initial={{ opacity: 0, y: 28, scale: 0.6 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ delay: i * 0.09, type: 'spring', stiffness: 320, damping: 15 }}
+                  whileTap={{ scale: 0.9 }}
                   onClick={() => handleCheckPick(opt)}
                 >
                   {opt}

@@ -1,30 +1,37 @@
-// 背景音乐（BGM）控制器：跨页面持续循环播放，路由切换不打断。
+// 背景音乐（BGM）控制器：循环播放一首柔和欢快的儿歌，跨页面持续，路由切换不打断。
 //
-// 设计要点：
-//   1. 模块级单例 Audio —— BGM 属于「整个 app」而非某个页面/组件，
-//      用单例保证换页时音乐连续，不会每次挂载都重头播。
-//   2. 浏览器自动播放限制 —— 现代浏览器禁止未经用户交互就播声音。
-//      因此监听首次交互（点一下/触屏）后才真正 play()。
-//   3. 开关与音量存 localStorage，家长中心可控；默认开、音量适中。
-//   4. 素材未就位也不报错：文件加载失败静默跳过，不影响学习。
+// 曲目：Kevin MacLeod《Carefree》(incompetech.com)，CC-BY 4.0 授权。
+//   —— 署名义务见家长中心底部的「音乐来源」标注，请勿移除。
+//   放在 public/audio/ 下，Vite 构建时原样拷进 dist/，纯静态部署即可访问。
 //
-// 用法：在 App 顶层挂一次 <BgmMount />（见下方），或在根组件调用 useBgmController()。
-// 素材放 public/bgm/bgm-home.mp3，替换 BGM_SRC 即可。
+// 为什么用真实 mp3 而非合成：
+//   长旋律的背景音乐靠振荡器合成音色单薄、不够欢快（实测被否）。
+//   真实编曲的儿歌才有陪伴感。短促 UI 提示音仍用 useSound 合成（零延迟）。
+//
+// 设计要点（沿用换曲前的成熟逻辑，勿回退）：
+//   1. 模块级单例 —— BGM 属于「整个 app」，单例 <Audio> 保证换页连续。
+//   2. 自动播放限制 —— 现代浏览器禁止未经交互就出声，监听首次交互后才启动。
+//   3. 开关/音量存 localStorage，家长中心可控；默认开、音量适中（不盖过朗读）。
+//   4. 切后台自动暂停，回前台恢复。
+//
+// 用法：根组件调用一次 useBgmController()。对外控制见文件底部导出。
 
 import { useEffect } from 'react';
 
 const BGM_ENABLED_KEY = 'jarvis-child-bgm';
 const BGM_VOLUME_KEY = 'jarvis-child-bgm-volume';
-// 素材就位后把文件放到 public/bgm/ 下并确认此路径。空字符串表示暂未接入。
-const BGM_SRC = `${import.meta.env.BASE_URL}bgm/bgm-home.mp3`;
 
-let audioEl = null; // 单例 Audio
-let started = false; // 是否已成功开始播放（避免重复 play）
+// mp3 路径：用 BASE_URL 前缀，兼容子路径部署（与 useSpeech 一致）。
+const BGM_SRC = `${import.meta.env.BASE_URL}audio/bgm-carefree.mp3`;
+const DEFAULT_VOLUME = 0.28; // 默认低音量，不盖过朗读语音
+
+let audio = null; // 单例 <Audio> 元素
+let started = false; // 是否已成功开始播放
 let interactionBound = false;
 
 function readEnabled() {
   try {
-    return localStorage.getItem(BGM_ENABLED_KEY) !== 'off'; // 默认开
+    return localStorage.getItem(BGM_ENABLED_KEY) !== 'off';
   } catch {
     return true;
   }
@@ -33,57 +40,74 @@ function readEnabled() {
 function readVolume() {
   try {
     const v = Number(localStorage.getItem(BGM_VOLUME_KEY));
-    return Number.isFinite(v) && v >= 0 && v <= 1 ? v : 0.35; // 默认音量适中，不盖过语音
+    return Number.isFinite(v) && v >= 0 && v <= 1 ? v : DEFAULT_VOLUME;
   } catch {
-    return 0.35;
+    return DEFAULT_VOLUME;
   }
 }
 
-function ensureAudio() {
-  if (audioEl || typeof window === 'undefined') return audioEl;
-  const el = new Audio(BGM_SRC);
-  el.loop = true;
-  el.volume = readVolume();
-  el.preload = 'auto';
-  // 加载失败（素材未就位）静默处理。
-  el.addEventListener('error', () => {
-    // 不抛错、不打断，控制台留一条便于调试。
-    console.info('[bgm] 背景音乐素材未就位或加载失败，已跳过。');
-  });
-  audioEl = el;
-  return el;
+// 惰性创建单例 <Audio>：循环、预加载、初始音量。
+function getAudio() {
+  if (audio || typeof window === 'undefined') return audio;
+  audio = new Audio(BGM_SRC);
+  audio.loop = true;
+  audio.preload = 'auto';
+  audio.volume = readVolume();
+  return audio;
 }
 
-function tryPlay() {
+// 尝试播放。fromGesture: 是否由真实用户手势触发（手势里 play() 才不会被策略拒绝）。
+function startPlayback(fromGesture = false) {
   if (!readEnabled()) return;
-  const el = ensureAudio();
-  if (!el) return;
-  const p = el.play();
-  if (p && typeof p.catch === 'function') {
+  // 非手势且尚未创建：不创建，等首次手势，避免被自动播放策略拒绝后留下暂停态。
+  if (!fromGesture && !audio) return;
+  const a = getAudio();
+  if (!a) return;
+  const p = a.play();
+  if (p && typeof p.then === 'function') {
     p.then(() => {
       started = true;
     }).catch(() => {
-      // 仍被自动播放策略拦截：等下一次交互再试（监听已绑定）。
+      // 被自动播放策略拒绝：保持未启动，等下一次真实手势重试。
+      started = false;
     });
+  } else {
+    started = true;
   }
 }
 
-// 首次用户交互后启动 BGM（满足浏览器自动播放策略）。
+function stopPlayback() {
+  if (audio) audio.pause();
+  started = false;
+}
+
+// 首次交互后启动（满足自动播放策略）。
+// 关键：只有确认「真的在播」（!paused）才解绑监听，否则保留、下次交互继续重试——
+// 这与换曲前的解锁逻辑一致，避免首次 play() 未生效就再没第二次机会。
 function bindFirstInteraction() {
   if (interactionBound || typeof window === 'undefined') return;
   interactionBound = true;
   const onInteract = () => {
-    tryPlay();
-    if (started) {
-      window.removeEventListener('pointerdown', onInteract);
-      window.removeEventListener('keydown', onInteract);
+    startPlayback(true);
+    if (audio && !audio.paused) {
+      window.removeEventListener('pointerdown', onInteract, true);
+      window.removeEventListener('touchend', onInteract, true);
+      window.removeEventListener('keydown', onInteract, true);
     }
   };
-  window.addEventListener('pointerdown', onInteract);
-  window.addEventListener('keydown', onInteract);
+  // 捕获阶段（true）：即使子元素 stopPropagation（浮层遮罩）也拦不住，任何点击都能解锁。
+  window.addEventListener('pointerdown', onInteract, true);
+  window.addEventListener('touchend', onInteract, true);
+  window.addEventListener('keydown', onInteract, true);
 }
 
-// ---- 对外控制 API（家长中心用）----
+// ---- 对外控制 API ----
+// 开场门在用户手势里显式启动 BGM（比隐形监听器可靠，尤其 StrictMode 下）。
+// 内部自查开关：家长关了音乐则不放，但调用本身已解锁 AudioContext/音效。
+export function startBgm() {
+  startPlayback(true);
+}
+
 export function isBgmEnabled() {
   return readEnabled();
 }
@@ -94,12 +118,8 @@ export function setBgmEnabled(on) {
   } catch {
     // 忽略
   }
-  if (on) {
-    tryPlay();
-  } else if (audioEl) {
-    audioEl.pause();
-    started = false;
-  }
+  if (on) startPlayback(true); // 家长中心手动开启也是用户手势
+  else stopPlayback();
 }
 
 export function getBgmVolume() {
@@ -113,25 +133,22 @@ export function setBgmVolume(v) {
   } catch {
     // 忽略
   }
-  if (audioEl) audioEl.volume = vol;
+  if (audio) audio.volume = vol;
 }
 
-// 在根组件调用一次：绑定首次交互、按需启动。
+// 根组件调用一次：绑定首次交互、切后台暂停/恢复。
 export function useBgmController() {
   useEffect(() => {
     if (typeof window === 'undefined') return undefined;
-    // 页面切到后台时暂停，回前台恢复，省电又不突兀。
     const onVisibility = () => {
-      if (!audioEl) return;
       if (document.hidden) {
-        audioEl.pause();
-      } else if (readEnabled() && started) {
-        audioEl.play().catch(() => {});
+        if (audio && !audio.paused) audio.pause();
+      } else if (readEnabled() && started && audio) {
+        audio.play().catch(() => {});
       }
     };
+    // 只绑定首次交互，不在挂载时预播：满足浏览器自动播放策略。
     bindFirstInteraction();
-    // 首帧也尝试一次（多数情况会被拦，靠交互兜底）。
-    tryPlay();
     document.addEventListener('visibilitychange', onVisibility);
     return () => document.removeEventListener('visibilitychange', onVisibility);
   }, []);

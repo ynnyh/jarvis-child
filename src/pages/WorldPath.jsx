@@ -71,7 +71,7 @@ export default function WorldPath() {
     return (
       <div className="page center-col">
         <p>找不到这个小世界。</p>
-        <button className="ui-btn ui-btn--primary ui-btn--lg" onClick={() => navigate('/')}>回首页</button>
+        <button className="ui-btn ui-btn--primary ui-btn--lg" onClick={() => { sound.tap(); navigate('/'); }}>回首页</button>
       </div>
     );
   }
@@ -80,7 +80,7 @@ export default function WorldPath() {
     <div className="map-page" style={{ '--theme-color': theme.color }}>
       <PlayfulBackground variant="grass" />
       <header className="map-topbar">
-        <button className="btn-icon" onClick={() => navigate('/')} aria-label="返回世界选择">←</button>
+        <button className="btn-icon" onClick={() => { sound.tap(); navigate('/'); }} aria-label="返回世界选择">←</button>
         <span className="map-title">{theme.emoji} {theme.name}</span>
         <span style={{ width: 48 }} />
       </header>
@@ -103,7 +103,7 @@ export default function WorldPath() {
                       animate={{ y: [0, -6, 0] }}
                       transition={{ repeat: Infinity, duration: 1.8 }}
                     >
-                      <Xiaomo size={52} expression="cheer" animate={false} />
+                      <Xiaomo size={52} expression="cheer" />
                     </motion.div>
                   )}
                   <motion.button

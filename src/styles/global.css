@@ -213,6 +213,59 @@ button {
   flex-shrink: 0;
 }
 
+/* ============ 卡通喇叭朗读钮（共用 SpeakerButton）============ */
+/* 蓝色果冻圆钮 + 白喇叭：厚底边、顶部高光，按下底边压缩（配合组件的果冻缩放）。 */
+.spk-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--r-pill);
+  background: linear-gradient(180deg, #a5e2ff 0%, var(--speaker-bg) 55%, var(--speaker-bg-deep) 100%);
+  box-shadow:
+    inset 0 3px 0 rgba(255, 255, 255, 0.55),
+    0 5px 0 var(--speaker-bg-deep),
+    var(--sh-md);
+  flex-shrink: 0;
+}
+.spk-btn:active {
+  box-shadow:
+    inset 0 3px 0 rgba(255, 255, 255, 0.5),
+    0 2px 0 var(--speaker-bg-deep),
+    var(--sh-sm);
+}
+.spk-btn--sm {
+  width: var(--tap-min);
+  height: var(--tap-min);
+}
+.spk-btn--md {
+  width: 88px;
+  height: 88px;
+}
+.spk-btn--lg {
+  width: 120px;
+  height: 120px;
+}
+.spk-icon {
+  width: 58%;
+  height: 58%;
+}
+/* 声波轻闪：两道声波错峰呼吸，暗示「我会出声」。 */
+.spk-wave {
+  animation: spk-wave 2.4s ease-in-out infinite;
+}
+.spk-wave.w2 {
+  animation-delay: 0.25s;
+}
+@keyframes spk-wave {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  35% {
+    opacity: 1;
+  }
+}
+
 /* ============ 子页头部 ============ */
 .sub-header {
   display: flex;
@@ -335,6 +388,21 @@ button {
 .map-node.current {
   transform: scale(1.05);
   box-shadow: var(--sh-lg);
+  animation: node-pulse 1.6s ease-in-out infinite;
+}
+/* 当前关脉冲：光圈呼吸，指引「玩这关」 */
+@keyframes node-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 0 rgba(255, 209, 102, 0.55),
+      var(--sh-lg);
+  }
+  55% {
+    box-shadow:
+      0 0 0 14px rgba(255, 209, 102, 0),
+      var(--sh-lg);
+  }
 }
 .map-mascot {
   margin-bottom: var(--s-1);
@@ -408,20 +476,25 @@ button {
 /* ============ 课程页 ============ */
 .lesson-page .lesson-char-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
   gap: var(--s-3);
   margin: var(--s-4) 0;
 }
 .lesson-char-card {
-  background: var(--c-card);
+  background: var(--c-card-warm);
   border-radius: var(--r-lg);
   padding: var(--s-3) var(--s-2);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--s-1);
-  box-shadow: var(--sh-sm);
+  box-shadow: 0 5px 0 var(--c-card-warm-edge), var(--sh-sm);
   border: 3px solid transparent;
+  min-height: var(--tap-min);
+  transition: box-shadow var(--t-fast) var(--ease-soft);
+}
+.lesson-char-card:active {
+  box-shadow: 0 2px 0 var(--c-card-warm-edge), var(--sh-sm);
 }
 .lesson-char-card.learned {
   border-color: var(--theme-color);
@@ -430,7 +503,7 @@ button {
   font-size: 28px;
 }
 .lcc-char {
-  font-size: 34px;
+  font-size: 44px;
   font-weight: 800;
 }
 .lcc-pinyin {
@@ -473,14 +546,20 @@ button {
   align-items: center;
   gap: var(--s-2);
 }
+/* 提示气泡 + 喇叭并排（喇叭是显式播放入口） */
+.intro-hint-row {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+}
 .speech-bubble {
   position: relative;
-  background: var(--c-card);
+  background: var(--c-card-warm);
   border-radius: var(--r-lg);
   padding: var(--s-3) var(--s-4);
   font-size: var(--f-md);
   max-width: 320px;
-  box-shadow: var(--sh-sm);
+  box-shadow: 0 4px 0 var(--c-card-warm-edge), var(--sh-sm);
 }
 .speech-bubble::after {
   content: '';
@@ -489,20 +568,24 @@ button {
   left: 50%;
   transform: translateX(-50%);
   border: 8px solid transparent;
-  border-bottom-color: var(--c-card);
+  border-bottom-color: var(--c-card-warm);
 }
 .read-char {
   font-size: var(--f-huge);
   font-weight: 900;
-  background: var(--c-card);
+  background: var(--c-card-warm);
   border-radius: var(--r-xl);
   width: 200px;
   height: 200px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: var(--sh-lg);
+  box-shadow: var(--sh-card-warm);
   color: var(--c-ink);
+  transition: box-shadow var(--t-fast) var(--ease-soft);
+}
+.read-char:active {
+  box-shadow: 0 2px 0 var(--c-card-warm-edge), var(--sh-sm);
 }
 .read-pinyin {
   font-size: var(--f-xl);
@@ -525,12 +608,24 @@ button {
   justify-content: center;
 }
 .word-chip {
-  background: var(--c-card);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  background: var(--c-card-warm);
   border-radius: var(--r-pill);
   padding: var(--s-3) var(--s-5);
   font-size: var(--f-lg);
   font-weight: 700;
-  box-shadow: var(--sh-sm);
+  min-height: var(--tap-min);
+  box-shadow: 0 5px 0 var(--c-card-warm-edge), var(--sh-sm);
+  transition: box-shadow var(--t-fast) var(--ease-soft);
+}
+.word-chip:active {
+  box-shadow: 0 2px 0 var(--c-card-warm-edge), var(--sh-sm);
+}
+/* 词条内装饰小喇叭：暗示「点我会出声」 */
+.wc-spk {
+  color: var(--speaker-bg-deep);
 }
 .evolve-caption {
   font-size: var(--f-md);
@@ -555,12 +650,12 @@ button {
 .pictograph-stage {
   width: 200px;
   height: 200px;
-  background: var(--c-card);
+  background: var(--c-card-warm);
   border-radius: var(--r-xl);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: var(--sh-lg);
+  box-shadow: var(--sh-card-warm);
 }
 .pictograph-glyph {
   font-size: 120px;
@@ -634,14 +729,14 @@ button {
 .q-char {
   font-size: 96px;
   font-weight: 900;
-  background: var(--c-card);
+  background: var(--c-card-warm);
   border-radius: var(--r-xl);
   width: 160px;
   height: 160px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: var(--sh-lg);
+  box-shadow: var(--sh-card-warm);
 }
 .q-char.small {
   font-size: 56px;
@@ -664,38 +759,29 @@ button {
   grid-template-columns: repeat(3, 1fr);
 }
 .q-option {
-  background: var(--c-card);
+  background: var(--c-card-warm);
   border-radius: var(--r-lg);
   padding: var(--s-5);
   font-size: 56px;
   font-weight: 800;
-  box-shadow: var(--sh-md);
+  box-shadow: 0 6px 0 var(--c-card-warm-edge), var(--sh-md);
   aspect-ratio: 1;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: box-shadow var(--t-fast) var(--ease-soft);
+}
+.q-option:active {
+  box-shadow: 0 2px 0 var(--c-card-warm-edge), var(--sh-sm);
 }
 .q-option.wrong {
   background: #ffe0e0;
+  box-shadow: 0 6px 0 #f3bcbc, var(--sh-md);
 }
 .q-trace-actions {
   display: flex;
   gap: var(--s-3);
   flex-wrap: wrap;
-  justify-content: center;
-}
-
-/* 大喇叭按钮 */
-.speaker-btn {
-  width: 120px;
-  height: 120px;
-  border-radius: var(--r-pill);
-  background: var(--theme-color);
-  font-size: 56px;
-  color: #fff;
-  box-shadow: var(--sh-lg);
-  display: inline-flex;
-  align-items: center;
   justify-content: center;
 }
 
@@ -721,17 +807,19 @@ button {
   flex: 1;
 }
 .match-item {
-  background: var(--c-card);
+  background: var(--c-card-warm);
   border-radius: var(--r-md);
   padding: var(--s-4);
   font-size: var(--f-xl);
   font-weight: 800;
-  box-shadow: var(--sh-sm);
+  min-height: var(--tap-min);
+  box-shadow: 0 4px 0 var(--c-card-warm-edge), var(--sh-sm);
   border: 3px solid transparent;
+  transition: transform var(--t-mid) var(--ease-juicy);
 }
 .match-item.sel {
   border-color: var(--theme-color);
-  transform: scale(1.05);
+  transform: scale(1.08);
 }
 .match-item.wrong {
   background: #ffe0e0;
@@ -749,14 +837,14 @@ button {
   z-index: var(--z-overlay);
 }
 .reward-card {
-  background: var(--c-card);
+  background: var(--c-card-warm);
   border-radius: var(--r-xl);
   padding: var(--s-6) var(--s-7);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--s-4);
-  box-shadow: var(--sh-lg);
+  box-shadow: 0 8px 0 var(--c-card-warm-edge), var(--sh-lg);
   max-width: 90vw;
 }
 .reward-title {
@@ -888,12 +976,13 @@ button {
   flex-direction: column;
   align-items: center;
   gap: var(--s-1);
-  background: var(--c-card);
+  background: var(--c-card-warm);
   border-radius: var(--r-lg);
   padding: var(--s-4) var(--s-5);
-  box-shadow: var(--sh-sm);
+  box-shadow: 0 5px 0 var(--c-card-warm-edge), var(--sh-sm);
   min-width: 92px;
-  transition: transform var(--t-fast);
+  min-height: var(--tap-min);
+  transition: transform var(--t-mid) var(--ease-juicy);
 }
 .food-card:active {
   transform: scale(0.94);
@@ -1149,6 +1238,20 @@ button {
   margin-top: var(--s-4);
   line-height: 1.5;
 }
+/* 版权署名（CC-BY 音源标注）：低调，不抢家长页视觉。 */
+.credit-note {
+  font-size: var(--f-xs);
+  color: var(--c-ink-soft);
+  margin-top: var(--s-5);
+  line-height: 1.5;
+  text-align: center;
+  opacity: 0.8;
+}
+.credit-note a {
+  color: var(--c-brand-deep);
+  text-decoration: none;
+  font-weight: 700;
+}
 .parent-danger,
 .danger {
   color: var(--c-error);
@@ -1251,26 +1354,34 @@ button {
   margin-bottom: var(--s-4);
 }
 .flow-dot {
-  width: 9px;
-  height: 9px;
+  width: 11px;
+  height: 11px;
   border-radius: var(--r-pill);
   background: var(--c-line);
-  transition: all var(--t-fast);
+  transition: all var(--t-mid) var(--ease-juicy);
 }
 .flow-dot.active {
   background: var(--theme-color);
-  transform: scale(1.4);
+  transform: scale(1.5);
 }
 .flow-dot.done {
   background: var(--c-success);
 }
 
-/* 情境导入的大字入场 */
+/* 情境导入的大字入场：暖卡舞台，C 位 */
 .intro-char {
-  font-size: 88px;
+  font-size: var(--f-huge);
   font-weight: 900;
   color: var(--theme-color);
   line-height: 1;
+  background: var(--c-card-warm);
+  border-radius: var(--r-xl);
+  width: 170px;
+  height: 170px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--sh-card-warm);
 }
 
 /* ============ 字理讲解 ============ */
@@ -1305,17 +1416,48 @@ button {
   gap: var(--s-3);
   flex-wrap: wrap;
   justify-content: center;
+  align-items: center;
+}
+/* 部件 + 前置「+」号成组，保证换行时符号跟着部件走 */
+.etym-part-group {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+}
+.etym-plus {
+  font-size: var(--f-xl);
+  font-weight: 800;
+  color: var(--c-ink-soft);
+  line-height: 1;
 }
 .etym-part {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--s-2);
-  background: var(--c-card);
+  background: var(--c-card-warm);
   border-radius: var(--r-lg);
   padding: var(--s-3);
-  box-shadow: var(--sh-sm);
+  box-shadow: 0 5px 0 var(--c-card-warm-edge), var(--sh-sm);
   max-width: 150px;
+}
+/* 部首/部件高对比分色（skill §2）：部首珊瑚强调，其余淡蓝 */
+.etym-part.is-radical {
+  background: var(--radical-bg);
+  box-shadow: 0 5px 0 var(--radical-edge), var(--sh-sm);
+}
+.etym-part.is-radical .etym-part-char {
+  color: var(--radical-ink);
+}
+.etym-part.is-radical .etym-part-hint {
+  color: var(--radical-ink);
+}
+.etym-part.is-comp {
+  background: var(--comp-bg);
+  box-shadow: 0 5px 0 var(--comp-edge), var(--sh-sm);
+}
+.etym-part.is-comp .etym-part-char {
+  color: var(--comp-ink);
 }
 .etym-part-char {
   font-size: 56px;
@@ -1325,6 +1467,7 @@ button {
 }
 .etym-part-hint {
   font-size: var(--f-xs);
+  font-weight: 700;
   color: var(--c-ink-soft);
   text-align: center;
   line-height: 1.4;
@@ -1343,14 +1486,14 @@ button {
   font-size: 88px;
   font-weight: 900;
   color: var(--theme-color);
-  background: var(--c-card);
+  background: var(--c-card-warm);
   border-radius: var(--r-xl);
   width: 130px;
   height: 130px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: var(--sh-md);
+  box-shadow: var(--sh-card-warm);
   line-height: 1;
 }
 .etym-big-char.solo {
@@ -1373,10 +1516,18 @@ button {
   gap: var(--s-2);
 }
 .words-char {
-  font-size: 72px;
+  font-size: 88px;
   font-weight: 900;
   color: var(--theme-color);
   line-height: 1;
+  background: var(--c-card-warm);
+  border-radius: var(--r-xl);
+  width: 130px;
+  height: 130px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--sh-card-warm);
 }
 .words-tip,
 .flow-tip {
@@ -1399,31 +1550,29 @@ button {
   gap: var(--s-4);
 }
 .sentence-box {
-  font-size: 34px;
+  font-size: 38px;
   font-weight: 700;
-  line-height: 1.6;
+  line-height: 1.7;
   text-align: center;
-  background: var(--c-card);
+  background: var(--c-card-warm);
   border-radius: var(--r-lg);
   padding: var(--s-5) var(--s-4);
-  box-shadow: var(--sh-sm);
+  box-shadow: 0 5px 0 var(--c-card-warm-edge), var(--sh-sm);
   max-width: 90%;
   color: var(--c-ink);
 }
 .sent-char-hl {
   color: var(--theme-color);
   font-weight: 900;
-  background: rgba(0, 0, 0, 0.04);
+  background: color-mix(in srgb, var(--theme-color) 16%, transparent);
   border-radius: var(--r-sm);
-  padding: 0 4px;
+  padding: 0 6px;
+  min-width: 52px;
+  min-height: 52px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
-.sent-play {
-  font-size: var(--f-md);
-  font-weight: 700;
-  color: var(--theme-color);
-  padding: var(--s-2) var(--s-4);
-}
-
 /* ============ 即时检查 ============ */
 .flow-check {
   display: flex;
@@ -1440,11 +1589,6 @@ button {
   color: var(--theme-color);
   font-size: var(--f-xl);
 }
-.check-speaker {
-  font-size: var(--f-md);
-  font-weight: 700;
-  color: var(--theme-color);
-}
 .check-options {
   display: flex;
   gap: var(--s-4);
@@ -1452,19 +1596,24 @@ button {
   justify-content: center;
 }
 .check-option {
-  width: 96px;
-  height: 96px;
+  width: 110px;
+  height: 110px;
   border-radius: var(--r-lg);
-  background: var(--c-card);
-  font-size: 56px;
+  background: var(--c-card-warm);
+  font-size: 60px;
   font-weight: 800;
-  box-shadow: var(--sh-md);
+  box-shadow: 0 6px 0 var(--c-card-warm-edge), var(--sh-md);
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: box-shadow var(--t-fast) var(--ease-soft);
+}
+.check-option:active {
+  box-shadow: 0 2px 0 var(--c-card-warm-edge), var(--sh-sm);
 }
 .check-option.wrong {
   background: #ffe0e0;
+  box-shadow: 0 6px 0 #f3bcbc, var(--sh-md);
 }
 
 /* ============ 绘本屋（书架）============ */
@@ -1547,7 +1696,7 @@ button {
   border-radius: var(--r-md);
   padding: 0 var(--s-2);
   margin: 0 2px;
-  box-shadow: var(--sh-sm);
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.14), var(--sh-sm);
   vertical-align: baseline;
 }
 .story-controls {
@@ -1559,15 +1708,15 @@ button {
   flex-shrink: 0;
 }
 .story-nav-btn {
-  width: 60px;
-  height: 60px;
+  width: var(--tap-min);
+  height: var(--tap-min);
   border-radius: var(--r-pill);
-  background: var(--c-card);
+  background: var(--c-card-warm);
   color: var(--theme-color);
   font-size: 36px;
   font-weight: 900;
   line-height: 1;
-  box-shadow: var(--sh-md);
+  box-shadow: 0 5px 0 var(--c-card-warm-edge), var(--sh-md);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1575,16 +1724,6 @@ button {
 }
 .story-nav-btn:disabled {
   opacity: 0.4;
-}
-.story-replay-btn {
-  padding: var(--s-3) var(--s-5);
-  border-radius: var(--r-pill);
-  background: var(--theme-color);
-  color: #fff;
-  font-size: var(--f-md);
-  font-weight: 800;
-  box-shadow: var(--sh-md);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
 }
 /* 读完结算 */
 .story-finish {
@@ -1757,9 +1896,381 @@ button {
   margin: 0;
 }
 
+/* ============ 首页 · 海岛乐园 ============ */
+.home-page {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: #9fe0ff; /* 兜底天空色，SVG 加载前不闪白 */
+}
+
+/* 顶部 HUD：悬浮在场景之上 */
+.home-hud {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-2);
+  padding: calc(var(--s-3) + env(safe-area-inset-top, 0px)) var(--s-4) var(--s-3);
+}
+.home-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  background: rgba(255, 255, 255, 0.86);
+  border-radius: var(--r-pill);
+  padding: 4px var(--s-3) 4px 4px;
+  box-shadow: var(--sh-sm);
+  backdrop-filter: blur(4px);
+}
+.home-title {
+  font-size: var(--f-md);
+  font-weight: 900;
+  color: var(--c-brand-deep);
+}
+.home-stats {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+.hud-icon-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--r-pill);
+  background: rgba(255, 255, 255, 0.86);
+  font-size: 22px;
+  box-shadow: var(--sh-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+
+/* 海岛场景：铺满视口 */
+.island-scene {
+  position: absolute;
+  inset: 0;
+}
+.island-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* 建筑入口层：与 SVG 同坐标系，用百分比定位对齐岛屿 */
+.island-buildings {
+  position: absolute;
+  inset: 0;
+  pointer-events: none; /* 层本身不拦，按钮各自开启 */
+}
+/* 外层只管定位：CSS translate 居中，不被 framer-motion 覆盖 */
+.island-building {
+  position: absolute;
+  pointer-events: none; /* 层本身不拦，按钮自身开启 */
+  transform: translate(-50%, -50%);
+}
+/* 内层按钮管布局/外观/动画（scale 由 motion 接管，不影响定位） */
+.island-building-btn {
+  position: relative; /* 塔顶小墨相对按钮定位，悬停时一起动 */
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 100%;
+  filter: drop-shadow(0 6px 10px rgba(43, 107, 138, 0.25));
+}
+.island-building .b-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.building-plate {
+  font-size: var(--f-sm);
+  font-weight: 900;
+  color: #fff;
+  background: var(--c-brand);
+  border-radius: var(--r-pill);
+  padding: 3px var(--s-3);
+  white-space: nowrap;
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.4), 0 3px 0 var(--c-brand-deep);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.15);
+}
+.plate-primary {
+  background: var(--c-success);
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.4), 0 3px 0 #2f7d55;
+  font-size: var(--f-md);
+  padding: var(--s-1) var(--s-4);
+}
+
+/* 各建筑定位（百分比，基于场景容器）+ 尺寸 */
+.b-tower {
+  left: 50%;
+  top: 46%;
+  width: 132px;
+}
+.b-tower-mascot {
+  position: absolute;
+  top: -34px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.b-library {
+  left: 50%;
+  top: 74%;
+  width: 96px;
+}
+.b-park {
+  left: 20%;
+  top: 66%;
+  width: 92px;
+}
+.b-school {
+  left: 82%;
+  top: 70%;
+  width: 92px;
+}
+
+/* 今日复习浮标（右下）：胖 pill，孩子主要触点之一 */
+.home-review-fab {
+  position: absolute;
+  right: var(--s-4);
+  bottom: calc(var(--s-5) + env(safe-area-inset-bottom, 0px));
+  z-index: 20;
+  background: var(--c-accent);
+  color: var(--c-ink);
+  font-weight: 900;
+  font-size: var(--f-md);
+  border-radius: var(--r-pill);
+  padding: var(--s-3) var(--s-5);
+  min-height: var(--tap-min);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.5), 0 4px 0 #d9a520, var(--sh-md);
+}
+
+/* 小墨的家（左下） */
+.home-pet-fab {
+  position: absolute;
+  left: var(--s-4);
+  bottom: calc(var(--s-4) + env(safe-area-inset-bottom, 0px));
+  z-index: 20;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border-radius: var(--r-pill);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: var(--sh-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+
+/* 世界选择浮层 */
+.world-picker-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-overlay);
+  background: rgba(43, 62, 82, 0.5);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  backdrop-filter: blur(3px);
+}
+.world-picker {
+  width: 100%;
+  max-width: 520px;
+  background: var(--c-paper);
+  border-radius: var(--r-xl) var(--r-xl) 0 0;
+  padding: var(--s-3) var(--s-4) calc(var(--s-6) + env(safe-area-inset-bottom, 0px));
+  max-height: 82vh;
+  overflow-y: auto;
+  box-shadow: 0 -8px 32px rgba(43, 62, 82, 0.24);
+}
+.world-picker-handle {
+  width: 44px;
+  height: 5px;
+  border-radius: var(--r-pill);
+  background: var(--c-line);
+  margin: 0 auto var(--s-3);
+}
+.world-picker-title {
+  text-align: center;
+  font-size: var(--f-lg);
+  margin: 0 0 var(--s-4);
+}
+
 /* ============ 桌面适配 ============ */
 @media (min-width: 640px) {
   .q-emoji { font-size: 130px; }
   .story-shelf-grid { grid-template-columns: repeat(3, 1fr); }
   .story-illustration { font-size: 150px; }
+  /* 桌面：海岛用 16:9 居中，避免建筑过度拉伸 */
+  .island-building .b-svg { max-width: 100%; }
+}
+
+/* ============ 开场欢迎门（StartGate · tap-to-start）============ */
+/* 铺满视口的最上层叠层：一个招手抖动的大糖果喇叭，宝宝点一下解锁音乐+音效。
+   浏览器自动播放策略要求先有用户手势才能出声，这个门把技术限制变成可爱开场。 */
+.start-gate {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--z-toast) + 20); /* 盖过一切，包括护眼/时长锁定层 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-5);
+  overflow: hidden;
+  /* 暖色糖果氛围底：顶部暖光 → 底部奶白 */
+  background:
+    radial-gradient(120% 80% at 50% 0%, #fff3d6 0%, transparent 55%),
+    radial-gradient(100% 70% at 50% 100%, #ffe6f0 0%, transparent 60%),
+    linear-gradient(180deg, #fff6e6 0%, #fff1e2 55%, #ffe9d6 100%);
+}
+
+/* 漂浮装饰：糖果音符，柔和不抢戏、不拦点击 */
+.sg-decor {
+  position: absolute;
+  pointer-events: none;
+  opacity: 0.9;
+  line-height: 1;
+}
+.sg-note { font-weight: 900; color: #ffc44d; opacity: 0.55; }
+.sg-fl { animation: sg-floaty 5s ease-in-out infinite; }
+.sg-fl.a { animation-delay: -1.2s; }
+.sg-fl.b { animation-delay: -2.4s; }
+.sg-fl.c { animation-delay: -3.6s; }
+@keyframes sg-floaty {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+.sg-inner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-5);
+}
+
+/* 小墨：大、呼吸 */
+.sg-mo { width: 150px; height: 158px; }
+.sg-breathe { animation: sg-breathe 3s ease-in-out infinite; }
+@keyframes sg-breathe {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-6px) scale(1.02); }
+}
+
+.sg-title {
+  font-weight: 900;
+  font-size: 30px;
+  color: var(--c-brand-deep);
+  text-shadow: 0 2px 0 rgba(255, 255, 255, 0.9);
+  letter-spacing: 1px;
+  margin: 0;
+}
+
+/* C 位大糖果喇叭钮：招手抖动 + 厚底座 */
+.sg-startbtn {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  border-radius: 50%;
+  background: radial-gradient(120% 100% at 50% 18%, #a5e2ff 0%, #67c7f5 52%, #3a90cf 100%);
+  box-shadow:
+    inset 0 5px 0 rgba(255, 255, 255, 0.75),
+    inset 0 -12px 20px rgba(30, 90, 140, 0.28),
+    0 12px 0 #3a90cf,
+    0 26px 40px rgba(50, 120, 180, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.12s var(--ease-juicy), box-shadow 0.12s var(--ease-juicy);
+  animation: sg-wiggle 3.2s ease-in-out infinite;
+}
+.sg-startbtn:active {
+  transform: translateY(9px);
+  box-shadow:
+    inset 0 5px 0 rgba(255, 255, 255, 0.7),
+    inset 0 -12px 20px rgba(30, 90, 140, 0.28),
+    0 3px 0 #3a90cf,
+    0 10px 18px rgba(50, 120, 180, 0.34);
+  animation: none;
+}
+.sg-startbtn svg { width: 56%; height: 56%; }
+/* 周期招手抖动：吸引点按 */
+@keyframes sg-wiggle {
+  0%, 82%, 100% { transform: rotate(0); }
+  86% { transform: rotate(-8deg); }
+  90% { transform: rotate(8deg); }
+  94% { transform: rotate(-5deg); }
+}
+/* 喇叭外扩声波光环 */
+.sg-halo { position: absolute; inset: 0; border-radius: 50%; pointer-events: none; }
+.sg-halo::before,
+.sg-halo::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 4px solid rgba(103, 199, 245, 0.5);
+  animation: sg-ring 2.6s ease-out infinite;
+}
+.sg-halo::after { animation-delay: 1.3s; }
+@keyframes sg-ring {
+  0% { transform: scale(0.9); opacity: 0.75; }
+  100% { transform: scale(1.55); opacity: 0; }
+}
+/* 喇叭里的声波弧轻闪 */
+.sg-wave { animation: sg-spkwave 2.2s ease-in-out infinite; transform-origin: left center; }
+.sg-wave.w2 { animation-delay: 0.3s; }
+@keyframes sg-spkwave {
+  0%, 100% { opacity: 0.4; }
+  40% { opacity: 1; }
+}
+
+/* 底部轻提示 pill */
+.sg-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  padding: 10px 20px;
+  border-radius: var(--r-pill);
+  font-weight: 800;
+  font-size: var(--f-md);
+  color: var(--c-ink-soft);
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.9), 0 4px 12px rgba(160, 120, 60, 0.16);
+}
+.sg-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--c-success); }
+
+/* 角落「安静玩」：无声进入，低调不抢主角 */
+.sg-quiet {
+  position: absolute;
+  bottom: calc(var(--s-5) + env(safe-area-inset-bottom, 0px));
+  right: var(--s-5);
+  z-index: 3;
+  min-height: 44px;
+  padding: var(--s-2) var(--s-4);
+  border: none;
+  cursor: pointer;
+  border-radius: var(--r-pill);
+  font-family: inherit;
+  font-weight: 800;
+  font-size: var(--f-sm);
+  color: var(--c-ink-soft);
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: var(--sh-sm);
 }

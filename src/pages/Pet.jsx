@@ -80,7 +80,7 @@ export default function Pet() {
       <PlayfulBackground variant="cozy" />
       <div className="page pet-page">
         <header className="sub-header">
-          <button className="btn-icon" onClick={() => navigate('/')} aria-label="返回">←</button>
+          <button className="btn-icon" onClick={() => { sound.tap(); navigate('/'); }} aria-label="返回">←</button>
           <h2 className="sub-title">小墨的家</h2>
           <CoinBadge count={coins} />
         </header>
@@ -147,7 +147,7 @@ export default function Pet() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => setLevelUp(false)}
+            onClick={() => { sound.tap(); setLevelUp(false); }}
           >
             <Confetti count={32} />
             <motion.div

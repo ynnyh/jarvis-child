@@ -1,16 +1,16 @@
-// 世界选择首页：5 个主题「小世界」大卡片。
-// 世界解锁：世界 N 需世界 N-1 的所有课都 ≥1 星才开（第 1 个世界永远开）。
-// 顶部状态栏（金币/打卡）、今日复习入口、底部导航（小墨/家长）。
-import { useMemo } from 'react';
+// 世界选择首页：海岛乐园门面（IslandScene）+ 世界选择浮层。
+// 建筑即入口：识字塔/游乐园 → 打开世界选择浮层 → 进入某世界关卡路径；
+//   绘本馆 → 绘本屋；学院 → 今日复习。顶部 HUD（金币/打卡），底部小墨与家长入口。
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { CURRICULUM } from '../data/content.generated.js';
 import { useGameStore } from '../store/useGameStore.js';
 import { useSpeech } from '../hooks/useSpeech.js';
 import { useSound } from '../hooks/useSound.js';
 import Xiaomo from '../components/mascot/Xiaomo.jsx';
 import CoinBadge from '../components/ui/CoinBadge.jsx';
-import PlayfulBackground from '../components/PlayfulBackground.jsx';
+import IslandScene from '../components/IslandScene.jsx';
 
 export default function WorldSelect() {
   const navigate = useNavigate();
@@ -22,110 +22,141 @@ export default function WorldSelect() {
   const chars = useGameStore((s) => s.chars);
   const getDueChars = useGameStore((s) => s.getDueChars);
 
-  // 每个世界的进度 + 解锁状态。
+  const [pickerOpen, setPickerOpen] = useState(false);
+
+  // 每个世界的进度（世界全部解锁，想学哪个都行）。
   const worlds = useMemo(() => {
-    // 一课完成 = 该课所有字都学过（比课程星级更稳，兼容历史数据）。
     const lessonDone = (l) => l.chars.every((c) => !!chars[c.char]);
     return CURRICULUM.map((theme) => {
       const total = theme.lessons.length;
       const done = theme.lessons.filter(lessonDone).length;
-      const stars = theme.lessons.reduce((n, l) => n + (lessons[l.id]?.stars ?? 0), 0);
-      // 世界全部解锁：想先学哪个主题都行（不再要求学完数字才能学别的）。
       const complete = done === total;
-      return { theme, done, total, stars, unlocked: true, complete };
+      return { theme, done, total, complete };
     });
   }, [lessons, chars]);
 
   const dueCount = getDueChars().length;
 
+  // 海岛建筑点击分发。
+  const handleEnter = (intent) => {
+    sound.tap();
+    if (intent === 'learn' || intent === 'games') {
+      setPickerOpen(true);
+      speak('选一个小世界');
+    } else if (intent === 'story') {
+      speak('绘本馆');
+      navigate('/story');
+    } else if (intent === 'review') {
+      speak('今天要复习啦');
+      navigate('/review');
+    }
+  };
+
   return (
-    <div className="map-page">
-      <PlayfulBackground variant="sky" />
-      <header className="map-topbar">
-        <div className="map-brand">
-          <Xiaomo size={40} expression="happy" animate={false} />
-          <span className="map-title">宝宝识字</span>
+    <div className="home-page">
+      {/* 顶部 HUD */}
+      <header className="home-hud">
+        <div className="home-brand">
+          <Xiaomo size={38} expression="happy" animate={false} />
+          <span className="home-title">识字乐园</span>
         </div>
-        <div className="map-stats">
+        <div className="home-stats">
           {streak.count > 0 && (
             <span className="streak-badge" aria-label={`连续 ${streak.count} 天`}>
               🔥 {streak.count}
             </span>
           )}
           <CoinBadge count={coins} />
+          <button
+            className="hud-icon-btn"
+            onClick={() => { sound.tap(); navigate('/parent'); }}
+            aria-label="家长中心"
+          >
+            👨‍👩‍👧
+          </button>
         </div>
       </header>
 
-      <div className="map-scroll">
-        {dueCount > 0 && (
-          <motion.button
-            className="review-banner"
-            onClick={() => { sound.tap(); speak('今天要复习啦'); navigate('/review'); }}
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            whileTap={{ scale: 0.97 }}
+      {/* 海岛场景（门面） */}
+      <IslandScene onEnter={handleEnter} worlds={worlds} />
+
+      {/* 今日复习角标 */}
+      {dueCount > 0 && (
+        <motion.button
+          className="home-review-fab"
+          onClick={() => { sound.tap(); speak('今天要复习啦'); navigate('/review'); }}
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          📅 复习 {dueCount}
+        </motion.button>
+      )}
+
+      {/* 底部小墨入口 */}
+      <button
+        className="home-pet-fab"
+        onClick={() => { sound.tap(); navigate('/pet'); }}
+        aria-label="小墨的家"
+      >
+        <Xiaomo size={44} expression="happy" />
+      </button>
+
+      {/* 世界选择浮层 */}
+      <AnimatePresence>
+        {pickerOpen && (
+          <motion.div
+            className="world-picker-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => { sound.tap(); setPickerOpen(false); }}
           >
-            📅 今日复习 · {dueCount} 个字 →
-          </motion.button>
-        )}
-
-        <p className="world-intro">选一个小世界，去认字吧！</p>
-
-        <div className="world-list">
-          {worlds.map(({ theme, done, total, unlocked, complete }, i) => (
-            <motion.button
-              key={theme.id}
-              className={`world-card ${unlocked ? '' : 'locked'}`}
-              style={unlocked ? { background: theme.color } : undefined}
-              onClick={() => {
-                if (!unlocked) {
-                  sound.error();
-                  speak('先学完前面的小世界哦');
-                  return;
-                }
-                sound.tap();
-                speak(theme.name);
-                navigate(`/world/${theme.id}`);
-              }}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.06 }}
-              whileTap={unlocked ? { scale: 0.96 } : {}}
+            <motion.div
+              className="world-picker"
+              initial={{ y: 60, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 60, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 28 }}
+              onClick={(e) => e.stopPropagation()}
             >
-              <span className="world-emoji">{theme.emoji}</span>
-              <span className="world-info">
-                <span className="world-name">{theme.name}</span>
-                <span className="world-progress-text">
-                  {unlocked ? `${done}/${total} 关` : '未解锁'}
-                </span>
-              </span>
-              {unlocked ? (
-                <span className="world-status">
-                  {complete ? '🏆' : (
-                    <span className="world-bar">
-                      <span className="world-bar-fill" style={{ width: `${(done / total) * 100}%` }} />
+              <div className="world-picker-handle" />
+              <h2 className="world-picker-title">选一个小世界</h2>
+              <div className="world-list">
+                {worlds.map(({ theme, done, total, complete }, i) => (
+                  <motion.button
+                    key={theme.id}
+                    className="world-card"
+                    style={{ background: theme.color }}
+                    onClick={() => {
+                      sound.tap();
+                      speak(theme.name);
+                      navigate(`/world/${theme.id}`);
+                    }}
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.05 }}
+                    whileTap={{ scale: 0.96 }}
+                  >
+                    <span className="world-emoji">{theme.emoji}</span>
+                    <span className="world-info">
+                      <span className="world-name">{theme.name}</span>
+                      <span className="world-progress-text">{done}/{total} 关</span>
                     </span>
-                  )}
-                </span>
-              ) : (
-                <span className="world-lock">🔒</span>
-              )}
-            </motion.button>
-          ))}
-        </div>
-      </div>
-
-      <nav className="map-bottomnav">
-        <button onClick={() => { sound.tap(); navigate('/pet'); }}>
-          <Xiaomo size={30} expression="happy" animate={false} /> <span>小墨</span>
-        </button>
-        <button onClick={() => { sound.tap(); navigate('/story'); }}>
-          <span className="nav-emoji">📚</span> <span>绘本</span>
-        </button>
-        <button onClick={() => { sound.tap(); navigate('/parent'); }}>
-          <span className="nav-emoji">👨‍👩‍👧</span> <span>家长</span>
-        </button>
-      </nav>
+                    <span className="world-status">
+                      {complete ? '🏆' : (
+                        <span className="world-bar">
+                          <span className="world-bar-fill" style={{ width: `${(done / total) * 100}%` }} />
+                        </span>
+                      )}
+                    </span>
+                  </motion.button>
+                ))}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

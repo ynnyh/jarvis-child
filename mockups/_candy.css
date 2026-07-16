@@ -1,0 +1,259 @@
+/* ============================================================
+   软 3D 糖果风 · 共享样式（mockup 专用，独立于生产代码）
+   目标：在现有色彩令牌基础上，把执行从「扁平矢量」升级为
+   「光泽 + 渐变 + 拟物立体 + 饱满圆润」——即用户要的「不简陋」。
+
+   这一层只加「质感配方」，不改色相：所有主色仍来自生产 tokens.css
+   的同名值，保证 mockup 通过后能 1:1 落到真实组件。
+   ============================================================ */
+
+:root {
+  /* ---- 主题色（与生产 tokens.css 一致）---- */
+  --c-first: #ff8fb1;
+  --c-nature: #5cc9a7;
+  --c-myself: #6fa8ff;
+  --c-things: #ffb454;
+  --c-life: #c08cff;
+
+  --c-brand: #fd9d2b;
+  --c-brand-deep: #f57c1f;
+  --c-accent: #ffd166;
+  --c-success: #4caf7d;
+  --c-error: #ff6b6b;
+  --c-ink: #3a3a4a;
+  --c-ink-soft: #6b6b7b;
+  --c-paper: #fffaf2;
+  --c-card-warm: #fff7ec;
+  --c-card-warm-edge: #ffe9cf;
+  --c-line: #f0e6da;
+
+  /* 场景色（海岛）*/
+  --sky-top: #7ec8f2;
+  --sky-mid: #a8dcf5;
+  --sky-low: #d6f0fb;
+  --sea-deep: #3fa9d6;
+  --sea-mid: #6cc5e3;
+  --land-grass: #8ed36a;
+  --land-sand: #f6e2a8;
+
+  --radical-bg: #ffe0e8;
+  --radical-ink: #e5527a;
+  --radical-edge: #ffc2d2;
+  --comp-bg: #e3f0ff;
+  --comp-ink: #3d7fd6;
+  --comp-edge: #c4dcff;
+
+  --r-md: 18px;
+  --r-lg: 24px;
+  --r-xl: 32px;
+  --r-pill: 999px;
+  --r-blob: 42% 58% 58% 42% / 48% 42% 58% 52%;
+
+  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px;
+  --s-5: 24px; --s-6: 32px; --s-7: 48px; --s-8: 64px;
+
+  --f-sm: 15px; --f-md: 18px; --f-lg: 24px; --f-xl: 32px;
+  --f-2xl: 48px; --f-huge: 96px;
+
+  --font-ui: 'Baloo 2', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+  --font-kai: 'Kaiti SC', 'STKaiti', 'KaiTi', 'PingFang SC', serif;
+
+  --tap-min: 64px;
+  --ease-juicy: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ============================================================
+     ★ 糖果风质感配方（这一层是「软3D」的核心，可复用）
+     ============================================================ */
+
+  /* 塑料糖果高光：顶部内高光 + 底部内暗边 —— 让平面「鼓起来」 */
+  --gloss-hi: inset 0 3px 0 rgba(255, 255, 255, 0.7),
+              inset 0 6px 12px rgba(255, 255, 255, 0.45);
+  --gloss-lo: inset 0 -8px 14px rgba(0, 0, 0, 0.14);
+
+  /* 拟物立体投影：厚彩色底座 + 弥散地面阴影（比生产 --sh 更强） */
+  --pop-sm: 0 4px 0 rgba(0,0,0,0.10), 0 8px 16px rgba(60, 80, 120, 0.18);
+  --pop-md: 0 8px 0 rgba(0,0,0,0.10), 0 16px 28px rgba(60, 80, 120, 0.22);
+  --pop-lg: 0 12px 0 rgba(0,0,0,0.10), 0 24px 40px rgba(60, 80, 120, 0.26);
+
+  --stroke-w: 3.5px;
+  --stroke-ink: #2f4858;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+body {
+  margin: 0;
+  font-family: var(--font-ui);
+  color: var(--c-ink);
+  background: var(--c-paper);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 学习汉字统一楷体 */
+.kai { font-family: var(--font-kai); }
+
+/* ---- 手机取景框：把 mockup 放进一个 390×844 的「设备」里预览 ---- */
+.phone {
+  position: relative;
+  width: 390px;
+  height: 844px;
+  margin: 0 auto;
+  border-radius: 46px;
+  overflow: hidden;
+  background: var(--c-paper);
+  box-shadow: 0 24px 60px rgba(40, 50, 80, 0.35),
+              0 0 0 12px #1c2233, 0 0 0 14px #2f3850;
+}
+.phone__screen { position: absolute; inset: 0; overflow: hidden; }
+
+/* ============================================================
+   ★ 糖果按钮：饱满、光泽、厚底座、按下真实下沉
+   ============================================================ */
+.candy-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
+  min-height: var(--tap-min);
+  padding: 0 var(--s-6);
+  border: none;
+  border-radius: var(--r-pill);
+  font-family: var(--font-ui);
+  font-weight: 800;
+  font-size: var(--f-lg);
+  color: #fff;
+  cursor: pointer;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--btn, var(--c-brand)) 70%, #fff) 0%,
+    var(--btn, var(--c-brand)) 52%,
+    color-mix(in srgb, var(--btn, var(--c-brand)) 78%, #000) 100%);
+  box-shadow:
+    var(--gloss-hi),
+    0 7px 0 color-mix(in srgb, var(--btn, var(--c-brand)) 70%, #000),
+    0 14px 22px rgba(60, 80, 120, 0.24);
+  transition: transform 0.12s var(--ease-juicy), box-shadow 0.12s var(--ease-juicy);
+}
+.candy-btn:active {
+  transform: translateY(6px);
+  box-shadow:
+    var(--gloss-hi),
+    0 2px 0 color-mix(in srgb, var(--btn, var(--c-brand)) 70%, #000),
+    0 6px 12px rgba(60, 80, 120, 0.2);
+}
+.candy-btn--success { --btn: var(--c-success); }
+.candy-btn--accent { --btn: var(--c-accent); color: var(--c-ink); text-shadow: none; }
+
+/* 白色果冻钮（次要） */
+.candy-btn--ghost {
+  color: var(--c-ink);
+  text-shadow: none;
+  background: linear-gradient(180deg, #fff 0%, #fff 55%, #f4ece0 100%);
+  box-shadow:
+    inset 0 3px 0 rgba(255,255,255,0.9),
+    0 6px 0 #e8dcc9,
+    0 12px 20px rgba(120, 90, 40, 0.16);
+}
+.candy-btn--ghost:active {
+  transform: translateY(5px);
+  box-shadow: inset 0 3px 0 rgba(255,255,255,0.9), 0 2px 0 #e8dcc9;
+}
+
+/* ============================================================
+   ★ 糖果喇叭钮：蓝色饱满圆球 + 白喇叭 + 声波
+   ============================================================ */
+.spk {
+  --btn: #67c7f5;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border-radius: 50%;
+  padding: 0;
+  flex-shrink: 0;
+}
+.spk--lg { width: 88px; height: 88px; }
+.spk svg { width: 54%; height: 54%; }
+.spk-wave { animation: spkwave 2.2s ease-in-out infinite; transform-origin: left center; }
+.spk-wave.w2 { animation-delay: 0.3s; }
+@keyframes spkwave { 0%,100% { opacity: 0.4; } 40% { opacity: 1; } }
+/* 招手抖动：吸引点按 */
+@keyframes spkwiggle {
+  0%, 88%, 100% { transform: rotate(0); }
+  92% { transform: rotate(-9deg); }
+  96% { transform: rotate(9deg); }
+}
+.spk--wiggle { animation: spkwiggle 3.4s ease-in-out infinite; }
+
+/* ============================================================
+   ★ 糖果卡片：暖奶白 + 顶部高光 + 厚暖底座
+   ============================================================ */
+.candy-card {
+  background: linear-gradient(180deg, #fffdf8 0%, var(--c-card-warm) 100%);
+  border-radius: var(--r-xl);
+  box-shadow:
+    inset 0 3px 0 rgba(255,255,255,0.9),
+    0 8px 0 var(--c-card-warm-edge),
+    0 18px 30px rgba(120, 90, 40, 0.14);
+}
+
+/* 大字舞台：目标汉字 C 位，鼓起的糖果面 */
+.char-stage {
+  width: 210px; height: 210px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 38px;
+  font-family: var(--font-kai);
+  font-size: var(--f-huge);
+  font-weight: 900;
+  color: var(--c-ink);
+  background:
+    radial-gradient(120% 100% at 50% 0%, #fff 0%, var(--c-card-warm) 60%, #ffe7cf 100%);
+  box-shadow:
+    inset 0 4px 0 rgba(255,255,255,0.95),
+    inset 0 -10px 18px rgba(210, 150, 70, 0.16),
+    0 10px 0 var(--c-card-warm-edge),
+    0 22px 38px rgba(120, 90, 40, 0.18);
+}
+
+/* 通用：一屏一主角的居中列 */
+.stack {
+  display: flex; flex-direction: column;
+  align-items: center; gap: var(--s-5);
+}
+
+/* 药丸小标签 */
+.pill {
+  display: inline-flex; align-items: center; gap: var(--s-1);
+  padding: var(--s-1) var(--s-4);
+  border-radius: var(--r-pill);
+  font-weight: 800; font-size: var(--f-md);
+  background: rgba(255,255,255,0.9);
+  box-shadow: var(--pop-sm);
+}
+
+/* HUD 玻璃药丸（悬浮场景上） */
+.glass-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 14px 6px 8px;
+  border-radius: var(--r-pill);
+  font-weight: 900; font-size: var(--f-md);
+  color: var(--c-ink);
+  background: rgba(255,255,255,0.82);
+  backdrop-filter: blur(8px);
+  box-shadow: inset 0 2px 0 rgba(255,255,255,0.9), 0 4px 12px rgba(40,60,90,0.18);
+}
+.glass-pill .ic { font-size: 20px; }
+
+/* 进入动画：果冻弹入 */
+@keyframes popin {
+  0% { opacity: 0; transform: scale(0.6) translateY(20px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+.popin { animation: popin 0.5s var(--ease-juicy) both; }
+
+/* 呼吸浮动（小墨/主角） */
+@keyframes breathe {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-6px) scale(1.02); }
+}
+.breathe { animation: breathe 3s ease-in-out infinite; }

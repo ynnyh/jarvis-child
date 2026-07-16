@@ -32,7 +32,7 @@ export default function StarReward({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
     >
-      {stars >= 2 && <Confetti />}
+      {stars >= 1 && <Confetti />}
       <motion.div
         className="reward-card"
         initial={{ scale: 0.6, y: 40 }}

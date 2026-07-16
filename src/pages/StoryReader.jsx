@@ -9,9 +9,11 @@ import { useGameStore } from '../store/useGameStore.js';
 import { useSpeech } from '../hooks/useSpeech.js';
 import { useSound } from '../hooks/useSound.js';
 import Button from '../components/ui/Button.jsx';
+import SpeakerButton from '../components/ui/SpeakerButton.jsx';
 import PageTransition from '../components/ui/PageTransition.jsx';
 import PlayfulBackground from '../components/PlayfulBackground.jsx';
 import Confetti from '../components/Confetti.jsx';
+import Xiaomo from '../components/mascot/Xiaomo.jsx';
 
 const STORY_REWARD = 10; // 读完一本绘本奖励金币
 
@@ -142,13 +144,11 @@ export default function StoryReader() {
               >
                 ‹
               </button>
-              <button
-                className="story-replay-btn"
+              <SpeakerButton
+                size="sm"
+                label="再听一遍"
                 onClick={() => { sound.tap(); speak(page.text); }}
-                aria-label="再听一遍"
-              >
-                🔊 再听一遍
-              </button>
+              />
               <button
                 className="story-nav-btn"
                 onClick={goNext}
@@ -166,6 +166,7 @@ export default function StoryReader() {
             transition={{ type: 'spring', stiffness: 200, damping: 18 }}
           >
             <Confetti />
+            <Xiaomo expression="cheer" size={110} />
             <div className="story-finish-emoji">{story.cover}</div>
             <h3 className="story-finish-title">读完啦！</h3>
             <p className="story-finish-reward">+{STORY_REWARD} 金币 🪙</p>

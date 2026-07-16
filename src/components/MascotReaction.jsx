@@ -38,7 +38,6 @@ export default function MascotReaction({ type, onHide, duration = 1400 }) {
           <Xiaomo
             expression={type === 'correct' ? 'cheer' : 'encourage'}
             size={72}
-            animate={false}
           />
           <span className={`mascot-bubble ${type}`}>{msg}</span>
         </motion.div>

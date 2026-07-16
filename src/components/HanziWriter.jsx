@@ -52,9 +52,11 @@ const HanziWriterView = forwardRef(function HanziWriterView(
       showOutline: true,
       strokeAnimationSpeed: 1,
       delayBetweenStrokes: 200,
-      strokeColor: '#333',
-      radicalColor: '#FF8FB1',
-      outlineColor: '#DDD',
+      // 儿童友好高对比分色（skill §2）：普通笔画深墨、部首珊瑚、孩子笔迹淡蓝。
+      strokeColor: '#3a3a4a',
+      radicalColor: '#e5527a',
+      outlineColor: '#e6dccb',
+      drawingColor: '#3d7fd6',
       drawingWidth: 28,
       charDataLoader,
     });
@@ -92,14 +94,14 @@ const HanziWriterView = forwardRef(function HanziWriterView(
         width: actualSize,
         height: actualSize,
         maxWidth: '100%',
-        background: '#fff',
+        background: '#fff7ec',
         borderRadius: 24,
-        // 田字格背景，帮助小朋友定位笔画。
+        // 田字格背景，帮助小朋友定位笔画（暖底 + 珊瑚虚线中线）。
         backgroundImage:
-          'linear-gradient(#f0f0f0 1px, transparent 1px), linear-gradient(90deg, #f0f0f0 1px, transparent 1px), linear-gradient(#ffd9e6 1px, transparent 1px), linear-gradient(90deg, #ffd9e6 1px, transparent 1px)',
+          'linear-gradient(#f3e8d8 1px, transparent 1px), linear-gradient(90deg, #f3e8d8 1px, transparent 1px), linear-gradient(#ffd9e6 1px, transparent 1px), linear-gradient(90deg, #ffd9e6 1px, transparent 1px)',
         backgroundSize: `${actualSize / 2}px ${actualSize / 2}px, ${actualSize / 2}px ${actualSize / 2}px, 100% 100%, 100% 100%`,
         backgroundPosition: 'center',
-        boxShadow: '0 6px 20px rgba(0,0,0,0.08)',
+        boxShadow: '0 6px 0 #ffe9cf, 0 12px 24px rgba(120, 90, 40, 0.14)',
       }}
     />
   );

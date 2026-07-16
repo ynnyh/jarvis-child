@@ -59,7 +59,7 @@ export default function Chest({ coins = 10, bonus = null, onOpen }) {
               {bonus && <div className="chest-bonus">{bonus}</div>}
               <button
                 className="ui-btn ui-btn--primary ui-btn--lg"
-                onClick={() => onOpen?.()}
+                onClick={() => { play('coin'); onOpen?.(); }}
               >
                 收下啦 →
               </button>

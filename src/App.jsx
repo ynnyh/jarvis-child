@@ -22,10 +22,11 @@ import Parent from './pages/Parent.jsx';
 import StoryShelf from './pages/StoryShelf.jsx';
 import StoryReader from './pages/StoryReader.jsx';
 import SettingsOverlay from './components/SettingsOverlay.jsx';
+import StartGate from './components/StartGate.jsx';
 import { useBgmController } from './hooks/useBgm.js';
 
 export default function App() {
-  useBgmController(); // 背景音乐：首次交互后循环播放，跨页面不打断
+  useBgmController(); // 背景音乐：由开场门 StartGate 启动，此 hook 负责跨页连续 + 切后台暂停/恢复
   const location = useLocation();
   return (
     <>
@@ -45,6 +46,8 @@ export default function App() {
       </AnimatePresence>
       {/* 全局叠层：护眼滤镜 + 使用时长锁定，跨页面常驻 */}
       <SettingsOverlay />
+      {/* 开场欢迎门：会话首次进入时铺满全屏，点大喇叭解锁音乐+音效（满足自动播放策略） */}
+      <StartGate />
     </>
   );
 }

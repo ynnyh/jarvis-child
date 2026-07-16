@@ -30,6 +30,8 @@
   --c-ink-soft: #6b6b7b; /* 次要文字 */
   --c-paper: #fffaf2; /* 页面底色 · 暖纸白 */
   --c-card: #ffffff;
+  --c-card-warm: #fff7ec; /* 暖奶白卡面（学习页大字卡/词卡，替代纯白）*/
+  --c-card-warm-edge: #ffe9cf; /* 暖卡面底边/描边暖影 */
   --c-line: #f0e6da; /* 分隔线/描边 */
 
   /* ---- 圆角 ---- */
@@ -77,9 +79,90 @@
   --t-slow: 0.5s;
   --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1); /* 回弹，卡通感 */
   --ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-juicy: cubic-bezier(0.175, 0.885, 0.32, 1.275); /* 果冻橡皮弹性（skill 指定）*/
+
+  /* ---- 触控热区（小手防挫败：一切可点元素的下限）---- */
+  --tap-min: 64px;
 
   /* ---- 层级 ---- */
   --z-nav: 100;
   --z-overlay: 900;
   --z-toast: 1000;
+
+  /* ============================================================
+     场景化视觉系统（矢量卡通海岛风）—— 阶段一重构新增。
+     这些令牌服务于 IslandScene 及全站"场景感"升级，
+     旧令牌保持不变以兼容存量样式。
+     ============================================================ */
+
+  /* ---- 天空（分层渐变，从高空到地平线）---- */
+  --sky-top: #7ec8f2;      /* 高空蓝 */
+  --sky-mid: #a8dcf5;      /* 中空 */
+  --sky-low: #d6f0fb;      /* 近地平线，淡 */
+  --sky-horizon: #eaf8ff;  /* 地平线雾白 */
+
+  /* ---- 海水（两层，深浅叠出层次）---- */
+  --sea-deep: #3fa9d6;
+  --sea-mid: #6cc5e3;
+  --sea-light: #a5e0ef;
+  --sea-foam: #e6f9ff;     /* 浪花白 */
+
+  /* ---- 陆地/草地（岛屿）---- */
+  --land-grass: #8ed36a;
+  --land-grass-deep: #6bbd4e;
+  --land-grass-dark: #4fa63c; /* 阴影侧 */
+  --land-sand: #f6e2a8;       /* 沙滩 */
+  --land-sand-deep: #ecce85;
+  --land-soil: #c99a5b;       /* 土壤断面 */
+
+  /* ---- 建筑/入口物件常用色 ---- */
+  --bld-roof-red: #ee6c5a;
+  --bld-roof-blue: #5aa9ee;
+  --bld-roof-purple: #b58cf0;
+  --bld-wall: #fff6e9;
+  --bld-wall-shadow: #f0e2cc;
+  --bld-wood: #d99a5c;
+
+  /* ---- 树木 ---- */
+  --tree-crown: #6cc44e;
+  --tree-crown-deep: #4fa63c;
+  --tree-trunk: #b07b45;
+
+  /* ---- 场景专用圆角 / 尺寸 ---- */
+  --r-scene: 40px;
+
+  /* ---- 立体质感投影（比旧 sh 更强，卡通厚涂感）---- */
+  --sh-pop: 0 8px 0 rgba(0, 0, 0, 0.10), 0 14px 26px rgba(60, 80, 120, 0.20);
+  --sh-float: 0 10px 24px rgba(60, 90, 140, 0.28);
+  --sh-inset-hi: inset 0 3px 0 rgba(255, 255, 255, 0.55);
+  --sh-inset-lo: inset 0 -5px 0 rgba(0, 0, 0, 0.12);
+
+  /* ---- 场景描边（卡通轮廓）---- */
+  --stroke-ink: #2f4858;         /* 深青墨，比纯黑柔和 */
+  --stroke-w: 3px;
+
+  /* ---- 入口气泡标签（建筑名牌）---- */
+  --label-bg: rgba(47, 72, 88, 0.72);
+  --label-ink: #ffffff;
+
+  /* ============================================================
+     识字学习闭环专用令牌 —— 儿童导向设计 skill 落地新增。
+     部首分色（字理教学）、喇叭朗读钮、更强卡通投影。
+     ============================================================ */
+
+  /* ---- 偏旁部首分色（有含义的部首高亮，其余部件淡彩）---- */
+  --radical-bg: #ffe0e8;    /* 部首块底 · 珊瑚粉 */
+  --radical-ink: #e5527a;   /* 部首字色 · 深珊瑚 */
+  --radical-edge: #ffc2d2;  /* 部首块厚底边 */
+  --comp-bg: #e3f0ff;       /* 普通部件块底 · 淡天蓝 */
+  --comp-ink: #3d7fd6;      /* 普通部件字色 */
+  --comp-edge: #c4dcff;     /* 普通部件厚底边 */
+
+  /* ---- 喇叭朗读钮（视听可供性：就绪时招手抖动）---- */
+  --speaker-bg: #8ad4ff;      /* 就绪态亮蓝 */
+  --speaker-bg-deep: #4aa6dd; /* 厚底边 */
+  --speaker-ink: #2b6b8a;     /* 喇叭图标色 */
+
+  /* ---- 学习卡片厚投影（比 --sh 更立体，卡通厚涂）---- */
+  --sh-card-warm: 0 6px 0 var(--c-card-warm-edge), 0 12px 24px rgba(120, 90, 40, 0.14);
 }
