@@ -16,31 +16,38 @@ function shuffle(arr) {
 // pairBy: 'pinyin' 字↔拼音；'emoji' 字↔图。
 export default function MatchGame({ chars, pairBy = 'pinyin', onComplete, onSpeak, onSound }) {
   // 取 4-5 对来配（太多屏幕挤）。
+  // 每对带稳定 id：连线/消除全部按 id 判断，而非按显示值。否则当两个字的
+  // 拼音相同（同音字）或 emoji 相同（回退到默认 📖）时，按值匹配会标错/隐藏
+  // 错误的 tile，且 React key 撞车。
   const pairs = useMemo(() => {
     const picked = shuffle(chars).slice(0, Math.min(5, chars.length));
-    return picked.map((c) => ({
+    return picked.map((c, i) => ({
+      id: `${c.char}-${i}`,
       char: c.char,
       right: pairBy === 'emoji' ? c.emoji : c.pinyin,
     }));
   }, [chars, pairBy]);
 
-  const leftItems = useMemo(() => shuffle(pairs.map((p) => p.char)), [pairs]);
-  const rightItems = useMemo(() => shuffle(pairs.map((p) => p.right)), [pairs]);
-
-  const [selectedLeft, setSelectedLeft] = useState(null);
-  const [selectedRight, setSelectedRight] = useState(null);
-  const [matched, setMatched] = useState([]); // 已配对的 char 列表
-  const [wrongPair, setWrongPair] = useState(false);
-
-  const rightOf = useCallback(
-    (char) => pairs.find((p) => p.char === char)?.right,
+  // 左右列各持 pair 的 {id, 显示值}，右列独立打乱。
+  const leftItems = useMemo(
+    () => shuffle(pairs.map((p) => ({ id: p.id, char: p.char }))),
+    [pairs]
+  );
+  const rightItems = useMemo(
+    () => shuffle(pairs.map((p) => ({ id: p.id, right: p.right }))),
     [pairs]
   );
 
+  const [selectedLeft, setSelectedLeft] = useState(null);   // pair id
+  const [selectedRight, setSelectedRight] = useState(null); // pair id
+  const [matched, setMatched] = useState([]); // 已配对的 pair id 列表
+  const [wrongPair, setWrongPair] = useState(false);
+
   const tryMatch = useCallback(
-    (left, right) => {
-      if (rightOf(left) === right) {
-        const nextMatched = [...matched, left];
+    (leftId, rightId) => {
+      // 同一 pair 的左右两半 id 相同即配对成功。
+      if (leftId === rightId) {
+        const nextMatched = [...matched, leftId];
         setMatched(nextMatched);
         setSelectedLeft(null);
         setSelectedRight(null);
@@ -59,26 +66,26 @@ export default function MatchGame({ chars, pairBy = 'pinyin', onComplete, onSpea
         }, 500);
       }
     },
-    [matched, pairs.length, rightOf, onComplete, onSound]
+    [matched, pairs.length, onComplete, onSound]
   );
 
   const pickLeft = useCallback(
-    (char) => {
-      if (matched.includes(char)) return;
-      onSpeak?.(char);
-      setSelectedLeft(char);
-      if (selectedRight != null) tryMatch(char, selectedRight);
+    (item) => {
+      if (matched.includes(item.id)) return;
+      onSpeak?.(item.char);
+      setSelectedLeft(item.id);
+      if (selectedRight != null) tryMatch(item.id, selectedRight);
     },
     [matched, selectedRight, tryMatch, onSpeak]
   );
 
   const pickRight = useCallback(
-    (right) => {
-      if (matched.some((c) => rightOf(c) === right)) return;
-      setSelectedRight(right);
-      if (selectedLeft != null) tryMatch(selectedLeft, right);
+    (item) => {
+      if (matched.includes(item.id)) return;
+      setSelectedRight(item.id);
+      if (selectedLeft != null) tryMatch(selectedLeft, item.id);
     },
-    [matched, selectedLeft, tryMatch, rightOf]
+    [matched, selectedLeft, tryMatch]
   );
 
   return (
@@ -87,20 +94,19 @@ export default function MatchGame({ chars, pairBy = 'pinyin', onComplete, onSpea
       <div className="match-columns">
         <div className="match-col">
           <AnimatePresence>
-            {leftItems.map((char) => {
-              const done = matched.includes(char);
-              if (done) return null;
+            {leftItems.map((item) => {
+              if (matched.includes(item.id)) return null;
               return (
                 <motion.button
-                  key={char}
+                  key={item.id}
                   layout
                   exit={{ scale: 0, opacity: 0 }}
-                  className={`match-item char ${selectedLeft === char ? 'sel' : ''} ${
-                    wrongPair && selectedLeft === char ? 'wrong' : ''
+                  className={`match-item char ${selectedLeft === item.id ? 'sel' : ''} ${
+                    wrongPair && selectedLeft === item.id ? 'wrong' : ''
                   }`}
-                  onClick={() => pickLeft(char)}
+                  onClick={() => pickLeft(item)}
                 >
-                  {char}
+                  {item.char}
                 </motion.button>
               );
             })}
@@ -108,20 +114,19 @@ export default function MatchGame({ chars, pairBy = 'pinyin', onComplete, onSpea
         </div>
         <div className="match-col">
           <AnimatePresence>
-            {rightItems.map((right) => {
-              const done = matched.some((c) => rightOf(c) === right);
-              if (done) return null;
+            {rightItems.map((item) => {
+              if (matched.includes(item.id)) return null;
               return (
                 <motion.button
-                  key={right}
+                  key={item.id}
                   layout
                   exit={{ scale: 0, opacity: 0 }}
-                  className={`match-item right ${selectedRight === right ? 'sel' : ''} ${
-                    wrongPair && selectedRight === right ? 'wrong' : ''
+                  className={`match-item right ${selectedRight === item.id ? 'sel' : ''} ${
+                    wrongPair && selectedRight === item.id ? 'wrong' : ''
                   }`}
-                  onClick={() => pickRight(right)}
+                  onClick={() => pickRight(item)}
                 >
-                  {right}
+                  {item.value}
                 </motion.button>
               );
             })}

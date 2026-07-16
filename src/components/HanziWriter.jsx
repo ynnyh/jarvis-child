@@ -27,17 +27,38 @@ const HanziWriterView = forwardRef(function HanziWriterView(
   const [actualSize, setActualSize] = useState(size);
 
   // 挂载/窗口变化时测量可用宽度。用外层包裹元素测量，画布用较小值。
+  // 关键：actualSize 变化会重建 writer（清空孩子正在描的笔画）。手机地址栏收放
+  // 会触发宽度抖动的 resize，若每次都更新尺寸就会打断描红。因此只在宽度变化
+  // 超过阈值时才更新，且对 resize 做防抖，避免连续 resize 反复重建。
   useLayoutEffect(() => {
-    function measure() {
+    let debounceId = null;
+
+    function computeAvail() {
       const parent = containerRef.current?.parentElement;
-      if (!parent) return;
+      if (!parent) return null;
       // 可用宽度：父容器宽度（已含页面 padding），再留 8px 余量。
-      const avail = Math.max(200, Math.min(size, parent.clientWidth - 8));
-      setActualSize(avail);
+      return Math.max(200, Math.min(size, parent.clientWidth - 8));
     }
-    measure();
-    window.addEventListener('resize', measure);
-    return () => window.removeEventListener('resize', measure);
+
+    function apply() {
+      const avail = computeAvail();
+      if (avail == null) return;
+      // 阈值 4px：忽略地址栏收放等造成的细微抖动，避免无谓重建。
+      setActualSize((prev) => (Math.abs(avail - prev) > 4 ? avail : prev));
+    }
+
+    // 首次同步测量（布局阶段），避免首帧用默认 size 闪一下。
+    apply();
+
+    function onResize() {
+      clearTimeout(debounceId);
+      debounceId = setTimeout(apply, 200);
+    }
+    window.addEventListener('resize', onResize);
+    return () => {
+      clearTimeout(debounceId);
+      window.removeEventListener('resize', onResize);
+    };
   }, [size]);
 
   // 创建 writer 实例；char 或尺寸变化时重建。
