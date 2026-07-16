@@ -8,8 +8,8 @@ import { motion } from 'framer-motion';
 import { CURRICULUM, ALL_CHARS } from '../data/content.generated.js';
 import { useGameStore } from '../store/useGameStore.js';
 import { useSettings } from '../hooks/useSettings.js';
-import { isBgmEnabled, setBgmEnabled } from '../hooks/useBgm.js';
-import { useSound } from '../hooks/useSound.js';
+import { isBgmEnabled, setBgmEnabled, getBgmVolume, setBgmVolume } from '../hooks/useBgm.js';
+import { useSound, getSoundVolume, setSoundVolume } from '../hooks/useSound.js';
 import { api, isLoggedIn } from '../api/client.js';
 import {
   syncNow,
@@ -161,6 +161,7 @@ function SettingsPanel() {
   const { eyecare, setEyecare, timeCap, setTimeCap, usageSeconds, resetUsageToday } =
     useSettings();
   const [bgm, setBgm] = useState(() => isBgmEnabled());
+  const [bgmVol, setBgmVol] = useState(() => getBgmVolume());
   // 音效开关沿用 useSound 的 localStorage（默认开）。
   const [sfx, setSfx] = useState(() => {
     try {
@@ -169,6 +170,7 @@ function SettingsPanel() {
       return true;
     }
   });
+  const [sfxVol, setSfxVol] = useState(() => getSoundVolume());
 
   const usedMin = Math.floor(usageSeconds / 60);
 
@@ -206,6 +208,27 @@ function SettingsPanel() {
           </button>
         </div>
 
+        {/* 背景音乐音量：仅在开启时可调 */}
+        {bgm && (
+          <div className="setting-tile wide">
+            <span className="setting-icon">🔊</span>
+            <span className="setting-name">
+              音乐音量
+              <span className="setting-sub">{Math.round(bgmVol * 100)}%</span>
+            </span>
+            <input
+              className="setting-range"
+              type="range"
+              min="0"
+              max="1"
+              step="0.05"
+              value={bgmVol}
+              onChange={(e) => { const v = Number(e.target.value); setBgmVol(v); setBgmVolume(v); }}
+              aria-label="背景音乐音量"
+            />
+          </div>
+        )}
+
         {/* 音效 */}
         <div className="setting-tile">
           <span className="setting-icon">🔔</span>
@@ -220,6 +243,28 @@ function SettingsPanel() {
             <span className="toggle-knob" />
           </button>
         </div>
+
+        {/* 音效音量：仅在开启时可调；拖动即时试听一声 */}
+        {sfx && (
+          <div className="setting-tile wide">
+            <span className="setting-icon">🔊</span>
+            <span className="setting-name">
+              音效音量
+              <span className="setting-sub">{Math.round(sfxVol * 100)}%</span>
+            </span>
+            <input
+              className="setting-range"
+              type="range"
+              min="0"
+              max="1"
+              step="0.05"
+              value={sfxVol}
+              onChange={(e) => { const v = Number(e.target.value); setSfxVol(v); setSoundVolume(v); }}
+              onPointerUp={() => sound.tap()}
+              aria-label="音效音量"
+            />
+          </div>
+        )}
 
         {/* 使用时长 */}
         <div className="setting-tile wide">

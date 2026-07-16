@@ -64,6 +64,45 @@ function getCtx() {
   return sharedCtx;
 }
 
+// ---- 音效主音量 ----
+// 做成模块级共享（不放进每个组件的 ref）：家长中心一调，全站后续音效立即生效，
+// 避免多个 useSound 实例各持一份、互不同步。乘到每个音符的 gain 上。
+const SOUND_VOLUME_KEY = 'jarvis-child-sound-volume';
+const DEFAULT_SOUND_VOLUME = 0.85; // 音效短促，默认给较高音量
+let masterVolume = null; // 惰性读，读到后缓存
+
+function readSoundVolume() {
+  if (masterVolume != null) return masterVolume;
+  try {
+    const raw = localStorage.getItem(SOUND_VOLUME_KEY);
+    // 与 useBgm 同一个坑：key 不存在时 getItem 返回 null，Number(null)===0 会通过
+    // 0<=v<=1 校验、把音量当成 0（静音）。因此 null/空串必须先落回默认值。
+    if (raw == null || raw === '') {
+      masterVolume = DEFAULT_SOUND_VOLUME;
+    } else {
+      const v = Number(raw);
+      masterVolume = Number.isFinite(v) && v >= 0 && v <= 1 ? v : DEFAULT_SOUND_VOLUME;
+    }
+  } catch {
+    masterVolume = DEFAULT_SOUND_VOLUME;
+  }
+  return masterVolume;
+}
+
+export function getSoundVolume() {
+  return readSoundVolume();
+}
+
+export function setSoundVolume(v) {
+  const vol = Math.max(0, Math.min(1, v));
+  masterVolume = vol;
+  try {
+    localStorage.setItem(SOUND_VOLUME_KEY, String(vol));
+  } catch {
+    // 忽略（隐私模式）
+  }
+}
+
 export function useSound() {
   const enabledRef = useRef(true);
 
@@ -86,17 +125,20 @@ export function useSound() {
     // 浏览器可能挂起 AudioContext，交互时恢复。
     if (ctx.state === 'suspended') ctx.resume().catch(() => {});
 
+    const master = readSoundVolume();
+    if (master <= 0) return; // 音量为 0 等同静音，省去建节点
     const now = ctx.currentTime;
     for (const note of recipe) {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = note.type ?? 'sine';
       osc.frequency.value = note.f;
-      // 用 gain 包络做出轻微的淡入淡出，避免爆音。
+      // 用 gain 包络做出轻微的淡入淡出，避免爆音。峰值 gain 乘以主音量。
       const start = now + note.t;
       const end = start + note.d;
+      const peak = (note.gain ?? 0.2) * master;
       gain.gain.setValueAtTime(0, start);
-      gain.gain.linearRampToValueAtTime(note.gain ?? 0.2, start + 0.01);
+      gain.gain.linearRampToValueAtTime(peak, start + 0.01);
       gain.gain.exponentialRampToValueAtTime(0.0001, end);
       osc.connect(gain);
       gain.connect(ctx.destination);

@@ -39,7 +39,12 @@ function readEnabled() {
 
 function readVolume() {
   try {
-    const v = Number(localStorage.getItem(BGM_VOLUME_KEY));
+    const raw = localStorage.getItem(BGM_VOLUME_KEY);
+    // 关键：未设置时 getItem 返回 null，而 Number(null) === 0 会通过下面的
+    // 0<=v<=1 校验、把音量当成 0（静音）。这正是无痕模式（localStorage 恒为空）
+    // 下「在播却没声」的元凶。因此 null/空串必须先落回默认音量，不能进 Number()。
+    if (raw == null || raw === '') return DEFAULT_VOLUME;
+    const v = Number(raw);
     return Number.isFinite(v) && v >= 0 && v <= 1 ? v : DEFAULT_VOLUME;
   } catch {
     return DEFAULT_VOLUME;
