@@ -1,7 +1,8 @@
 // 小墨情绪反应：答对/答错时从屏幕底角弹出小墨 + 一句气泡话，短暂停留后自动消失。
 // 用于游戏、即时检查等即时反馈场景。
 // props:
-//   type: 'correct' | 'wrong' | null   反应类型（null 不显示）
+//   type: 'correct' | 'wrong' | 'cheer' | 'celebrate' | 'dizzy' | null
+//         反应类型（null 不显示）；后三种对应小墨的新状态（欢呼/庆祝/晕）
 //   onHide: () => void                 自动消失回调
 import { useEffect, useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -10,6 +11,18 @@ import Xiaomo from './mascot/Xiaomo.jsx';
 const MSG = {
   correct: ['答对啦！', '真棒！', '好厉害！', '就是它！'],
   wrong: ['再想想～', '不是这个哦', '换一个试试', '加油！'],
+  cheer: ['耶！', '好耶！', '太棒啦！'],
+  celebrate: ['大获全胜！', '我们一起庆祝！', '你做到了！'],
+  dizzy: ['哎呀，有点晕…', '转晕啦～'],
+};
+
+// 反应类型 → 小墨表情状态的映射。
+const EXPRESSION = {
+  correct: 'cheer',
+  wrong: 'encourage',
+  cheer: 'cheer',
+  celebrate: 'celebrate',
+  dizzy: 'dizzy',
 };
 
 export default function MascotReaction({ type, onHide, duration = 1400 }) {
@@ -36,7 +49,7 @@ export default function MascotReaction({ type, onHide, duration = 1400 }) {
           transition={{ type: 'spring', stiffness: 300, damping: 22 }}
         >
           <Xiaomo
-            expression={type === 'correct' ? 'cheer' : 'encourage'}
+            expression={EXPRESSION[type] ?? 'encourage'}
             size={72}
           />
           <span className={`mascot-bubble ${type}`}>{msg}</span>

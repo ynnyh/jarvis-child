@@ -667,6 +667,37 @@ button {
   justify-content: center;
 }
 
+/* 「下一步」按钮：在 ui-btn--lg 基础上再加大，减少步骤间停滞感。
+   弹簧 scale 入场由 LearnFlow 的 NextButton（framer-motion）驱动。 */
+.flow-next .ui-btn {
+  padding: var(--s-4) var(--s-7);
+  font-size: var(--f-xl);
+}
+
+/* 字卡收入囊中：结算时字卡从屏幕中央缩小飞向右下角的纯动效层。
+   位移/缩放由 framer-motion 驱动，这里只定初始锚点与外观；盖过奖励弹层但不拦点击。 */
+.char-fly {
+  position: fixed;
+  top: 42%;
+  left: 50%;
+  width: 140px;
+  height: 140px;
+  margin: -70px 0 0 -70px; /* 让 left/top 锚在卡片中心，位移从屏幕中心起算 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-kai);
+  font-size: 88px;
+  font-weight: 900;
+  color: var(--c-ink);
+  background: var(--c-card-warm);
+  border: var(--stroke-w) solid var(--stroke-ink);
+  border-radius: var(--r-xl);
+  box-shadow: var(--sh-card-warm);
+  z-index: var(--z-toast);
+  pointer-events: none;
+}
+
 /* ============ 象形演变 ============ */
 .pictograph {
   display: flex;
@@ -777,37 +808,6 @@ button {
   color: var(--c-ink-soft);
   margin: 0;
 }
-.q-options {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--s-4);
-  width: 100%;
-  max-width: 420px;
-}
-.q-options.six {
-  grid-template-columns: repeat(3, 1fr);
-}
-.q-option {
-  background: var(--c-card-warm);
-  border: var(--stroke-w) solid var(--stroke-ink);
-  border-radius: var(--r-lg);
-  padding: var(--s-5);
-  font-size: 56px;
-  font-weight: 800;
-  box-shadow: 0 6px 0 var(--c-card-warm-edge), var(--sh-under-sm);
-  aspect-ratio: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: box-shadow var(--t-fast) var(--ease-soft);
-}
-.q-option:active {
-  box-shadow: 0 2px 0 var(--c-card-warm-edge), var(--sh-sm);
-}
-.q-option.wrong {
-  background: #ffe0e0;
-  box-shadow: 0 6px 0 #f3bcbc, var(--sh-under-sm);
-}
 .q-trace-actions {
   display: flex;
   gap: var(--s-3);
@@ -815,46 +815,328 @@ button {
   justify-content: center;
 }
 
-/* ============ 连连看 ============ */
-.match-game {
+/* ============ 舞台化小游戏（阶段 2 重构）============ */
+/* 通用舞台：粗描边大圆角场景卡，每个游戏一个"小场景"而非白底表单 */
+.game-stage {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  margin: var(--s-3) auto 0;
+  border: var(--stroke-w) solid var(--stroke-ink);
+  border-radius: var(--r-xl);
+  box-shadow: var(--sh-pop);
+  padding: var(--s-4);
+  overflow: hidden;
+}
+.stage-head {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-3);
+}
+.stage-head-col {
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: var(--s-2);
+}
+
+/* 游戏 HUD：心 / 连击 / 金币（顶部常驻） */
+.game-hud {
+  margin-bottom: var(--s-3);
+}
+.hud-hearts {
+  display: flex;
+  gap: 2px;
+  font-size: 26px;
+  line-height: 1;
+}
+.hud-heart {
+  display: inline-block;
+}
+.hud-combo {
+  font-weight: 900;
+  color: var(--c-brand-deep);
+  background: #fff3d6;
+  border: var(--stroke-w-sm) solid var(--stroke-ink);
+  border-radius: var(--r-pill);
+  padding: 2px var(--s-3);
+}
+.hud-coins {
+  margin-left: auto;
+  font-weight: 900;
+  color: var(--c-brand-deep);
+  background: #fff3d6;
+  border: var(--stroke-w-sm) solid var(--stroke-ink);
+  border-radius: var(--r-pill);
+  padding: 2px var(--s-3);
+}
+.game-hud-sub {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  margin-bottom: var(--s-2);
+}
+
+/* 结算/失败页 */
+.result-wrap {
+  gap: var(--s-4);
+  min-height: 60vh;
+  justify-content: center;
+}
+.result-stats {
+  font-size: var(--f-lg);
+  font-weight: 800;
+  color: var(--c-ink-soft);
+}
+.result-btns {
+  display: flex;
+  gap: var(--s-3);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* ---- 打地鼠（听音选字）---- */
+.mole-stage {
+  background: linear-gradient(180deg, #bfe9ff 0%, #bfe9ff 34%, var(--land-grass) 34%, var(--land-grass-deep) 100%);
+}
+.mole-field {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: var(--s-4);
   margin-top: var(--s-4);
 }
-.match-columns {
+.mole-hole {
+  position: relative;
   display: flex;
-  gap: var(--s-7);
-  width: 100%;
-  max-width: 420px;
-  justify-content: space-between;
+  justify-content: center;
+  align-items: flex-end;
+  min-height: 148px;
 }
-.match-col {
+/* 洞口：底部椭圆土坑 */
+.mole-hole::before {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 128px;
+  height: 32px;
+  background: radial-gradient(ellipse at center, #6b4a2c 0%, #8a6138 68%, rgba(138, 97, 56, 0) 72%);
+  border-radius: 50%;
+}
+.mole {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: var(--tap-min);
+  min-height: var(--tap-min);
+}
+.mole-face {
+  font-size: 52px;
+  line-height: 1;
+}
+.mole-sign {
+  margin-top: -4px;
+  background: var(--c-card-warm);
+  border: var(--stroke-w-sm) solid var(--stroke-ink);
+  border-radius: var(--r-md);
+  min-width: 64px;
+  padding: 2px var(--s-3);
+  font-size: 34px;
+  font-weight: 900;
+  font-family: var(--font-kai);
+  box-shadow: 0 4px 0 var(--c-card-warm-edge);
+}
+/* 演示正确答案：正确字牌绿圈高亮 */
+.mole.reveal .mole-sign {
+  border-color: var(--c-success);
+  box-shadow: 0 4px 0 var(--c-success-deep), 0 0 0 6px rgba(47, 179, 119, 0.28);
+}
+.mole-hammer {
+  position: absolute;
+  top: -6px;
+  right: 12%;
+  font-size: 44px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* ---- 点泡泡（看字选图）---- */
+.bubble-stage {
+  background: linear-gradient(180deg, #cfeeff 0%, #9edcff 55%, var(--sea-mid) 100%);
+}
+.bubble-target {
+  font-size: 72px;
+  width: 132px;
+  height: 132px;
+}
+.bubble-sea {
+  position: relative;
+  height: 260px;
+  margin-top: var(--s-3);
+}
+.bubble {
+  position: absolute;
+  bottom: 20px;
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.95);
+  background: radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.95) 0 18%, rgba(190, 235, 255, 0.55) 45%, rgba(120, 200, 240, 0.5) 100%);
+  font-size: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--sh-float);
+}
+/* 演示正确答案：正确泡泡金圈高亮 */
+.bubble.reveal {
+  border-color: var(--c-accent);
+  box-shadow: 0 0 0 6px rgba(255, 198, 54, 0.4), var(--sh-float);
+}
+
+/* ---- 钓鱼（看图选字）---- */
+.fish-stage {
+  background: linear-gradient(180deg, #d8f4ff 0%, #d8f4ff 36%, var(--sea-light) 36%, var(--sea-mid) 62%, var(--sea-deep) 100%);
+}
+.fish-emoji {
+  font-size: 84px;
+  line-height: 1;
+}
+.fish-water {
+  position: relative;
+  height: 250px;
+  margin-top: var(--s-2);
+}
+.fish {
+  position: absolute;
+  left: 0;
+  min-width: var(--tap-min);
+  min-height: var(--tap-min);
+}
+.fish-body {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 84px;
+  height: 56px;
+  padding: 0 var(--s-3);
+  background: linear-gradient(180deg, #ffb25e, #ff8f3a);
+  border: var(--stroke-w-sm) solid var(--stroke-ink);
+  border-radius: 50% 55% 55% 50% / 62% 62% 42% 42%;
+  font-size: 30px;
+  font-weight: 900;
+  font-family: var(--font-kai);
+  color: #fff;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.15);
+}
+/* 尾巴：右侧三角 */
+.fish-body::after {
+  content: '';
+  position: absolute;
+  right: -20px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 13px solid transparent;
+  border-left: 20px solid var(--stroke-ink);
+}
+.fish-body::before {
+  content: '';
+  position: absolute;
+  right: -16px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 10px solid transparent;
+  border-left: 16px solid #ff8f3a;
+  z-index: 1;
+}
+/* 各鱼异色 */
+.fish--1 .fish-body { background: linear-gradient(180deg, #ff8fb2, #ff6f9f); }
+.fish--1 .fish-body::before { border-left-color: #ff6f9f; }
+.fish--2 .fish-body { background: linear-gradient(180deg, #6fd3a7, #2fbd8b); }
+.fish--2 .fish-body::before { border-left-color: #2fbd8b; }
+.fish--3 .fish-body { background: linear-gradient(180deg, #b58cf0, #a86bf5); }
+.fish--3 .fish-body::before { border-left-color: #a86bf5; }
+/* 演示正确答案：正确的鱼金圈高亮 */
+.fish.reveal .fish-body {
+  box-shadow: 0 0 0 5px rgba(255, 198, 54, 0.55);
+}
+
+/* ---- 连连看（字 ↔ 拼音）---- */
+.match-stage {
+  background: linear-gradient(180deg, #eaf6ff, #fdf3ff);
+}
+.match2-cols {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s-6);
+  margin-top: var(--s-3);
+}
+.match2-col {
   display: flex;
   flex-direction: column;
   gap: var(--s-3);
   flex: 1;
 }
-.match-item {
-  background: var(--c-card-warm);
-  border-radius: var(--r-md);
-  padding: var(--s-4);
-  font-size: var(--f-xl);
-  font-weight: 800;
+.match2-item {
   min-height: var(--tap-min);
-  box-shadow: 0 5px 0 var(--c-card-warm-edge), var(--sh-under-sm);
-  /* 默认深青墨轮廓；选中/错误态改 border-color 高亮 */
+  font-size: var(--f-lg);
+  font-weight: 900;
+  background: var(--c-card-warm);
   border: var(--stroke-w) solid var(--stroke-ink);
+  border-radius: var(--r-md);
+  box-shadow: 0 5px 0 var(--c-card-warm-edge), var(--sh-under-sm);
   transition: transform var(--t-mid) var(--ease-juicy);
 }
-.match-item.sel {
-  border-color: var(--theme-color);
-  transform: scale(1.08);
+.match2-item.char {
+  font-family: var(--font-kai);
+  font-size: var(--f-xl);
 }
-.match-item.wrong {
+.match2-item.sel {
+  border-color: var(--theme-color);
+  transform: scale(1.06);
+}
+.match2-item.wrong {
   background: #ffe0e0;
   border-color: var(--c-error);
+}
+.match2-item.done {
+  opacity: 0.45;
+  border-color: var(--c-success);
+}
+/* 连线层：盖在两列之上，不拦点击 */
+.match2-lines {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+.match2-lines line {
+  stroke: var(--c-success);
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+.match2-burst {
+  position: absolute;
+  z-index: 3;
+  pointer-events: none;
+  font-size: 30px;
+  transform: translate(-50%, -50%);
+}
+
+/* ---- 描红 ---- */
+.trace-stage {
+  background: linear-gradient(180deg, #fff6e9, #ffe9d6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-3);
 }
 
 /* ============ 星奖励弹层 ============ */
@@ -941,6 +1223,10 @@ button {
   font-size: var(--f-md);
   font-weight: 700;
   color: var(--c-ink-soft);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-3);
 }
 
 .pet-level-tag {
@@ -964,6 +1250,8 @@ button {
   border-radius: 50%;
   border: var(--stroke-w-lg) solid var(--stroke-ink);
   box-shadow: inset 0 6px 0 rgba(255, 255, 255, 0.6), var(--sh-under);
+  position: relative; /* 阶段 4：装扮/爱心/气泡/飞食物都绝对定位在它里面 */
+  cursor: pointer; /* 点击 = 抚摸 */
 }
 
 .pet-avatar.pet-eating {
@@ -1034,6 +1322,118 @@ button {
   font-size: var(--f-xs);
   color: var(--c-brand-deep);
   font-weight: 800;
+}
+.food-effect {
+  font-size: var(--f-xs);
+  color: var(--c-ink-soft);
+  font-weight: 700;
+}
+
+/* --- 阶段 4：宠物三维状态条 --- */
+.pet-stats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  width: 100%;
+  max-width: 340px;
+}
+.pet-stat {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+.pet-stat-icon {
+  font-size: 18px;
+  width: 26px;
+  text-align: center;
+  line-height: 1;
+}
+.pet-stat-bar {
+  flex: 1;
+  height: 16px;
+  background: #f0e6da;
+  border-radius: var(--r-pill);
+  border: var(--stroke-w-sm) solid var(--stroke-ink);
+  overflow: hidden;
+}
+.pet-stat-fill {
+  height: 100%;
+  border-radius: var(--r-pill);
+  transition: width var(--t-mid) var(--ease-soft);
+}
+.pet-stat-num {
+  font-size: var(--f-xs);
+  font-weight: 800;
+  color: var(--c-ink-soft);
+  min-width: 44px;
+  text-align: right;
+}
+
+/* --- 阶段 4：穿戴叠加 / 抚摸爱心 / 气泡 / 飞食物 --- */
+/* 装扮 emoji：绝对定位在宠物身上（位置映射见 Pet.jsx 的 WEAR_MAP），不拦点击。 */
+.pet-wear {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+  line-height: 1;
+  filter: drop-shadow(0 2px 2px rgba(47, 58, 74, 0.25));
+}
+/* 抚摸爱心：从宠物胸口向上飘。 */
+.pet-heart {
+  position: absolute;
+  bottom: 52%;
+  font-size: 26px;
+  z-index: 3;
+  pointer-events: none;
+}
+/* 提示气泡（饿了 / 摸够了）：纯文字，不 speak。 */
+.pet-bubble {
+  position: absolute;
+  top: -6px;
+  right: -14px;
+  background: var(--c-card);
+  border: var(--stroke-w-sm) solid var(--stroke-ink);
+  border-radius: var(--r-lg);
+  padding: 6px 12px;
+  font-size: var(--f-sm);
+  font-weight: 700;
+  color: var(--c-ink);
+  box-shadow: var(--sh-under-sm);
+  z-index: 4;
+  white-space: nowrap;
+}
+/* 飞食物：从食物栏方向飞到嘴边缩小消失（位置由 framer 控制 y/scale）。 */
+.pet-eating {
+  position: absolute;
+  bottom: 12%;
+  left: 50%;
+  font-size: 44px;
+  z-index: 3;
+  pointer-events: none;
+}
+/* 穿戴中的装扮小图标列表：点击卸下。 */
+.pet-equipped {
+  display: flex;
+  gap: var(--s-2);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.pet-equip-chip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--c-card-warm);
+  border: var(--stroke-w-sm) solid var(--stroke-ink);
+  border-radius: var(--r-pill);
+  padding: 4px 12px;
+  font-size: var(--f-xs);
+  font-weight: 800;
+  color: var(--c-ink);
+  box-shadow: 0 2px 0 var(--c-card-warm-edge);
+}
+.pet-equip-chip:active {
+  transform: translateY(1px);
+  box-shadow: none;
 }
 
 /* ============ 宝箱 ============ */
@@ -2137,12 +2537,266 @@ button {
   top: 70%;
   width: 92px;
 }
+/* 商城（中央岛右坡，商店入口，阶段 5 由 HUD 按钮升级为建筑） */
+.b-shop {
+  left: 64%;
+  top: 62%;
+  width: 88px;
+}
+/* 字库（中央岛左坡，收集册入口，阶段 5） */
+.b-collection {
+  left: 36%;
+  top: 62%;
+  width: 88px;
+}
 
-/* 今日复习浮标（右下）：胖 pill，孩子主要触点之一 */
+/* 建筑 idle 微动效（阶段 5，克制不吵）：全部 CSS transform/opacity；
+   SVG 子元素需 transform-box: fill-box 才能围绕自身中心变换。 */
+/* 游乐园：摩天轮缓慢转动 */
+.wheel-rotor {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: b-wheel-spin 24s linear infinite;
+}
+@keyframes b-wheel-spin {
+  to { transform: rotate(360deg); }
+}
+/* 学院：屋顶小旗飘动 */
+.flag-wave {
+  transform-box: fill-box;
+  transform-origin: left center;
+  animation: b-flag-wave 2.4s ease-in-out infinite;
+}
+@keyframes b-flag-wave {
+  0%, 100% { transform: skewY(0deg) scaleX(1); }
+  50% { transform: skewY(-8deg) scaleX(0.94); }
+}
+/* 商城：门口挂牌轻轻摇晃 */
+.shop-sign {
+  transform-box: fill-box;
+  transform-origin: top center;
+  animation: b-sign-swing 3.2s ease-in-out infinite;
+}
+@keyframes b-sign-swing {
+  0%, 100% { transform: rotate(-6deg); }
+  50% { transform: rotate(6deg); }
+}
+/* 绘本馆：屋顶书本上下轻浮 */
+.lib-book {
+  animation: b-book-bob 3s ease-in-out infinite;
+}
+@keyframes b-book-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+/* 字库：圆形字牌轻微浮动（与绘本馆错开节奏） */
+.b-collection .b-svg text {
+  animation: b-book-bob 3.4s ease-in-out infinite;
+}
+
+/* ============ 首页 · 彩蛋与装饰层（阶段 5）============
+   层本身 pointer-events:none，彩蛋/礼物按钮各自开启，不与建筑热区冲突。
+   所有动画只动 transform/opacity（不动 JS 逐帧），播完自动复位、可反复触发。
+   锚点坐标表在 IslandScene.jsx 顶部（EGG_SPOTS / DECOR_ANCHORS / GIFT_SPOTS）。 */
+.island-decor {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* 彩蛋底座：button 只负责定位与热区；idle 小动作与点击大动效都挂内层 .egg-inner，
+   避免动画 transform 覆盖掉定位用的 translate(-50%,-50%)。 */
+.island-egg {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+}
+.egg-inner {
+  display: inline-block;
+  line-height: 1;
+}
+
+/* ---- 各彩蛋 idle 小动作（常驻、克制）---- */
+.egg-cloud .egg-inner { animation: egg-drift 7s ease-in-out infinite; }
+@keyframes egg-drift {
+  0%, 100% { transform: translateX(-8px); }
+  50% { transform: translateX(8px); }
+}
+.egg-bird .egg-inner { animation: egg-bob 2.4s ease-in-out infinite; }
+@keyframes egg-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+.egg-balloon .egg-inner {
+  transform-origin: top center;
+  animation: egg-sway 3.4s ease-in-out infinite;
+}
+@keyframes egg-sway {
+  0%, 100% { transform: rotate(-5deg); }
+  50% { transform: rotate(5deg); }
+}
+.egg-frog .egg-inner { animation: egg-breathe 4s ease-in-out infinite; }
+@keyframes egg-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+.egg-butterfly .egg-inner { animation: egg-flutter 1.8s ease-in-out infinite; }
+@keyframes egg-flutter {
+  0%, 100% { transform: translate(0, 0) rotate(-6deg); }
+  50% { transform: translate(3px, -4px) rotate(6deg); }
+}
+.egg-crab .egg-inner { animation: egg-crab-idle 3.6s ease-in-out infinite; }
+@keyframes egg-crab-idle {
+  0%, 100% { transform: rotate(-4deg); }
+  50% { transform: rotate(4deg); }
+}
+
+/* ---- 点击大动效（is-playing 期间覆盖 idle；类名移除后自动复位回 idle）---- */
+/* 🐦 飞鸟：加速飞出右屏，隐身瞬移到左屏外，再滑翔飞回原位 */
+.egg-bird.is-playing .egg-inner { animation: egg-bird-fly 3.5s ease-in-out; }
+@keyframes egg-bird-fly {
+  0% { transform: translate(0, 0); opacity: 1; }
+  22% { transform: translate(80vw, -8vh); opacity: 1; }
+  23% { transform: translate(80vw, -8vh); opacity: 0; }
+  24% { transform: translate(-80vw, 6vh); opacity: 0; }
+  72% { transform: translate(0, 0); opacity: 1; }
+  100% { transform: translate(0, 0); opacity: 1; }
+}
+/* 🎈 气球：升空飘走，隐身落回下方，再慢慢飘回原位 */
+.egg-balloon.is-playing .egg-inner { animation: egg-balloon-rise 5.2s ease-in-out; }
+@keyframes egg-balloon-rise {
+  0% { transform: translateY(0); opacity: 1; }
+  28% { transform: translateY(-55vh); opacity: 1; }
+  29% { transform: translateY(-55vh); opacity: 0; }
+  30% { transform: translateY(26vh); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+/* 🐸 青蛙：跳一下，落地带点挤压回弹 */
+.egg-frog.is-playing .egg-inner { animation: egg-frog-jump 0.7s var(--ease-juicy); }
+@keyframes egg-frog-jump {
+  0% { transform: translateY(0) scale(1, 1); }
+  35% { transform: translateY(-26px) scale(1.05, 0.95); }
+  70% { transform: translateY(0) scale(0.92, 1.1); }
+  100% { transform: translateY(0) scale(1, 1); }
+}
+/* 🦋 蝴蝶：扑腾飞一小段弧线再落回 */
+.egg-butterfly.is-playing .egg-inner { animation: egg-butterfly-trip 1.4s ease-in-out; }
+@keyframes egg-butterfly-trip {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  30% { transform: translate(16px, -18px) rotate(10deg); }
+  60% { transform: translate(34px, -8px) rotate(-8deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+/* 🦀 螃蟹：横爬一小段再回来（emoji 无法开合钳子，用横行+摇摆表现） */
+.egg-crab.is-playing .egg-inner { animation: egg-crab-walk 0.9s ease-in-out; }
+@keyframes egg-crab-walk {
+  0% { transform: translateX(0) rotate(0deg); }
+  25% { transform: translateX(18px) rotate(6deg); }
+  60% { transform: translateX(-12px) rotate(-6deg); }
+  100% { transform: translateX(0) rotate(0deg); }
+}
+
+/* ☁️ 雨滴粒子：点击云时挂载，0.9s 落完消散（配合 splash 音效） */
+.egg-rain {
+  position: absolute;
+  left: 50%;
+  top: 62%;
+  pointer-events: none;
+}
+.egg-rain span {
+  position: absolute;
+  width: 4px;
+  height: 12px;
+  border-radius: 4px;
+  background: linear-gradient(#cfeaff, #4aa6dd);
+  animation: egg-raindrop 0.9s ease-in forwards;
+}
+@keyframes egg-raindrop {
+  from { transform: translateY(0); opacity: 0.9; }
+  to { transform: translateY(30px); opacity: 0; }
+}
+
+/* 🪷 荷叶：青蛙的站台，纯装饰（垫在青蛙按钮下方） */
+.egg-lily {
+  position: absolute;
+  transform: translate(-50%, -50%) translateY(13px);
+  font-size: 24px;
+}
+
+/* ---- 商店装饰上岛（买了才出现，锚点表见 IslandScene.jsx DECOR_ANCHORS）---- */
+.island-decor-item {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  font-size: 36px;
+  pointer-events: none;
+}
+.decor-inner {
+  display: inline-block;
+  line-height: 1;
+}
+/* 🌀 风车：叶片缓慢转动（🌀 emoji 整体旋转即风车效果） */
+.decor-windmill .decor-inner { animation: decor-spin 9s linear infinite; }
+@keyframes decor-spin {
+  to { transform: rotate(360deg); }
+}
+/* 🎏 彩旗串：挂两树之间，轻轻摇摆 */
+.decor-flags { font-size: 42px; }
+.decor-flags .decor-inner {
+  transform-origin: top center;
+  animation: decor-flags-sway 3.4s ease-in-out infinite;
+}
+@keyframes decor-flags-sway {
+  0%, 100% { transform: rotate(-3.5deg); }
+  50% { transform: rotate(3.5deg); }
+}
+/* ⛵ 小船：海面轻晃 */
+.decor-boat .decor-inner { animation: decor-boat-rock 3s ease-in-out infinite; }
+@keyframes decor-boat-rock {
+  0%, 100% { transform: translateY(0) rotate(-3deg); }
+  50% { transform: translateY(-4px) rotate(3deg); }
+}
+/* 🗼 灯塔：灯光呼吸（drop-shadow 光晕脉动） */
+.decor-lighthouse .decor-inner { animation: decor-lighthouse-glow 4s ease-in-out infinite; }
+@keyframes decor-lighthouse-glow {
+  0%, 100% { filter: drop-shadow(0 0 3px rgba(255, 230, 140, 0.5)); }
+  50% { filter: drop-shadow(0 0 12px rgba(255, 230, 140, 0.95)); }
+}
+
+/* ---- 每日惊喜礼物盒：呼吸发光；点击领奖后当天不再出现（显隐由 giftAvailable 控制）---- */
+.island-gift {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 34px;
+  animation: gift-breathe 1.6s ease-in-out infinite;
+}
+@keyframes gift-breathe {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    filter: drop-shadow(0 0 4px rgba(255, 198, 54, 0.55));
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.12);
+    filter: drop-shadow(0 0 16px rgba(255, 198, 54, 0.95));
+  }
+}
+
+/* 今日复习浮标（右下）：胖 pill，孩子主要触点之一。抬到底部导航之上避让。 */
 .home-review-fab {
   position: absolute;
   right: var(--s-4);
-  bottom: calc(var(--s-5) + env(safe-area-inset-bottom, 0px));
+  bottom: calc(var(--bottom-nav-h) + var(--s-4) + env(safe-area-inset-bottom, 0px));
   z-index: 20;
   background: var(--c-accent);
   color: var(--c-ink);
@@ -2157,21 +2811,65 @@ button {
   box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.5), 0 4px 0 #d9a520, var(--sh-md);
 }
 
-/* 小墨的家（左下） */
-.home-pet-fab {
-  position: absolute;
-  left: var(--s-4);
-  bottom: calc(var(--s-4) + env(safe-area-inset-bottom, 0px));
-  z-index: 20;
-  width: var(--tap-min);
-  height: var(--tap-min);
+/* ---- 全局底部导航（阶段 5，BottomNav.jsx）----
+   厚涂胶囊风：4 tab（地图/绘本/小墨/我的），当前路由高亮。
+   按路由显隐（规则见组件注释）；显示时组件给 body 加 .has-bottom-nav，
+   滚动页（.page）借此在底部腾出导航高度，避免内容被遮住。 */
+.bottom-nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: var(--z-nav);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  max-width: 780px; /* 与 .page 同宽，桌面不拉满 */
+  margin: 0 auto;
+  height: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px));
+  padding: 0 var(--s-2) env(safe-area-inset-bottom, 0px);
+  background: linear-gradient(180deg, #fffdf8 0%, #fdf1de 100%);
+  border-top: var(--stroke-w) solid var(--stroke-ink);
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+  box-shadow: 0 -6px 20px rgba(60, 110, 90, 0.12);
+}
+.bottom-nav-item {
+  flex: 1;
+  min-height: var(--tap-min);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  color: var(--c-ink-soft);
+  font-weight: 800;
+  font-size: var(--f-xs);
+}
+.bottom-nav-ic {
+  width: 48px;
+  height: 34px;
   border-radius: var(--r-pill);
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: var(--sh-md);
   display: flex;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(4px);
+  font-size: 22px;
+  transition: transform var(--t-fast) var(--ease-bounce), background var(--t-fast) var(--ease-soft);
+}
+.bottom-nav-item:active .bottom-nav-ic {
+  transform: scale(0.9);
+}
+.bottom-nav-item.is-active {
+  color: var(--c-brand-deep);
+}
+.bottom-nav-item.is-active .bottom-nav-ic {
+  background: radial-gradient(120% 100% at 50% 20%, #ffe9c2 0%, #ffd98f 100%);
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.9), 0 4px 10px rgba(236, 106, 16, 0.28);
+  transform: translateY(-2px);
+}
+
+/* 导航可见时，滚动页底部留白（组件按路由切换 body.has-bottom-nav） */
+.has-bottom-nav .page {
+  padding-bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px) + var(--s-4));
 }
 
 /* 世界选择浮层 */
@@ -2374,4 +3072,359 @@ button {
   color: var(--c-ink-soft);
   background: rgba(255, 255, 255, 0.7);
   box-shadow: var(--sh-sm);
+}
+
+/* ============ 商店页（阶段 3）============ */
+.shop-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+
+.shop-tabs {
+  display: flex;
+  gap: var(--s-2);
+  justify-content: center;
+}
+.shop-tab {
+  padding: var(--s-2) var(--s-4);
+  min-height: 48px;
+  border-radius: var(--r-pill);
+  font-size: var(--f-md);
+  font-weight: 800;
+  color: var(--c-ink);
+  background: var(--c-card);
+  border: var(--stroke-w-sm) solid var(--stroke-ink);
+  box-shadow: 0 3px 0 rgba(47, 72, 88, 0.18), var(--sh-under-sm);
+}
+.shop-tab.active {
+  background: var(--c-brand);
+  color: #fff;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.4), 0 3px 0 var(--c-brand-deep);
+}
+.shop-tab:active { transform: translateY(2px); }
+.shop-tip {
+  text-align: center;
+  font-size: var(--f-sm);
+  color: var(--c-ink-soft);
+  margin: 0;
+}
+
+.shop-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(128px, 1fr));
+  gap: var(--s-3);
+  padding-bottom: var(--s-6);
+}
+.shop-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-1);
+  background: var(--c-card-warm);
+  border-radius: var(--r-lg);
+  padding: var(--s-4) var(--s-3);
+  border: var(--stroke-w) solid var(--stroke-ink);
+  box-shadow: 0 5px 0 var(--c-card-warm-edge), var(--sh-under-sm);
+}
+.shop-card.disabled {
+  opacity: 0.55;
+  filter: grayscale(0.5);
+}
+.shop-card-icon { font-size: 44px; line-height: 1.1; }
+.shop-card-name { font-size: var(--f-sm); font-weight: 800; }
+.shop-card-sub { font-size: var(--f-xs); color: var(--c-ink-soft); }
+.shop-buy-btn {
+  margin-top: var(--s-1);
+  min-width: 84px;
+  min-height: 44px;
+  border-radius: var(--r-pill);
+  font-size: var(--f-sm);
+  font-weight: 900;
+  color: var(--c-ink);
+  background: var(--c-accent);
+  border: var(--stroke-w-sm) solid var(--stroke-ink);
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.5), 0 3px 0 #d9a520;
+}
+.shop-buy-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #d9a520; }
+.shop-owned-tag {
+  margin-top: var(--s-1);
+  font-size: var(--f-xs);
+  font-weight: 800;
+  color: var(--c-success-deep);
+  background: #dff5e9;
+  border-radius: var(--r-pill);
+  padding: 4px 12px;
+}
+.shop-lock-tag {
+  margin-top: var(--s-1);
+  font-size: var(--f-xs);
+  font-weight: 800;
+  color: var(--c-ink-soft);
+  background: #eee7dc;
+  border-radius: var(--r-pill);
+  padding: 4px 12px;
+}
+.shop-equip-btn {
+  min-height: 40px;
+  border-radius: var(--r-pill);
+  font-size: var(--f-xs);
+  font-weight: 800;
+  color: var(--c-ink);
+  background: var(--c-card);
+  border: var(--stroke-w-sm) solid var(--stroke-ink);
+  box-shadow: 0 2px 0 rgba(47, 72, 88, 0.18);
+  padding: 0 var(--s-3);
+}
+.shop-equip-btn.equipped {
+  background: var(--c-success);
+  color: #fff;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+/* ============ 字卡收集册（阶段 3）============ */
+.collection-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+}
+
+.coll-progress {
+  position: relative;
+  height: 26px;
+  background: #f0e6da;
+  border-radius: var(--r-pill);
+  border: var(--stroke-w-sm) solid var(--stroke-ink);
+  overflow: hidden;
+}
+.coll-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--c-accent), #ffe08a);
+  border-radius: var(--r-pill);
+  transition: width var(--t-mid) var(--ease-soft);
+}
+.coll-progress-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--f-xs);
+  font-weight: 900;
+  color: var(--c-ink);
+}
+
+.coll-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-2);
+  padding: var(--s-6) var(--s-4);
+  font-size: var(--f-md);
+  font-weight: 700;
+  color: var(--c-ink-soft);
+  text-align: center;
+}
+.coll-empty p { margin: 0; }
+
+.coll-theme {
+  background: var(--c-card);
+  border-radius: var(--r-lg);
+  border: var(--stroke-w) solid var(--stroke-ink);
+  box-shadow: var(--sh-under-sm);
+  padding: var(--s-3);
+}
+.coll-theme-head {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  padding: var(--s-1) var(--s-2) var(--s-3);
+}
+.coll-theme-emoji { font-size: 26px; }
+.coll-theme-name {
+  font-size: var(--f-md);
+  font-weight: 900;
+  color: var(--theme-color, var(--c-brand-deep));
+  flex: 1;
+}
+.coll-theme-count {
+  font-size: var(--f-xs);
+  font-weight: 800;
+  color: var(--c-ink-soft);
+  background: #f4ede2;
+  border-radius: var(--r-pill);
+  padding: 3px 10px;
+}
+
+.coll-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(58px, 1fr));
+  gap: var(--s-2);
+}
+.coll-card {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--r-md);
+  border: var(--stroke-w-sm) solid var(--stroke-ink);
+}
+/* 已学：主题色字卡 + 星级（color-mix 不支持时降级为暖卡面 + 主题色厚边） */
+.coll-card.learned {
+  background: var(--c-card-warm);
+  box-shadow: 0 3px 0 var(--theme-color, var(--c-brand));
+  background: color-mix(in srgb, var(--theme-color, var(--c-brand)) 18%, var(--c-card));
+  box-shadow: 0 3px 0 color-mix(in srgb, var(--theme-color, var(--c-brand)) 45%, #c9b18e);
+  cursor: pointer;
+}
+.coll-card.learned:active { transform: translateY(2px); }
+.coll-card-char {
+  font-family: var(--font-kai);
+  font-size: 30px;
+  line-height: 1;
+  color: var(--c-ink);
+}
+.coll-card-stars { font-size: 10px; line-height: 1; margin-top: 3px; }
+.coll-card-stars i { font-style: normal; color: #ddd2c2; }
+.coll-card-stars i.on { color: var(--c-accent); text-shadow: 0 1px 0 #d9a520; }
+/* 未学：灰底「?」剪影 */
+.coll-card.locked {
+  background: #ece5da;
+  border-style: dashed;
+  border-color: #c9bda9;
+}
+.coll-card-q {
+  font-size: 26px;
+  font-weight: 900;
+  color: #c3b7a3;
+}
+
+/* 大字卡弹层（复用 reward-overlay / reward-card 外壳） */
+.coll-modal { gap: var(--s-2); }
+.coll-modal-emoji { font-size: 56px; line-height: 1; }
+.coll-modal-char {
+  font-family: var(--font-kai);
+  font-size: 120px;
+  line-height: 1.1;
+  color: var(--c-ink);
+  background: var(--c-card-warm);
+  border-radius: var(--r-lg);
+  border: var(--stroke-w) solid var(--stroke-ink);
+  box-shadow: var(--sh-card-warm);
+  padding: var(--s-2) var(--s-6);
+  cursor: pointer;
+}
+.coll-modal-char:active { transform: scale(0.96); }
+.coll-modal-pinyin {
+  font-size: var(--f-lg);
+  font-weight: 800;
+  color: var(--c-ink-soft);
+}
+
+/* ============ 每日任务（阶段 3）============ */
+/* 首页 HUD 徽章：3 个小图标显示今日进度 */
+.daily-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 48px;
+  padding: 0 var(--s-3);
+  border-radius: var(--r-pill);
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--c-ink);
+  background: rgba(255, 255, 255, 0.9);
+  border: var(--stroke-w-sm) solid var(--stroke-ink);
+  box-shadow: 0 3px 0 rgba(47, 72, 88, 0.18), var(--sh-under-sm);
+  backdrop-filter: blur(4px);
+}
+.daily-badge:active { transform: translateY(2px); }
+.daily-badge .done { color: var(--c-success-deep); }
+/* 全部完成：金光闪闪 */
+.daily-badge.daily-done {
+  background: linear-gradient(135deg, #ffe37a, var(--c-accent));
+  animation: daily-glow 1.6s ease-in-out infinite;
+}
+@keyframes daily-glow {
+  0%, 100% { box-shadow: 0 3px 0 #d9a520, 0 0 8px rgba(255, 198, 54, 0.6); }
+  50% { box-shadow: 0 3px 0 #d9a520, 0 0 22px rgba(255, 198, 54, 0.95); }
+}
+
+/* 任务面板：HUD 下方弹出的小卡片 */
+.daily-panel {
+  position: absolute;
+  top: calc(64px + env(safe-area-inset-top, 0px));
+  right: var(--s-4);
+  z-index: 30;
+  width: 240px;
+  background: var(--c-card);
+  border-radius: var(--r-lg);
+  border: var(--stroke-w) solid var(--stroke-ink);
+  box-shadow: 0 6px 0 var(--c-card-warm-edge), var(--sh-under);
+  padding: var(--s-3) var(--s-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+.daily-panel-title {
+  font-size: var(--f-md);
+  font-weight: 900;
+  color: var(--c-brand-deep);
+}
+.daily-task {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  font-size: var(--f-sm);
+  font-weight: 700;
+  color: var(--c-ink);
+}
+.daily-task.done { color: var(--c-success-deep); }
+.daily-task-icon { font-size: 20px; }
+.daily-task-label { flex: 1; }
+.daily-task-progress { font-weight: 900; }
+.daily-panel-tip {
+  font-size: var(--f-xs);
+  color: var(--c-ink-soft);
+  border-top: 2px dashed var(--c-line);
+  padding-top: var(--s-2);
+}
+
+/* 每日任务完成通知：顶部轻量 toast */
+.daily-toast {
+  position: fixed;
+  top: calc(var(--s-4) + env(safe-area-inset-top, 0px));
+  left: 0;
+  right: 0;
+  margin: 0 auto; /* 不用 translateX 居中：framer-motion 动画会接管 transform */
+  width: fit-content;
+  z-index: var(--z-toast);
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  background: var(--c-card);
+  border-radius: var(--r-lg);
+  border: var(--stroke-w) solid var(--stroke-ink);
+  box-shadow: 0 6px 0 var(--c-card-warm-edge), var(--sh-under);
+  padding: var(--s-3) var(--s-5);
+  cursor: pointer;
+  max-width: min(92vw, 360px);
+}
+.daily-toast-badge { font-size: 40px; line-height: 1; }
+.daily-toast-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.daily-toast-line {
+  font-size: var(--f-sm);
+  font-weight: 800;
+  color: var(--c-ink);
+}
+.daily-toast-coins {
+  font-size: var(--f-md);
+  font-weight: 900;
+  color: var(--c-brand-deep);
 }

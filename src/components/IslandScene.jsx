@@ -5,11 +5,20 @@
 //   1. 天空渐变 + 太阳 + 漂浮云
 //   2. 远景海平线 + 海水（多层色带 + 波光）
 //   3. 岛屿群（沙滩描边 + 草地 + 棕榈树点缀）
-//   4. 建筑入口：中央识字塔（小墨坐塔顶）、绘本馆、游乐园、叫叫学院、商城、字库
+//   4. 彩蛋与装饰层（HTML）：6 处纯趣味彩蛋 + 商店已购装饰 + 每日惊喜礼物盒
+//   5. 建筑入口：中央识字塔（小墨坐塔顶）、绘本馆、游乐园、叫叫学院、商城、字库
 //
 // 入口用 <Building> 渲染为可点击热区（button），点击回调由父组件传入（导航）。
 // 全部相对坐标基于 1000×620 的 viewBox，用 preserveAspectRatio 铺满容器。
+//
+// 阶段 5 焕活：
+//   - 彩蛋/装饰/礼物全部走 HTML 绝对定位层（.island-decor），锚点都是百分比常量表，
+//     微调位置只改下面的 EGG_SPOTS / DECOR_ANCHORS / GIFT_SPOTS；
+//   - 动画全部 CSS transform/opacity，不用 JS 逐帧，可反复触发（播完复位）。
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
+import { useGameStore } from '../store/useGameStore.js';
+import { useSound } from '../hooks/useSound.js';
 import Xiaomo from './mascot/Xiaomo.jsx';
 
 // 单朵云：一组交叠圆 + 底部平边，柔和投影。
@@ -60,8 +69,166 @@ function Bush({ x, y, scale = 1 }) {
   );
 }
 
-export default function IslandScene({ onEnter, worlds = [] }) {
+// ============ 阶段 5：彩蛋 / 装饰 / 礼物锚点表 ============
+// 坐标均为场景容器百分比（left/top），与建筑定位同坐标系；微调位置只改这里。
+
+// 彩蛋锚点：6 处纯趣味小元素（无奖励）。
+const EGG_SPOTS = {
+  cloud: { left: '78%', top: '12%' }, // ☁️ 云：右上角天空
+  bird: { left: '40%', top: '15%' }, // 🐦 飞鸟：中天
+  balloon: { left: '60%', top: '33%' }, // 🎈 气球：塔右上方半空
+  frog: { left: '11%', top: '76%' }, // 🐸 青蛙：左岛滩边荷叶上
+  butterfly: { left: '31%', top: '70%' }, // 🦋 蝴蝶：字库旁树丛前
+  crab: { left: '74%', top: '80%' }, // 🦀 螃蟹：中央岛右侧沙滩
+};
+
+// 商店装饰锚点：买了才出现（id 与 shop.js 的 decor 商品一致）。
+const DECOR_ANCHORS = {
+  windmill: { left: '41%', top: '48%' }, // 🌀 风车：中央岛高处（塔左后方"山顶"）
+  flags: { left: '21%', top: '54%' }, // 🎏 彩旗串：左岛两棵棕榈之间
+  boat: { left: '63%', top: '89%' }, // ⛵ 小船：前景海面
+  lighthouse: { left: '90%', top: '53%' }, // 🗼 灯塔：右岛边缘
+};
+
+// 每日惊喜礼物盒候选锚点：每天随机挑一处出现（避开建筑热区）。
+const GIFT_SPOTS = [
+  { left: '58%', top: '72%' }, // 中央岛右侧草地
+  { left: '40%', top: '76%' }, // 中央岛左前沙滩
+  { left: '26%', top: '77%' }, // 左岛前滩
+  { left: '87%', top: '82%' }, // 右岛前滩
+  { left: '8%', top: '82%' }, // 左岛最左滩角
+];
+
+// 装饰 id -> emoji（与 shop.js 对齐，icon 以 shop.js 为准这里只做渲染映射）。
+const DECOR_EMOJI = { windmill: '🌀', flags: '🎏', boat: '⛵', lighthouse: '🗼' };
+
+// 彩蛋通用状态：trigger 播一次性动效，ms 后复位（动画中不重复触发，可反复玩）。
+function useReplay() {
+  const [playing, setPlaying] = useState(false);
+  const timer = useRef(null);
+  useEffect(() => () => clearTimeout(timer.current), []);
+  const trigger = useCallback(
+    (ms) => {
+      if (playing) return; // 动画还没播完，忽略连点
+      setPlaying(true);
+      clearTimeout(timer.current);
+      timer.current = setTimeout(() => setPlaying(false), ms);
+    },
+    [playing]
+  );
+  return [playing, trigger];
+}
+
+// 彩蛋底座：外层 button 负责定位 + 一次性大动效（transition/keyframes 都行），
+// 内层 .egg-inner 负责常驻 idle 小动作——两层分离，transform 互不覆盖。
+function Egg({ spot, emoji, label, className = '', playing, onTap, children }) {
+  return (
+    <button
+      className={`island-egg ${className} ${playing ? 'is-playing' : ''}`}
+      style={{ left: spot.left, top: spot.top }}
+      onClick={onTap}
+      aria-label={label}
+    >
+      <span className="egg-inner">{emoji}</span>
+      {children}
+    </button>
+  );
+}
+
+// 6 处彩蛋：云/飞鸟/气球/青蛙/蝴蝶/螃蟹。纯趣味无奖励，各自配音效。
+function EasterEggs() {
+  const sound = useSound();
+  const [cloudOn, cloudGo] = useReplay();
+  const [birdOn, birdGo] = useReplay();
+  const [balloonOn, balloonGo] = useReplay();
+  const [frogOn, frogGo] = useReplay();
+  const [butterflyOn, butterflyGo] = useReplay();
+  const [crabOn, crabGo] = useReplay();
+
+  return (
+    <>
+      {/* ☁️ 云：点了下几滴雨（CSS 粒子 1s 消散） */}
+      <Egg
+        spot={EGG_SPOTS.cloud}
+        emoji="☁️"
+        label="云朵"
+        className="egg-cloud"
+        playing={cloudOn}
+        onTap={() => { sound.splash(); cloudGo(1000); }}
+      >
+        {cloudOn && (
+          <span className="egg-rain" aria-hidden="true">
+            {[-16, -7, 2, 11, 20].map((x, i) => (
+              <span key={i} style={{ left: x, animationDelay: `${i * 0.08}s` }} />
+            ))}
+          </span>
+        )}
+      </Egg>
+
+      {/* 🐦 飞鸟：点了加速飞走，过几秒飞回 */}
+      <Egg
+        spot={EGG_SPOTS.bird}
+        emoji="🐦"
+        label="飞鸟"
+        className="egg-bird"
+        playing={birdOn}
+        onTap={() => { sound.swoosh(); birdGo(3500); }}
+      />
+
+      {/* 🎈 气球：点了升空飘走，之后慢慢飘回 */}
+      <Egg
+        spot={EGG_SPOTS.balloon}
+        emoji="🎈"
+        label="气球"
+        className="egg-balloon"
+        playing={balloonOn}
+        onTap={() => { sound.pop(); balloonGo(5200); }}
+      />
+
+      {/* 🪷 荷叶（纯装饰，青蛙的站台） */}
+      <span className="egg-lily" style={{ left: EGG_SPOTS.frog.left, top: EGG_SPOTS.frog.top }} aria-hidden="true">
+        🪷
+      </span>
+      {/* 🐸 青蛙：点了跳一下 */}
+      <Egg
+        spot={EGG_SPOTS.frog}
+        emoji="🐸"
+        label="青蛙"
+        className="egg-frog"
+        playing={frogOn}
+        onTap={() => { sound.pop(); frogGo(700); }}
+      />
+
+      {/* 🦋 蝴蝶：点了扑腾飞一小段再落回 */}
+      <Egg
+        spot={EGG_SPOTS.butterfly}
+        emoji="🦋"
+        label="蝴蝶"
+        className="egg-butterfly"
+        playing={butterflyOn}
+        onTap={() => { sound.pluck(); butterflyGo(1400); }}
+      />
+
+      {/* 🦀 螃蟹：点了横爬一小段 */}
+      <Egg
+        spot={EGG_SPOTS.crab}
+        emoji="🦀"
+        label="螃蟹"
+        className="egg-crab"
+        playing={crabOn}
+        onTap={() => { sound.tap(); crabGo(900); }}
+      />
+    </>
+  );
+}
+
+export default function IslandScene({ onEnter, worlds = [], showGift = false, onGift }) {
   // worlds: [{ theme, done, total, complete }]，用于门牌进度（可选）。
+  // 已购海岛装饰（owned 旧数据可能 undefined，?? 防御）。
+  const owned = useGameStore((s) => s.owned) ?? {};
+  // 礼物盒锚点：本天内随机一处（组件挂载时定一次即可，一天只出现一次）。
+  const [giftSpot] = useState(() => GIFT_SPOTS[Math.floor(Math.random() * GIFT_SPOTS.length)]);
+
   return (
     <div className="island-scene">
       <svg
@@ -147,7 +314,39 @@ export default function IslandScene({ onEnter, worlds = [] }) {
         <Bush x={690} y={512} scale={0.9} />
       </svg>
 
-      {/* 4) 建筑入口层（HTML 绝对定位覆盖在 SVG 上，便于做交互与文字） */}
+      {/* 4) 彩蛋与装饰层（HTML 绝对定位覆盖在 SVG 上）。
+           层本身 pointer-events:none，彩蛋/礼物按钮各自开启，不与建筑热区冲突。 */}
+      <div className="island-decor">
+        <EasterEggs />
+
+        {/* 商店已购装饰上岛（锚点见 DECOR_ANCHORS 常量表） */}
+        {Object.entries(DECOR_ANCHORS).map(([id, spot]) =>
+          owned[id] ? (
+            <span
+              key={id}
+              className={`island-decor-item decor-${id}`}
+              style={{ left: spot.left, top: spot.top }}
+              aria-hidden="true"
+            >
+              <span className="decor-inner">{DECOR_EMOJI[id]}</span>
+            </span>
+          ) : null
+        )}
+
+        {/* 每日惊喜礼物盒：呼吸发光，点击由父组件发奖（每天一次） */}
+        {showGift && (
+          <button
+            className="island-gift"
+            style={{ left: giftSpot.left, top: giftSpot.top }}
+            onClick={onGift}
+            aria-label="每日惊喜礼物"
+          >
+            🎁
+          </button>
+        )}
+      </div>
+
+      {/* 5) 建筑入口层（HTML 绝对定位覆盖在 SVG 上，便于做交互与文字） */}
       <div className="island-buildings">
         {/* 中央识字塔（主入口，小墨坐塔顶） */}
         <Building
@@ -178,43 +377,68 @@ export default function IslandScene({ onEnter, worlds = [] }) {
             <path d="M12 44 L60 16 L108 44 Z" fill="#8ad4ff" stroke="#4aa6dd" strokeWidth="4" strokeLinejoin="round" />
             <rect x="20" y="44" width="80" height="52" rx="8" fill="#bfe8ff" stroke="#4aa6dd" strokeWidth="4" />
             <rect x="50" y="66" width="20" height="30" rx="4" fill="#fff" stroke="#4aa6dd" strokeWidth="3" />
-            <text x="60" y="38" textAnchor="middle" fontSize="20">📖</text>
+            <text className="lib-book" x="60" y="38" textAnchor="middle" fontSize="20">📖</text>
           </svg>
         </Building>
 
-        {/* 游乐园（左岛，游戏入口） */}
+        {/* 游乐园（左岛，游戏入口）。摩天轮缓慢转动（idle 微动效） */}
         <Building className="b-park" label="游乐园" onClick={() => onEnter?.('games')}>
           <svg viewBox="0 0 120 120" className="b-svg" aria-hidden="true">
-            {/* 摩天轮 */}
-            <circle cx="60" cy="52" r="40" fill="none" stroke="#ff9ec4" strokeWidth="5" />
+            {/* 摩天轮转动部分（轮缘 + 辐条 + 座舱），轴心不动 */}
+            <g className="wheel-rotor">
+              <circle cx="60" cy="52" r="40" fill="none" stroke="#ff9ec4" strokeWidth="5" />
+              <g stroke="#ff9ec4" strokeWidth="4">
+                <line x1="60" y1="52" x2="60" y2="12" /><line x1="60" y1="52" x2="60" y2="92" />
+                <line x1="60" y1="52" x2="20" y2="52" /><line x1="60" y1="52" x2="100" y2="52" />
+                <line x1="60" y1="52" x2="32" y2="24" /><line x1="60" y1="52" x2="88" y2="80" />
+                <line x1="60" y1="52" x2="88" y2="24" /><line x1="60" y1="52" x2="32" y2="80" />
+              </g>
+              <g fill="#ffd166">
+                <circle cx="60" cy="12" r="7" /><circle cx="60" cy="92" r="7" />
+                <circle cx="20" cy="52" r="7" /><circle cx="100" cy="52" r="7" />
+              </g>
+            </g>
             <circle cx="60" cy="52" r="8" fill="#ff7fb0" />
-            <g stroke="#ff9ec4" strokeWidth="4">
-              <line x1="60" y1="52" x2="60" y2="12" /><line x1="60" y1="52" x2="60" y2="92" />
-              <line x1="60" y1="52" x2="20" y2="52" /><line x1="60" y1="52" x2="100" y2="52" />
-              <line x1="60" y1="52" x2="32" y2="24" /><line x1="60" y1="52" x2="88" y2="80" />
-              <line x1="60" y1="52" x2="88" y2="24" /><line x1="60" y1="52" x2="32" y2="80" />
-            </g>
-            <g fill="#ffd166">
-              <circle cx="60" cy="12" r="7" /><circle cx="60" cy="92" r="7" />
-              <circle cx="20" cy="52" r="7" /><circle cx="100" cy="52" r="7" />
-            </g>
             <rect x="52" y="92" width="16" height="24" fill="#c98a5a" />
           </svg>
         </Building>
 
-        {/* 叫叫学院（右岛，复习入口） */}
+        {/* 叫叫学院（右岛，复习入口）。屋顶小旗飘动（idle 微动效） */}
         <Building className="b-school" label="学院" onClick={() => onEnter?.('review')}>
           <svg viewBox="0 0 120 110" className="b-svg" aria-hidden="true">
             <rect x="24" y="44" width="72" height="52" rx="6" fill="#c9b6ff" stroke="#9a7de0" strokeWidth="4" />
             <path d="M18 44 L60 18 L102 44 Z" fill="#b39cf7" stroke="#9a7de0" strokeWidth="4" strokeLinejoin="round" />
             <rect x="54" y="8" width="6" height="16" fill="#9a7de0" />
-            <path d="M60 8 L78 12 L60 18 Z" fill="#ff6b6b" />
+            <path className="flag-wave" d="M60 8 L78 12 L60 18 Z" fill="#ff6b6b" />
             <rect x="52" y="66" width="16" height="30" rx="3" fill="#fff" stroke="#9a7de0" strokeWidth="3" />
           </svg>
         </Building>
-      </div>
 
-      {/* 顶部功能小按钮（字库/商城/家长）—— 覆盖在场景四角，由父组件接管点击 */}
+        {/* 商城（中央岛右坡，商店入口）。门口挂牌轻轻摇晃（idle 微动效） */}
+        <Building className="b-shop" label="商城" onClick={() => onEnter?.('shop')}>
+          <svg viewBox="0 0 120 110" className="b-svg" aria-hidden="true">
+            <rect x="22" y="46" width="76" height="50" rx="8" fill="#ffe9d6" stroke="#e0803c" strokeWidth="4" />
+            {/* 条纹雨棚 */}
+            <path d="M14 46 L60 20 L106 46 Z" fill="#ff8a5c" stroke="#e0803c" strokeWidth="4" strokeLinejoin="round" />
+            <path d="M34 46 L60 20 L86 46 Z" fill="#ffd166" stroke="#e0803c" strokeWidth="3" strokeLinejoin="round" />
+            <rect x="50" y="68" width="20" height="28" rx="4" fill="#fff" stroke="#e0803c" strokeWidth="3" />
+            {/* 挂牌 */}
+            <text className="shop-sign" x="60" y="62" textAnchor="middle" fontSize="18">🛍️</text>
+          </svg>
+        </Building>
+
+        {/* 字库（中央岛左坡，收集册入口） */}
+        <Building className="b-collection" label="字库" onClick={() => onEnter?.('collection')}>
+          <svg viewBox="0 0 120 110" className="b-svg" aria-hidden="true">
+            <rect x="24" y="46" width="72" height="50" rx="8" fill="#d8f5e6" stroke="#2f9a6c" strokeWidth="4" />
+            <path d="M16 46 L60 20 L104 46 Z" fill="#4ecb91" stroke="#2f9a6c" strokeWidth="4" strokeLinejoin="round" />
+            <rect x="50" y="68" width="20" height="28" rx="4" fill="#fff" stroke="#2f9a6c" strokeWidth="3" />
+            {/* 圆形字牌 */}
+            <circle cx="60" cy="44" r="14" fill="#fffdf8" stroke="#2f9a6c" strokeWidth="3" />
+            <text x="60" y="50" textAnchor="middle" fontSize="17" fill="#1f8a5a" fontWeight="bold">字</text>
+          </svg>
+        </Building>
+      </div>
     </div>
   );
 }

@@ -10,6 +10,8 @@
 //   /parent                 家长中心
 //   /story                  绘本屋（书架）
 //   /story/:storyId         绘本阅读页（逐页翻阅 + 朗读）
+//   /shop                   商店（食物/装扮/装饰，金币消费出口）
+//   /collection             字卡收集册（300 字按主题分组）
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import WorldSelect from './pages/WorldSelect.jsx';
@@ -21,8 +23,11 @@ import Pet from './pages/Pet.jsx';
 import Parent from './pages/Parent.jsx';
 import StoryShelf from './pages/StoryShelf.jsx';
 import StoryReader from './pages/StoryReader.jsx';
+import Shop from './pages/Shop.jsx';
+import Collection from './pages/Collection.jsx';
 import SettingsOverlay from './components/SettingsOverlay.jsx';
 import StartGate from './components/StartGate.jsx';
+import BottomNav from './components/BottomNav.jsx';
 import { useBgmController } from './hooks/useBgm.js';
 
 export default function App() {
@@ -42,8 +47,12 @@ export default function App() {
           <Route path="/parent" element={<Parent />} />
           <Route path="/story" element={<StoryShelf />} />
           <Route path="/story/:storyId" element={<StoryReader />} />
+          <Route path="/shop" element={<Shop />} />
+          <Route path="/collection" element={<Collection />} />
         </Routes>
       </AnimatePresence>
+      {/* 全局底部导航（阶段 5）：按路由显隐，规则见 BottomNav.jsx 头注释 */}
+      <BottomNav />
       {/* 全局叠层：护眼滤镜 + 使用时长锁定，跨页面常驻 */}
       <SettingsOverlay />
       {/* 开场欢迎门：会话首次进入时铺满全屏，点大喇叭解锁音乐+音效（满足自动播放策略） */}
