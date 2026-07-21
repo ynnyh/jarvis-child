@@ -31,16 +31,16 @@ import Xiaomo from './mascot/Xiaomo.jsx';
 // ============ 锚点常量表（微调位置只改这里）============
 // 坐标为 hi-stage（岛屿舞台容器）的百分比；舞台 SVG viewBox = 1200×780。
 
-// 岛上彩蛋（气球/青蛙/蝴蝶/螃蟹）。云和鸟挂在天空层，用视口百分比，见 SKY_EGGS。
+// 岛上彩蛋（青蛙/蝴蝶/螃蟹）。天上的云/鸟/气球挂在天空层，用视口百分比，见 SKY_EGGS。
 const EGG_SPOTS = {
-  balloon: { left: '63%', top: '6%' }, // 🎈 塔右上方半空
   frog: { left: '35%', top: '81%' }, // 🐸 左前池塘荷叶上
   butterfly: { left: '52%', top: '76%' }, // 🦋 小路弯道花丛边
   crab: { left: '70%', top: '86.5%' }, // 🦀 右前沙滩
 };
 const SKY_EGGS = {
   cloud: { left: '77%', top: '17%' }, // ☁️ 右上天空（绘制云按钮，点了下雨）
-  bird: { left: '32%', top: '13%' }, // 🐦 中天（点了加速飞走再飞回）
+  bird: { left: '36%', top: '20%' }, // 🐦 中天（点了加速飞走再飞回）
+  balloon: { left: '86%', top: '30%' }, // 🎈 右侧天空（点了升空飘走再飘回）
 };
 
 // 商店装饰锚点（id 与 shop.js 的 decor 商品一致，买了才出现）。
@@ -866,14 +866,11 @@ function CollectionArt() {
 // ============ 岛上彩蛋（emoji 类，站在新场景锚点上）============
 function IslandEggs() {
   const sound = useSound();
-  const [balloonOn, balloonGo] = useReplay();
   const [frogOn, frogGo] = useReplay();
   const [butterflyOn, butterflyGo] = useReplay();
   const [crabOn, crabGo] = useReplay();
   return (
     <>
-      <Egg spot={EGG_SPOTS.balloon} emoji="🎈" label="气球" className="hi-egg--balloon" playing={balloonOn}
-        onTap={() => { sound.pop(); balloonGo(5200); }} />
       <Egg spot={EGG_SPOTS.frog} emoji="🐸" label="青蛙" className="hi-egg--frog" playing={frogOn}
         onTap={() => { sound.pop(); frogGo(700); }} />
       <Egg spot={EGG_SPOTS.butterfly} emoji="🦋" label="蝴蝶" className="hi-egg--butterfly" playing={butterflyOn}
@@ -891,6 +888,7 @@ export default function IslandScene({ onEnter, showGift = false, onGift }) {
   const sound = useSound();
   const [giftSpot] = useState(() => GIFT_SPOTS[Math.floor(Math.random() * GIFT_SPOTS.length)]);
   const [birdOn, birdGo] = useReplay();
+  const [balloonOn, balloonGo] = useReplay();
 
   // ---- 指针视差：pointer → (-1..1)，弹簧平滑，各层按景深错位 ----
   const px = useMotionValue(0);
@@ -947,6 +945,9 @@ export default function IslandScene({ onEnter, showGift = false, onGift }) {
               {/* 🐦 鸟彩蛋：点了加速飞走，几秒后飞回 */}
               <Egg spot={SKY_EGGS.bird} emoji="🐦" label="飞鸟" className="hi-egg--bird" playing={birdOn}
                 onTap={() => { sound.swoosh(); birdGo(3500); }} />
+              {/* 🎈 气球彩蛋：飘在右侧天空，点了升空飘走再飘回 */}
+              <Egg spot={SKY_EGGS.balloon} emoji="🎈" label="气球" className="hi-egg--balloon" playing={balloonOn}
+                onTap={() => { sound.pop(); balloonGo(5200); }} />
             </motion.div>
 
             {/* 2) 远景 */}

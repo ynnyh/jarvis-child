@@ -254,14 +254,14 @@
   from { transform: translateY(-88px); }
   to { transform: translateY(0); }
 }
-/* 海平线雾气：把远方"推"出去 */
+/* 海平线雾气：把远方轻轻"推"出去（太重会变成一条泛白带） */
 .hi-sea-haze {
   position: absolute;
   left: 0;
   right: 0;
   top: 0;
-  height: 46%;
-  background: linear-gradient(180deg, rgba(238, 251, 255, 0.95) 0%, rgba(224, 246, 253, 0.4) 40%, rgba(224, 246, 253, 0) 100%);
+  height: 26%;
+  background: linear-gradient(180deg, rgba(238, 251, 255, 0.8) 0%, rgba(228, 247, 253, 0.28) 55%, rgba(228, 247, 253, 0) 100%);
   pointer-events: none;
 }
 /* 波光闪烁点 */
@@ -1579,19 +1579,30 @@ button.hud3-chip:active { transform: translateY(3px); box-shadow: inset 0 2px 0 
   .hud3-brand { display: none; } /* 小屏：名字让位给数据（岛就是品牌） */
   .hi-review-fab { width: 68px; height: 68px; }
 }
-/* 竖屏手机：地平线下移、岛按屏宽适配（全部建筑保持可见可点），
-   空出的中段海面交给远景群岛/帆船/热气球去"演" */
+/* 竖屏手机：地平线下移；岛放大并整体抬到导航坞之上（所有建筑和名牌完整可见）；
+   复习浮标挪到 HUD 下方右侧的天空区，不再压建筑；空出的海面交给远景群岛/帆船去"演" */
 @media (max-aspect-ratio: 3/4) {
   .hi-scene { --hi-horizon: clamp(240px, 42%, 430px); }
-  .hi-stage { width: clamp(380px, 118vw, 620px); bottom: -10px; }
+  .hi-stage {
+    width: clamp(380px, 136vw, 660px);
+    bottom: calc(var(--bottom-nav-h) + 12px + env(safe-area-inset-bottom, 0px));
+  }
+  .hi-sun { left: 4%; top: 13%; }
   .hi-cloud--2 { top: 15%; }
   .hi-cloud--3 { top: 30%; }
   .hi-far-isle--l { width: clamp(150px, 34vw, 240px); opacity: 0.7; }
   .hi-far-isle--r { width: clamp(160px, 36vw, 250px); opacity: 0.7; }
-  .hi-balloon--a { right: 10%; top: calc(var(--hi-horizon) - 150px); }
-  .hi-balloon--b { left: 12%; top: calc(var(--hi-horizon) - 90px); }
+  .hi-balloon--a { right: 6%; top: calc(var(--hi-horizon) - 120px); }
+  .hi-balloon--b { left: 10%; top: calc(var(--hi-horizon) - 70px); }
   .hi-far-boat { width: clamp(56px, 14vw, 88px); }
   .hi-egg { width: 52px; height: 52px; font-size: 29px; }
+  .hi-review-fab {
+    right: var(--s-3);
+    bottom: auto;
+    top: calc(env(safe-area-inset-top, 0px) + 74px);
+    width: 66px;
+    height: 66px;
+  }
 }
 @media (max-height: 480px) {
   .hi-scene { --hi-horizon: 130px; }

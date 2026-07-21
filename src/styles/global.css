@@ -2120,7 +2120,8 @@ button {
 
 /* 导航可见时，滚动页底部留白（组件按路由切换 body.has-bottom-nav） */
 .has-bottom-nav .page {
-  padding-bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px) + var(--s-4));
+  /* 悬浮导航坞比旧贴底导航更高（自身 bottom 偏移 10px），多留一档 */
+  padding-bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px) + var(--s-6));
 }
 
 
