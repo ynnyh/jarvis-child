@@ -1,0 +1,1616 @@
+/* ============================================================
+   海岛大厅 · 2.5D 立体舞台 + 全套游戏化界面（home3d.css）
+   ------------------------------------------------------------
+   涵盖：hi-*(大厅场景) / hud3-*(顶部HUD) / wpk-*(选世界浮层)
+        trail-*(关卡地图) / dock-*(底部导航坞) / coin3-*(金币章)
+   原则：
+   · 环境动画只用 transform / opacity（GPU 合成，弱平板不掉帧）
+   · 一切可点元素 ≥ 56px 热区；prefers-reduced-motion 全部静止
+   · 颜色尽量引用 tokens.css，场景专属色就地定义
+   ============================================================ */
+
+/* ---------- 场景骨架 ---------- */
+.hi-home {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: #8fd4f5; /* 兜底天空色 */
+}
+.hi-scene {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  perspective: 1100px;
+  perspective-origin: 50% 34%;
+  --hi-horizon: clamp(180px, 34%, 360px);
+}
+.hi-entrance {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+.hi-tilt {
+  position: absolute;
+  inset: 0;
+}
+/* 无输入时的呼吸式镜头游移：极慢、极小，让画面永远"活着" */
+.hi-drift {
+  position: absolute;
+  inset: 0;
+  animation: hi-drift 18s ease-in-out infinite;
+}
+@keyframes hi-drift {
+  0%, 100% { transform: translate(0, 0); }
+  30% { transform: translate(6px, -4px); }
+  65% { transform: translate(-6px, 3px); }
+}
+.hi-layer {
+  position: absolute;
+  inset: 0;
+}
+
+/* ---------- 1) 天空 ---------- */
+.hi-sky {
+  inset: -6% -7%;
+  background: linear-gradient(
+    180deg,
+    #5fbdf2 0%,
+    #8fd2f6 34%,
+    #bce7fb 58%,
+    #e6f8ff 76%,
+    #f4fcff 100%
+  );
+}
+/* 太阳：光晕呼吸 + 光芒慢转 + 奶黄核心 */
+.hi-sun {
+  position: absolute;
+  left: 7%;
+  top: 10%;
+  width: clamp(96px, 13vw, 170px);
+  aspect-ratio: 1;
+}
+.hi-sun-halo {
+  position: absolute;
+  inset: -26%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 243, 176, 0.85) 0%, rgba(255, 243, 176, 0) 68%);
+  animation: hi-sun-halo 5s ease-in-out infinite;
+}
+@keyframes hi-sun-halo {
+  0%, 100% { transform: scale(1); opacity: 0.85; }
+  50% { transform: scale(1.14); opacity: 1; }
+}
+.hi-sun-rays {
+  position: absolute;
+  inset: -18%;
+  animation: hi-sun-spin 46s linear infinite;
+}
+@keyframes hi-sun-spin {
+  to { transform: rotate(360deg); }
+}
+.hi-sun-core {
+  position: absolute;
+  inset: 12%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 32%, #fffbe0 0%, #ffe884 55%, #ffd35c 100%);
+  box-shadow: inset 0 -6px 12px rgba(240, 170, 40, 0.35), 0 0 30px rgba(255, 226, 122, 0.8);
+}
+
+/* 绘制云：三档大小/速度/清晰度 → 天空的纵深 */
+.hi-cloud {
+  position: absolute;
+  pointer-events: none;
+}
+.hi-cloud-svg { width: 100%; height: auto; display: block; }
+.hi-cloud--1 {
+  left: 30%;
+  top: 13%;
+  width: clamp(110px, 15vw, 200px);
+  animation: hi-cloud-drift 44s ease-in-out infinite;
+}
+.hi-cloud--2 {
+  left: 62%;
+  top: 5%;
+  width: clamp(150px, 20vw, 270px);
+  animation: hi-cloud-drift 58s ease-in-out infinite reverse;
+}
+.hi-cloud--3 {
+  left: 12%;
+  top: 27%;
+  width: clamp(80px, 10vw, 140px);
+  opacity: 0.82;
+  filter: blur(1px);
+  animation: hi-cloud-drift 36s ease-in-out infinite;
+}
+@keyframes hi-cloud-drift {
+  0%, 100% { transform: translateX(-3vw); }
+  50% { transform: translateX(3vw); }
+}
+
+/* 掠屏飞鸟群：26s 一班，大部分时间停在屏外 */
+.hi-birds {
+  position: absolute;
+  left: 0;
+  top: 20%;
+  width: clamp(70px, 9vw, 110px);
+  pointer-events: none;
+  animation: hi-birds-fly 26s linear infinite;
+  animation-delay: 4s;
+  transform: translateX(-16vw);
+}
+@keyframes hi-birds-fly {
+  0% { transform: translate(-16vw, 2vh); }
+  38% { transform: translate(112vw, -5vh); }
+  100% { transform: translate(112vw, -5vh); }
+}
+.hi-bird-w { animation: hi-flap 0.8s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: center; }
+.hi-bird-w.w2 { animation-delay: 0.2s; }
+.hi-bird-w.w3 { animation-delay: 0.4s; }
+@keyframes hi-flap {
+  from { transform: scaleY(1); }
+  to { transform: scaleY(0.55); }
+}
+
+/* ---------- 2) 远景 ---------- */
+.hi-far-inner { position: absolute; inset: 0; pointer-events: none; }
+.hi-far-isle {
+  position: absolute;
+  top: calc(var(--hi-horizon) - 42px);
+  opacity: 0.6;
+}
+.hi-far-isle--l { left: 2%; width: clamp(120px, 16vw, 220px); }
+.hi-far-isle--r { right: 3%; width: clamp(130px, 17vw, 230px); }
+.hi-lh-lamp { animation: hi-lh-blink 3.4s ease-in-out infinite; }
+@keyframes hi-lh-blink {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+/* 远景帆船：极慢横渡整个海平线（一趟 70s） */
+.hi-far-boat {
+  position: absolute;
+  top: calc(var(--hi-horizon) - 26px);
+  left: 0;
+  width: clamp(44px, 5.6vw, 76px);
+  opacity: 0.9;
+  animation: hi-boat-cross 70s linear infinite;
+}
+@keyframes hi-boat-cross {
+  0% { transform: translateX(-14vw) rotate(-1.5deg); }
+  25% { transform: translateX(24vw) rotate(1.5deg); }
+  50% { transform: translateX(56vw) rotate(-1.5deg); }
+  75% { transform: translateX(84vw) rotate(1.5deg); }
+  100% { transform: translateX(112vw) rotate(-1.5deg); }
+}
+/* 热气球：缓慢升沉 + 微横移 */
+.hi-balloon {
+  position: absolute;
+  width: clamp(46px, 6vw, 80px);
+}
+.hi-balloon--a {
+  right: 14%;
+  top: calc(var(--hi-horizon) - 200px);
+  animation: hi-balloon-a 11s ease-in-out infinite;
+}
+.hi-balloon--b {
+  left: 20%;
+  top: calc(var(--hi-horizon) - 150px);
+  width: clamp(34px, 4.4vw, 60px);
+  opacity: 0.9;
+  animation: hi-balloon-a 14s ease-in-out infinite reverse;
+}
+@keyframes hi-balloon-a {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(10px, -22px); }
+}
+
+/* ---------- 3) 透视海面 ---------- */
+.hi-sea {
+  top: var(--hi-horizon);
+  bottom: -6%;
+  left: -7%;
+  right: -7%;
+  background: linear-gradient(180deg, #6cc6ea 0%, #45aede 40%, #2f97cf 100%);
+}
+.hi-sea-persp {
+  position: absolute;
+  inset: 0;
+  perspective: 430px;
+  perspective-origin: 50% 0%;
+  overflow: hidden;
+}
+/* 海面平面：rotateX 放倒成"地板"，贴图向镜头方向流动 */
+.hi-sea-plane {
+  position: absolute;
+  left: -35%;
+  width: 170%;
+  top: -2px;
+  height: 320%;
+  transform-origin: top center;
+  transform: rotateX(56deg);
+  background: linear-gradient(180deg, #8fdcf2 0%, #4db4e2 34%, #2f97cf 72%, #2384bd 100%);
+  overflow: hidden;
+}
+.hi-sea-tex {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -88px;
+  height: calc(100% + 176px);
+  background:
+    repeating-linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.11) 0 6px,
+      rgba(255, 255, 255, 0) 6px 88px
+    ),
+    repeating-linear-gradient(
+      180deg,
+      rgba(18, 105, 155, 0.11) 16px 26px,
+      rgba(18, 105, 155, 0) 26px 88px
+    );
+  animation: hi-sea-flow 7s linear infinite;
+  will-change: transform;
+}
+@keyframes hi-sea-flow {
+  from { transform: translateY(-88px); }
+  to { transform: translateY(0); }
+}
+/* 海平线雾气：把远方"推"出去 */
+.hi-sea-haze {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 46%;
+  background: linear-gradient(180deg, rgba(238, 251, 255, 0.95) 0%, rgba(224, 246, 253, 0.4) 40%, rgba(224, 246, 253, 0) 100%);
+  pointer-events: none;
+}
+/* 波光闪烁点 */
+.hi-glint {
+  position: absolute;
+  width: 46px;
+  height: 8px;
+  border-radius: 999px;
+  background: radial-gradient(closest-side, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0));
+  animation: hi-glint 4.2s ease-in-out infinite;
+  pointer-events: none;
+}
+.hi-glint.g1 { left: 16%; top: 34%; }
+.hi-glint.g2 { left: 74%; top: 26%; animation-delay: 1.3s; }
+.hi-glint.g3 { left: 42%; top: 55%; width: 64px; animation-delay: 2.4s; }
+@keyframes hi-glint {
+  0%, 100% { opacity: 0.15; transform: scaleX(0.7); }
+  50% { opacity: 0.95; transform: scaleX(1.15); }
+}
+
+/* ---------- 4) 主岛舞台 ---------- */
+.hi-stagewrap { pointer-events: none; }
+.hi-stage {
+  position: absolute;
+  left: 50%;
+  bottom: max(-64px, -4vh);
+  transform: translateX(-50%);
+  width: clamp(700px, min(150vw, 158vh), 1340px);
+  aspect-ratio: 1200 / 780;
+  pointer-events: none;
+  container-type: inline-size;
+}
+/* 全岛浮沉呼吸（连同建筑与彩蛋一起，像一艘停泊的大船） */
+.hi-bob {
+  position: absolute;
+  inset: 0;
+  animation: hi-bob 6.6s ease-in-out infinite;
+}
+@keyframes hi-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.hi-island {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+}
+.hi-anchors {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* 环岛浪花：两圈错峰呼吸 + 虚点慢转（像泡泡沿岸线游走） */
+.hi-foam {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.hi-foam--1 { animation: hi-foam-a 7s ease-in-out infinite, hi-foam-drift 26s linear infinite; }
+.hi-foam--2 { animation: hi-foam-b 7s ease-in-out infinite, hi-foam-drift 34s linear infinite reverse; }
+@keyframes hi-foam-a {
+  0%, 100% { opacity: 0.9; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(1.015); }
+}
+@keyframes hi-foam-b {
+  0%, 100% { opacity: 0.3; transform: scale(1.012); }
+  50% { opacity: 0.85; transform: scale(1); }
+}
+@keyframes hi-foam-drift {
+  to { stroke-dashoffset: -320; }
+}
+
+/* 糖果小路流光虚点：一路"流"向塔前 */
+.hi-road-dots { animation: hi-road-flow 3.4s linear infinite; }
+@keyframes hi-road-flow {
+  to { stroke-dashoffset: -72; }
+}
+
+/* 花草轻晃（底部为轴） */
+.hi-sway {
+  transform-box: fill-box;
+  transform-origin: bottom center;
+  animation: hi-sway 4.2s ease-in-out infinite;
+}
+.hi-sway.s1 { animation-delay: -1.2s; }
+.hi-sway.s2 { animation-delay: -2.4s; }
+.hi-sway.s3 { animation-delay: -3.4s; }
+@keyframes hi-sway {
+  0%, 100% { transform: rotate(-3.4deg); }
+  50% { transform: rotate(3.4deg); }
+}
+
+/* 云影扫过岛面 */
+.hi-cloudshadow { animation: hi-cloudshadow 36s ease-in-out infinite; }
+.hi-cloudshadow--2 { animation-duration: 44s; animation-direction: reverse; }
+@keyframes hi-cloudshadow {
+  0%, 100% { transform: translateX(-130px); }
+  50% { transform: translateX(130px); }
+}
+
+/* 草地星星闪烁 */
+.hi-twinkle {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: hi-twinkle 3.2s ease-in-out infinite;
+}
+.hi-twinkle.t2 { animation-delay: 1.1s; }
+.hi-twinkle.t3 { animation-delay: 2.2s; }
+@keyframes hi-twinkle {
+  0%, 100% { opacity: 0.15; transform: scale(0.7); }
+  50% { opacity: 0.95; transform: scale(1.1); }
+}
+
+/* 小船随浪 / 彩旗摆动 / 路灯呼吸 */
+.hi-rowboat {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: hi-rowboat 4.4s ease-in-out infinite;
+}
+@keyframes hi-rowboat {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-4px) rotate(2deg); }
+}
+.hi-bunting {
+  transform-box: fill-box;
+  transform-origin: center top;
+  animation: hi-bunting 3.6s ease-in-out infinite;
+}
+@keyframes hi-bunting {
+  0%, 100% { transform: skewX(-2.4deg); }
+  50% { transform: skewX(2.4deg); }
+}
+.hi-lamp-glow { animation: hi-lampglow 4s ease-in-out infinite; }
+@keyframes hi-lampglow {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+
+/* 鱼跃出水：9s 一跳（含长停顿），带两次水花 */
+.hi-fish { animation: hi-fish-jump 9s ease-in-out infinite; opacity: 0; }
+@keyframes hi-fish-jump {
+  0%, 71% { transform: translate(0, 34px) rotate(-24deg); opacity: 0; }
+  74% { transform: translate(4px, 26px) rotate(-28deg); opacity: 1; }
+  81% { transform: translate(30px, -58px) rotate(0deg); opacity: 1; }
+  88% { transform: translate(58px, 30px) rotate(38deg); opacity: 1; }
+  89%, 100% { transform: translate(58px, 34px) rotate(38deg); opacity: 0; }
+}
+.hi-splash { animation: hi-fish-splash 9s ease-out infinite; opacity: 0; transform-box: fill-box; transform-origin: center; }
+@keyframes hi-fish-splash {
+  0%, 71% { opacity: 0; transform: scale(0.4); }
+  75% { opacity: 0.9; transform: scale(1); }
+  80% { opacity: 0; transform: scale(1.25); }
+  87% { opacity: 0; transform: scale(0.4); }
+  91% { opacity: 0.9; transform: scale(1.1) translateX(46px); }
+  96%, 100% { opacity: 0; transform: scale(1.3) translateX(46px); }
+}
+
+/* ---------- 5) 前景浪带 ---------- */
+.hi-fg {
+  top: auto;
+  left: -8%;
+  right: -8%;
+  bottom: -2px;
+  height: clamp(44px, 7vh, 90px);
+  pointer-events: none;
+}
+.hi-fg-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  animation: hi-fg-drift 9s ease-in-out infinite;
+}
+@keyframes hi-fg-drift {
+  0%, 100% { transform: translateX(-1.6%); }
+  50% { transform: translateX(1.6%); }
+}
+
+/* 晕影：轻轻包住画面，纵深收口 */
+.hi-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(130% 100% at 50% 46%, rgba(0, 0, 0, 0) 72%, rgba(20, 60, 90, 0.16) 100%);
+}
+
+/* ============================================================
+   建筑：软 3D 地标（锚点 = 舞台百分比，微调只改这里）
+   ============================================================ */
+.hi-b {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.hi-b--tower { left: 50%; top: 32%; width: 24%; z-index: 6; }
+.hi-b--park { left: 24%; top: 47%; width: 18.5%; z-index: 5; }
+.hi-b--library { left: 75%; top: 43.5%; width: 17.5%; z-index: 5; }
+.hi-b--school { left: 36.5%; top: 64.5%; width: 15%; z-index: 7; }
+.hi-b--shop { left: 63%; top: 64.5%; width: 15%; z-index: 7; }
+.hi-b--collection { left: 77%; top: 69.5%; width: 13.5%; z-index: 8; }
+
+.hi-b-btn {
+  position: relative;
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1cqw;
+  width: 100%;
+  filter: drop-shadow(0 10px 14px rgba(30, 90, 120, 0.28));
+  -webkit-tap-highlight-color: transparent;
+}
+.hi-b-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+/* 主入口（识字塔）：周期轻跳，喊"点我" */
+.hi-b-btn.is-primary { animation: hi-cta-hop 5.4s ease-in-out infinite; }
+@keyframes hi-cta-hop {
+  0%, 88%, 100% { transform: translateY(0); }
+  91% { transform: translateY(-8px) scale(1.02, 0.99); }
+  94% { transform: translateY(0) scale(0.99, 1.01); }
+  97% { transform: translateY(-3px); }
+}
+
+/* 塔顶小墨（宽度随建筑缩放；svg 尺寸交给 CSS 接管） */
+.hi-tower-mascot {
+  position: absolute;
+  top: 6.5%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 27%;
+  pointer-events: none;
+  z-index: 2;
+}
+.hi-tower-mascot svg { width: 100%; height: auto; display: block; }
+
+/* 名牌：糖果 pill（各建筑配色见下），字号跟舞台宽度走 */
+.hi-plate {
+  --pl: #58b9f0;
+  --pl-d: #3a8ec2;
+  margin-top: -1.5%;
+  font-weight: 900;
+  color: #fff;
+  white-space: nowrap;
+  padding: 0.34em 1.15em;
+  border-radius: 999px;
+  font-size: clamp(11px, 2cqw, 17px);
+  background: var(--pl);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--pl) 70%, #fff) 0%, var(--pl) 52%, var(--pl-d) 100%);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.5),
+    0 0.26em 0 var(--pl-d),
+    0 0.7em 1em rgba(30, 70, 110, 0.28);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+  letter-spacing: 0.06em;
+}
+.hi-b--tower .hi-plate { --pl: #3cbf80; --pl-d: #24925c; }
+.hi-b--park .hi-plate { --pl: #ff8fb1; --pl-d: #e05f8d; }
+.hi-b--library .hi-plate { --pl: #58b9f0; --pl-d: #3a8ec2; }
+.hi-b--school .hi-plate { --pl: #b39cf7; --pl-d: #8a6ce0; }
+.hi-b--shop .hi-plate { --pl: #ffb054; --pl-d: #e08228; }
+.hi-b--collection .hi-plate { --pl: #4ecb91; --pl-d: #2f9a6c; }
+.hi-plate--primary {
+  font-size: clamp(13px, 2.6cqw, 21px);
+  padding: 0.38em 1.3em;
+  animation: hi-plate-glow 2.6s ease-in-out infinite;
+}
+@keyframes hi-plate-glow {
+  0%, 100% {
+    box-shadow:
+      inset 0 2px 0 rgba(255, 255, 255, 0.5),
+      0 0.26em 0 var(--pl-d),
+      0 0.7em 1em rgba(30, 70, 110, 0.28),
+      0 0 0 0 rgba(255, 214, 90, 0.65);
+  }
+  50% {
+    box-shadow:
+      inset 0 2px 0 rgba(255, 255, 255, 0.5),
+      0 0.26em 0 var(--pl-d),
+      0 0.7em 1em rgba(30, 70, 110, 0.28),
+      0 0 0 0.55em rgba(255, 214, 90, 0);
+  }
+}
+
+/* 点按星星迸发（六向） */
+.hi-burst {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  pointer-events: none;
+  z-index: 4;
+}
+.hi-burst span {
+  position: absolute;
+  font-size: clamp(13px, 2.4cqw, 20px);
+  line-height: 1;
+  transform: translate(-50%, -50%);
+  animation: hi-burst-fly 0.55s ease-out forwards;
+}
+@keyframes hi-burst-fly {
+  from {
+    transform: translate(-50%, -50%) rotate(var(--deg)) translateY(-0.6em) scale(0.4);
+    opacity: 1;
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(var(--deg)) translateY(-4.2em) scale(1.1);
+    opacity: 0;
+  }
+}
+
+/* ---- 建筑 idle 动画 ---- */
+/* 摩天轮：轮盘转 + 吊舱反转保持直立（原点用 viewBox 坐标精确到轮轴） */
+.hi-wheel {
+  transform-box: view-box;
+  transform-origin: 120px 96px;
+  animation: hi-spin 22s linear infinite;
+}
+.hi-gondola {
+  transform-box: view-box;
+  animation: hi-spin-rev 22s linear infinite;
+}
+@keyframes hi-spin { to { transform: rotate(360deg); } }
+@keyframes hi-spin-rev { to { transform: rotate(-360deg); } }
+
+/* 窗户暖光呼吸 */
+.hi-win { animation: hi-win-glow 4.4s ease-in-out infinite; }
+.hi-win.w2 { animation-delay: 1.4s; }
+.hi-win.w3 { animation-delay: 2.6s; }
+@keyframes hi-win-glow {
+  0%, 100% { opacity: 0.72; }
+  50% { opacity: 1; }
+}
+
+/* 塔尖旗帜飘动 */
+.hi-flagwave {
+  transform-box: fill-box;
+  transform-origin: left center;
+  animation: hi-flagwave 2.6s ease-in-out infinite;
+}
+@keyframes hi-flagwave {
+  0%, 100% { transform: skewY(0) scaleX(1); }
+  50% { transform: skewY(-7deg) scaleX(0.88); }
+}
+
+/* 绘本馆：烟圈上升 + 魔法书浮动发光 */
+.hi-smoke {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: hi-smoke 3.8s ease-in infinite;
+  opacity: 0;
+}
+.hi-smoke.s2 { animation-delay: 1.3s; }
+.hi-smoke.s3 { animation-delay: 2.5s; }
+@keyframes hi-smoke {
+  0% { transform: translateY(0) scale(0.5); opacity: 0; }
+  18% { opacity: 0.85; }
+  100% { transform: translateY(-36px) scale(1.4); opacity: 0; }
+}
+.hi-magicbook {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: hi-magicbook 3.2s ease-in-out infinite;
+}
+@keyframes hi-magicbook {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* 学院铃铛摆动 */
+.hi-bell {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  animation: hi-bell 2.8s ease-in-out infinite;
+}
+@keyframes hi-bell {
+  0%, 100% { transform: rotate(-9deg); }
+  50% { transform: rotate(9deg); }
+}
+
+/* 商店金币招牌摇晃 */
+.hi-shopsign {
+  transform-box: view-box;
+  transform-origin: 100px 88px;
+  animation: hi-shopsign 3.4s ease-in-out infinite;
+}
+@keyframes hi-shopsign {
+  0%, 100% { transform: rotate(-7deg); }
+  50% { transform: rotate(7deg); }
+}
+
+/* 字库：印章呼吸 + 塔尖星星闪 */
+.hi-seal {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: hi-seal 3.6s ease-in-out infinite;
+}
+@keyframes hi-seal {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+.hi-clstar {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: hi-twinkle 2.8s ease-in-out infinite;
+}
+
+/* ============================================================
+   彩蛋 / 礼物 / 商店装饰
+   ============================================================ */
+.hi-egg {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+  width: 58px;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 33px;
+  filter: drop-shadow(0 4px 5px rgba(30, 80, 110, 0.3));
+  -webkit-tap-highlight-color: transparent;
+}
+.hi-egg-inner { display: inline-block; line-height: 1; }
+
+/* 云彩蛋（绘制云按钮） */
+.hi-egg--cloud { width: clamp(76px, 9vw, 120px); height: auto; }
+.hi-egg--cloud .hi-egg-inner { width: 100%; animation: hi-eggcloud 8s ease-in-out infinite; }
+@keyframes hi-eggcloud {
+  0%, 100% { transform: translateX(-9px); }
+  50% { transform: translateX(9px); }
+}
+.hi-rain {
+  position: absolute;
+  left: 50%;
+  top: 68%;
+  pointer-events: none;
+}
+.hi-rain span {
+  position: absolute;
+  width: 4.5px;
+  height: 13px;
+  border-radius: 4px;
+  background: linear-gradient(#cfeaff, #4aa6dd);
+  animation: hi-raindrop 0.9s ease-in forwards;
+}
+@keyframes hi-raindrop {
+  from { transform: translateY(0); opacity: 0.95; }
+  to { transform: translateY(34px); opacity: 0; }
+}
+
+/* 鸟彩蛋 */
+.hi-egg--bird .hi-egg-inner { animation: hi-eggbob 2.4s ease-in-out infinite; }
+@keyframes hi-eggbob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+.hi-egg--bird.is-playing .hi-egg-inner { animation: hi-eggbird-fly 3.5s ease-in-out; }
+@keyframes hi-eggbird-fly {
+  0% { transform: translate(0, 0); opacity: 1; }
+  22% { transform: translate(80vw, -8vh); opacity: 1; }
+  23% { transform: translate(80vw, -8vh); opacity: 0; }
+  24% { transform: translate(-80vw, 6vh); opacity: 0; }
+  72% { transform: translate(0, 0); opacity: 1; }
+  100% { transform: translate(0, 0); opacity: 1; }
+}
+
+/* 气球彩蛋 */
+.hi-egg--balloon .hi-egg-inner {
+  transform-origin: top center;
+  animation: hi-eggsway 3.4s ease-in-out infinite;
+}
+@keyframes hi-eggsway {
+  0%, 100% { transform: rotate(-5deg); }
+  50% { transform: rotate(5deg); }
+}
+.hi-egg--balloon.is-playing .hi-egg-inner { animation: hi-eggballoon 5.2s ease-in-out; }
+@keyframes hi-eggballoon {
+  0% { transform: translateY(0); opacity: 1; }
+  28% { transform: translateY(-55vh); opacity: 1; }
+  29% { transform: translateY(-55vh); opacity: 0; }
+  30% { transform: translateY(26vh); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+/* 青蛙彩蛋 */
+.hi-egg--frog .hi-egg-inner { animation: hi-eggbreathe 4s ease-in-out infinite; }
+@keyframes hi-eggbreathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.07); }
+}
+.hi-egg--frog.is-playing .hi-egg-inner { animation: hi-eggfrog 0.7s var(--ease-juicy); }
+@keyframes hi-eggfrog {
+  0% { transform: translateY(0) scale(1, 1); }
+  35% { transform: translateY(-28px) scale(1.05, 0.95); }
+  70% { transform: translateY(0) scale(0.92, 1.1); }
+  100% { transform: translateY(0) scale(1, 1); }
+}
+
+/* 蝴蝶彩蛋 */
+.hi-egg--butterfly .hi-egg-inner { animation: hi-eggflutter 1.8s ease-in-out infinite; }
+@keyframes hi-eggflutter {
+  0%, 100% { transform: translate(0, 0) rotate(-6deg); }
+  50% { transform: translate(3px, -5px) rotate(6deg); }
+}
+.hi-egg--butterfly.is-playing .hi-egg-inner { animation: hi-eggbtf 1.4s ease-in-out; }
+@keyframes hi-eggbtf {
+  0% { transform: translate(0, 0) rotate(0); }
+  30% { transform: translate(18px, -20px) rotate(10deg); }
+  60% { transform: translate(38px, -8px) rotate(-8deg); }
+  100% { transform: translate(0, 0) rotate(0); }
+}
+
+/* 螃蟹彩蛋 */
+.hi-egg--crab .hi-egg-inner { animation: hi-eggcrab 3.6s ease-in-out infinite; }
+@keyframes hi-eggcrab {
+  0%, 100% { transform: rotate(-4deg); }
+  50% { transform: rotate(4deg); }
+}
+.hi-egg--crab.is-playing .hi-egg-inner { animation: hi-eggcrabwalk 0.9s ease-in-out; }
+@keyframes hi-eggcrabwalk {
+  0% { transform: translateX(0) rotate(0); }
+  25% { transform: translateX(20px) rotate(6deg); }
+  60% { transform: translateX(-13px) rotate(-6deg); }
+  100% { transform: translateX(0) rotate(0); }
+}
+
+/* 每日惊喜礼物盒：光圈 + 呼吸跳动 */
+.hi-gift {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+  width: 68px;
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 38px;
+  animation: hi-gift-bounce 1.7s ease-in-out infinite;
+  filter: drop-shadow(0 5px 6px rgba(160, 110, 20, 0.35));
+  -webkit-tap-highlight-color: transparent;
+}
+@keyframes hi-gift-bounce {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -54%) scale(1.1); }
+}
+.hi-gift-glow {
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 214, 90, 0.75) 0%, rgba(255, 214, 90, 0) 70%);
+  animation: hi-gift-glow 1.7s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes hi-gift-glow {
+  0%, 100% { transform: scale(1); opacity: 0.7; }
+  50% { transform: scale(1.5); opacity: 1; }
+}
+
+/* 商店装饰（emoji 收藏品） */
+.hi-decor {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  font-size: clamp(30px, 3.6cqw, 44px);
+  pointer-events: none;
+  filter: drop-shadow(0 4px 5px rgba(30, 80, 110, 0.28));
+}
+.hi-decor-inner { display: inline-block; line-height: 1; }
+.hi-decor--windmill .hi-decor-inner { animation: hi-decorspin 9s linear infinite; }
+@keyframes hi-decorspin { to { transform: rotate(360deg); } }
+.hi-decor--flags { font-size: clamp(36px, 4.4cqw, 52px); }
+.hi-decor--flags .hi-decor-inner {
+  transform-origin: top center;
+  animation: hi-eggsway 3.6s ease-in-out infinite;
+}
+.hi-decor--boat .hi-decor-inner { animation: hi-rowboat 3.2s ease-in-out infinite; }
+.hi-decor--lighthouse .hi-decor-inner { animation: hi-decorlh 4s ease-in-out infinite; }
+@keyframes hi-decorlh {
+  0%, 100% { filter: drop-shadow(0 0 3px rgba(255, 230, 140, 0.5)); }
+  50% { filter: drop-shadow(0 0 13px rgba(255, 230, 140, 0.95)); }
+}
+
+/* ============================================================
+   顶部 HUD（hud3）：玻璃糖果药丸
+   ============================================================ */
+.hud3 {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--s-2);
+  padding: calc(var(--s-3) + env(safe-area-inset-top, 0px)) var(--s-3) 0;
+  pointer-events: none;
+}
+.hud3-left,
+.hud3-right {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  pointer-events: auto;
+}
+.hud3-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 48px;
+  padding: 4px 14px;
+  border-radius: var(--r-pill);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 253, 244, 0.88) 100%);
+  backdrop-filter: blur(6px);
+  box-shadow:
+    inset 0 2px 0 #fff,
+    0 4px 0 rgba(120, 150, 175, 0.28),
+    0 10px 18px rgba(30, 80, 110, 0.22);
+  font-weight: 900;
+  color: var(--c-ink);
+  font-size: var(--f-md);
+  border: none;
+}
+button.hud3-chip:active { transform: translateY(3px); box-shadow: inset 0 2px 0 #fff, 0 1px 0 rgba(120, 150, 175, 0.28), 0 4px 8px rgba(30, 80, 110, 0.18); }
+.hud3-ic { width: 26px; height: 26px; display: block; }
+
+/* 小墨头像钮（宠物入口） */
+.hud3-avatar {
+  width: 54px;
+  height: 54px;
+  min-height: 0;
+  padding: 3px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.hud3-avatar > * { pointer-events: none; }
+
+/* 品牌名牌 */
+.hud3-brand {
+  color: var(--c-brand-deep);
+  letter-spacing: 0.04em;
+  font-size: var(--f-md);
+}
+
+/* 连续打卡火焰 */
+.hud3-streak { color: #e05a2b; }
+
+/* 每日任务钮：全完成时金光呼吸 */
+.hud3-quest { position: relative; }
+.hud3-quest-badge {
+  position: absolute;
+  top: -5px;
+  right: -4px;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--c-error);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(180, 60, 60, 0.4);
+}
+.hud3-quest.all-done { animation: hud3-quest-glow 2.2s ease-in-out infinite; }
+.hud3-quest.all-done .hud3-quest-badge { background: var(--c-success); }
+@keyframes hud3-quest-glow {
+  0%, 100% { box-shadow: inset 0 2px 0 #fff, 0 4px 0 rgba(120, 150, 175, 0.28), 0 10px 18px rgba(30, 80, 110, 0.22), 0 0 0 0 rgba(255, 198, 54, 0.7); }
+  50% { box-shadow: inset 0 2px 0 #fff, 0 4px 0 rgba(120, 150, 175, 0.28), 0 10px 18px rgba(30, 80, 110, 0.22), 0 0 0 12px rgba(255, 198, 54, 0); }
+}
+
+/* 每日任务面板：糖果告示板 */
+.hud3-qpanel {
+  position: absolute;
+  top: calc(var(--s-3) + env(safe-area-inset-top, 0px) + 58px);
+  right: var(--s-3);
+  z-index: 40;
+  width: min(330px, calc(100vw - 24px));
+  border-radius: var(--r-lg);
+  background: linear-gradient(180deg, #fffdf6 0%, #fff3dd 100%);
+  box-shadow: inset 0 3px 0 #fff, 0 8px 0 #ecd2a2, 0 22px 40px rgba(30, 70, 110, 0.32);
+  padding: var(--s-4);
+}
+.hud3-qpanel-title {
+  font-size: var(--f-md);
+  font-weight: 900;
+  color: var(--c-brand-deep);
+  text-align: center;
+  margin-bottom: var(--s-3);
+}
+.hud3-qtask {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  padding: var(--s-2) 0;
+}
+.hud3-qtask-ic {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  background: #fff;
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.08), 0 3px 8px rgba(120, 90, 40, 0.14);
+}
+.hud3-qtask-main { flex: 1; min-width: 0; }
+.hud3-qtask-label { font-weight: 900; font-size: var(--f-sm); }
+.hud3-qbar {
+  margin-top: 5px;
+  height: 14px;
+  border-radius: 999px;
+  background: #f0e2c8;
+  box-shadow: inset 0 2px 3px rgba(120, 90, 40, 0.2);
+  overflow: hidden;
+}
+.hud3-qbar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #ffd873 0%, var(--c-brand) 100%);
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.5);
+  transition: width 0.5s var(--ease-juicy);
+}
+.hud3-qtask.done .hud3-qbar-fill { background: linear-gradient(180deg, #7fe0ae 0%, var(--c-success) 100%); }
+.hud3-qtask-state {
+  font-weight: 900;
+  font-size: var(--f-sm);
+  color: var(--c-ink-soft);
+  min-width: 40px;
+  text-align: right;
+}
+.hud3-qtask.done .hud3-qtask-state { color: var(--c-success-deep); }
+.hud3-qpanel-tip {
+  margin-top: var(--s-3);
+  padding-top: var(--s-3);
+  border-top: 2px dashed #ecd2a2;
+  font-size: var(--f-xs);
+  font-weight: 800;
+  color: var(--c-ink-soft);
+  text-align: center;
+}
+
+/* 今日复习浮标：漂浮圆章 + 数量泡 */
+.hi-review-fab {
+  position: absolute;
+  right: var(--s-4);
+  bottom: calc(var(--bottom-nav-h) + var(--s-5) + env(safe-area-inset-bottom, 0px));
+  z-index: 30;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  font-size: var(--f-xs);
+  font-weight: 900;
+  color: #7a4c04;
+  background: radial-gradient(120% 100% at 50% 20%, #ffe8a3 0%, #ffc636 58%, #f0a92c 100%);
+  box-shadow:
+    inset 0 3px 0 rgba(255, 255, 255, 0.65),
+    0 6px 0 #d9a520,
+    0 16px 26px rgba(160, 120, 20, 0.38);
+  animation: hi-fab-float 3.4s ease-in-out infinite;
+}
+.hi-review-fab:active { transform: translateY(4px); box-shadow: inset 0 3px 0 rgba(255, 255, 255, 0.6), 0 2px 0 #d9a520, 0 8px 14px rgba(160, 120, 20, 0.3); animation: none; }
+@keyframes hi-fab-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.hi-review-fab .fab-ic { font-size: 26px; line-height: 1.1; }
+.hi-review-fab .fab-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--c-error);
+  color: #fff;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(180, 60, 60, 0.4);
+}
+
+/* ============================================================
+   金币徽章（coin3）：绘制金币 + 变化时翻面
+   ============================================================ */
+.coin3 {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 48px;
+  padding: 4px 14px 4px 10px;
+  border-radius: var(--r-pill);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 250, 235, 0.9) 100%);
+  backdrop-filter: blur(6px);
+  box-shadow:
+    inset 0 2px 0 #fff,
+    0 4px 0 rgba(120, 150, 175, 0.28),
+    0 10px 18px rgba(30, 80, 110, 0.22);
+  font-weight: 900;
+  font-size: var(--f-md);
+  color: #b07708;
+}
+.coin3-ic { width: 28px; height: 28px; display: block; }
+
+/* ============================================================
+   选世界浮层（wpk）：航海图
+   ============================================================ */
+.wpk-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--s-4);
+  background: radial-gradient(130% 110% at 50% 0%, rgba(24, 74, 120, 0.6) 0%, rgba(10, 38, 70, 0.82) 100%);
+  backdrop-filter: blur(5px);
+  overflow: hidden;
+}
+/* 上浮的小气泡 */
+.wpk-bubble {
+  position: absolute;
+  bottom: -30px;
+  border-radius: 50%;
+  border: 2.5px solid rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.08);
+  animation: wpk-bubble 7s linear infinite;
+  pointer-events: none;
+}
+@keyframes wpk-bubble {
+  from { transform: translateY(0) scale(0.8); opacity: 0.8; }
+  to { transform: translateY(-110vh) scale(1.15); opacity: 0; }
+}
+.wpk-panel {
+  position: relative;
+  width: min(600px, 96vw);
+  max-height: min(86vh, 86dvh);
+  overflow-y: auto;
+  border-radius: 34px;
+  background:
+    radial-gradient(140% 60% at 50% 0%, #fffef8 0%, rgba(255, 254, 248, 0) 55%),
+    linear-gradient(180deg, #fffdf4 0%, #ffedca 100%);
+  box-shadow:
+    inset 0 3px 0 #fff,
+    0 12px 0 #e2bd83,
+    0 34px 70px rgba(6, 30, 60, 0.5);
+  padding: var(--s-5) var(--s-4) var(--s-6);
+}
+.wpk-head {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin-bottom: var(--s-4);
+}
+.wpk-title {
+  margin: 0;
+  font-size: var(--f-xl);
+  font-weight: 900;
+  color: var(--c-brand-deep);
+  letter-spacing: 0.06em;
+  text-shadow: 0 2px 0 #fff;
+}
+.wpk-close {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #fff;
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--c-ink-soft);
+  box-shadow: inset 0 2px 0 #fff, 0 4px 0 #e2cba0, 0 8px 14px rgba(120, 90, 40, 0.2);
+}
+.wpk-close:active { transform: translateY(calc(-50% + 3px)); box-shadow: inset 0 2px 0 #fff, 0 1px 0 #e2cba0; }
+.wpk-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(156px, 1fr));
+  gap: var(--s-3);
+}
+.wpk-card {
+  --wc: #58b9f0;
+  position: relative;
+  border-radius: 26px;
+  padding: var(--s-4) var(--s-2) var(--s-3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  overflow: hidden;
+  background: var(--wc);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--wc) 72%, #fff) 0%, var(--wc) 58%, color-mix(in srgb, var(--wc) 82%, #000) 100%);
+  box-shadow:
+    inset 0 3px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -6px 0 rgba(0, 0, 0, 0.12),
+    0 7px 0 rgba(0, 0, 0, 0.2),
+    0 16px 24px rgba(20, 50, 90, 0.3);
+}
+.wpk-card:active { transform: translateY(4px); }
+/* 世界小岛台：白色云台 + 大 emoji 立在上面 */
+.wpk-isle {
+  position: relative;
+  width: 92px;
+  height: 74px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+.wpk-isle::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 86px;
+  height: 30px;
+  border-radius: 50%;
+  background: radial-gradient(120% 100% at 50% 18%, #ffffff 0%, #dff0e2 100%);
+  box-shadow: 0 5px 0 rgba(0, 0, 0, 0.14), inset 0 3px 0 #fff;
+}
+.wpk-emoji {
+  position: relative;
+  z-index: 1;
+  font-size: 46px;
+  line-height: 1;
+  filter: drop-shadow(0 5px 4px rgba(0, 0, 0, 0.2));
+  animation: wpk-emoji-bob 2.8s ease-in-out infinite;
+}
+@keyframes wpk-emoji-bob {
+  0%, 100% { transform: translateY(2px); }
+  50% { transform: translateY(-4px); }
+}
+.wpk-name {
+  font-size: var(--f-md);
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 1.5px 0 rgba(0, 0, 0, 0.22);
+  letter-spacing: 0.04em;
+}
+.wpk-progress {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  font-size: var(--f-xs);
+  font-weight: 900;
+  color: var(--c-ink);
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.08);
+}
+.wpk-crown {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  font-size: 24px;
+  filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.25));
+  animation: wpk-emoji-bob 2.2s ease-in-out infinite;
+}
+/* 已通关：金光扫过 */
+.wpk-card.is-complete::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.5) 46%, transparent 60%);
+  transform: translateX(-120%);
+  animation: wpk-shine 3.2s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes wpk-shine {
+  0%, 55% { transform: translateX(-120%); }
+  85%, 100% { transform: translateX(120%); }
+}
+
+/* ============================================================
+   关卡地图（trail）：主题小径爬塔
+   ============================================================ */
+.trail-page {
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  background:
+    radial-gradient(130% 40% at 50% 0%, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0) 60%),
+    linear-gradient(180deg, var(--trail-sky, #cfeaff) 0%, #f6fbff 44%, #fef6ea 100%);
+}
+/* 顶部主题光斑 */
+.trail-page::before {
+  content: '';
+  position: absolute;
+  top: -140px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 480px;
+  height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--trail-glow, rgba(255, 214, 90, 0.5)), transparent);
+  pointer-events: none;
+}
+.trail-topbar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-2);
+  padding: calc(var(--s-3) + env(safe-area-inset-top, 0px)) var(--s-3) var(--s-2);
+  z-index: 5;
+}
+.trail-back {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #fff 0%, #fff4e2 100%);
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--c-ink);
+  box-shadow: inset 0 2px 0 #fff, 0 4px 0 #e2cba0, 0 8px 14px rgba(120, 90, 40, 0.22);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.trail-back:active { transform: translateY(3px); box-shadow: inset 0 2px 0 #fff, 0 1px 0 #e2cba0; }
+.trail-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 22px;
+  border-radius: 999px;
+  font-size: var(--f-lg);
+  font-weight: 900;
+  color: #fff;
+  background: var(--theme-color);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--theme-color) 70%, #fff) 0%, var(--theme-color) 55%, color-mix(in srgb, var(--theme-color) 78%, #000) 100%);
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.5), 0 5px 0 rgba(0, 0, 0, 0.2), 0 12px 20px rgba(30, 70, 110, 0.25);
+  text-shadow: 0 1.5px 0 rgba(0, 0, 0, 0.2);
+  letter-spacing: 0.05em;
+}
+.trail-stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 52px;
+  justify-content: center;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  font-weight: 900;
+  font-size: var(--f-sm);
+  color: #c98a10;
+  box-shadow: inset 0 2px 0 #fff, 0 4px 0 rgba(120, 150, 175, 0.24), 0 8px 14px rgba(30, 80, 110, 0.16);
+}
+
+.trail-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+.trail-wrap {
+  position: relative;
+  width: min(480px, 100%);
+  margin: 0 auto calc(var(--bottom-nav-h) + var(--s-5)); /* 给悬浮导航坞留出走位 */
+}
+.trail-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.trail-road-dots { animation: hi-road-flow 3.6s linear infinite; }
+
+/* 途中散布的装饰 */
+.trail-deco {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  font-size: 30px;
+  line-height: 1;
+  pointer-events: none;
+  filter: drop-shadow(0 3px 4px rgba(60, 90, 60, 0.25));
+  opacity: 0.95;
+}
+.trail-deco.sway { animation: hi-eggsway 4.2s ease-in-out infinite; transform-origin: bottom center; }
+
+/* 宽屏两侧的静态风景（窄屏隐藏，避免挤压地图） */
+.trail-flair {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+.trail-flair span {
+  position: absolute;
+  font-size: 54px;
+  opacity: 0.5;
+  filter: drop-shadow(0 4px 5px rgba(60, 90, 60, 0.2));
+}
+@media (max-width: 720px) {
+  .trail-flair { display: none; }
+}
+
+/* 关卡节点：软 3D 大圆钮 */
+.trail-node {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 120px;
+  pointer-events: none;
+}
+.trail-node-btn {
+  position: relative;
+  pointer-events: auto;
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-ui);
+  font-size: 38px;
+  font-weight: 900;
+  color: #fff;
+  background: var(--theme-color);
+  background: radial-gradient(120% 110% at 50% 18%, color-mix(in srgb, var(--theme-color) 55%, #fff) 0%, var(--theme-color) 55%, color-mix(in srgb, var(--theme-color) 76%, #000) 100%);
+  box-shadow:
+    inset 0 4px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -7px 0 rgba(0, 0, 0, 0.16),
+    0 8px 0 rgba(0, 0, 0, 0.22),
+    0 16px 22px rgba(30, 70, 110, 0.28);
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.2);
+}
+.trail-node-btn:active { transform: translateY(5px); box-shadow: inset 0 4px 0 rgba(255, 255, 255, 0.5), inset 0 -7px 0 rgba(0, 0, 0, 0.16), 0 2px 0 rgba(0, 0, 0, 0.22), 0 6px 10px rgba(30, 70, 110, 0.22); }
+/* 锁定 */
+.trail-node-btn.locked {
+  background: radial-gradient(120% 110% at 50% 18%, #e8ebf2 0%, #c9cfda 60%, #a8afc0 100%);
+  color: #7c8496;
+  font-size: 30px;
+  text-shadow: none;
+}
+/* 当前关：雷达光圈 + 微放大 */
+.trail-node-btn.current { scale: 1.08; }
+.trail-node-btn.current::before {
+  content: '';
+  position: absolute;
+  inset: -7px;
+  border-radius: 50%;
+  border: 5px solid rgba(255, 255, 255, 0.9);
+  animation: trail-ring 1.9s ease-out infinite;
+  pointer-events: none;
+}
+@keyframes trail-ring {
+  0% { transform: scale(0.94); opacity: 0.9; }
+  100% { transform: scale(1.35); opacity: 0; }
+}
+/* 三星金冠加成 */
+.trail-node-btn.aced::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: linear-gradient(115deg, transparent 32%, rgba(255, 255, 255, 0.55) 47%, transparent 62%);
+  transform: translateX(-110%);
+  animation: wpk-shine 3.6s ease-in-out infinite;
+  pointer-events: none;
+  overflow: hidden;
+}
+/* 节点上方星星排 */
+.trail-node-stars {
+  display: flex;
+  gap: 2px;
+  height: 20px;
+  align-items: center;
+  font-size: 16px;
+  filter: drop-shadow(0 2px 2px rgba(140, 90, 10, 0.3));
+}
+.trail-node-stars .dim { opacity: 0.35; filter: grayscale(1); }
+/* 名字牌 */
+.trail-node-name {
+  max-width: 130px;
+  padding: 4px 13px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.95);
+  font-size: var(--f-sm);
+  font-weight: 900;
+  color: var(--c-ink);
+  white-space: nowrap;
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.08), 0 4px 8px rgba(30, 70, 110, 0.18);
+}
+.trail-node.locked .trail-node-name { color: #98a0b0; }
+/* 当前关的小墨 */
+.trail-mascot {
+  position: absolute;
+  left: 50%;
+  top: -56px;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 3;
+  filter: drop-shadow(0 5px 5px rgba(30, 70, 110, 0.25));
+}
+
+/* 终点城堡台 */
+.trail-goal {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  pointer-events: none;
+}
+.trail-goal-emoji {
+  font-size: 64px;
+  line-height: 1;
+  filter: drop-shadow(0 6px 6px rgba(120, 80, 20, 0.3));
+}
+.trail-goal.done .trail-goal-emoji { animation: hi-eggbreathe 2.2s ease-in-out infinite; }
+.trail-goal-label {
+  padding: 3px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  font-size: var(--f-xs);
+  font-weight: 900;
+  color: #b07708;
+  box-shadow: 0 3px 8px rgba(120, 90, 40, 0.2);
+}
+
+/* ============================================================
+   底部导航坞（dock）：悬浮糖果坞
+   ============================================================ */
+.dock {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  z-index: var(--z-nav);
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  width: min(520px, calc(100vw - 20px));
+  padding: 8px 10px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #fffdf6 0%, #ffedd0 100%);
+  box-shadow:
+    inset 0 3px 0 #fff,
+    0 7px 0 #e7c78f,
+    0 20px 34px rgba(40, 80, 110, 0.32);
+}
+.dock-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-height: 60px;
+  justify-content: flex-end;
+  color: #96a0ae;
+  font-weight: 900;
+  font-size: var(--f-xs);
+  -webkit-tap-highlight-color: transparent;
+}
+.dock-ic {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform var(--t-mid) var(--ease-juicy), background var(--t-fast) var(--ease-soft), box-shadow var(--t-fast) var(--ease-soft);
+}
+.dock-ic svg { width: 27px; height: 27px; display: block; }
+.dock-item:active .dock-ic { transform: scale(0.88); }
+.dock-item.is-active { color: var(--dock-c, var(--c-brand-deep)); }
+.dock-item.is-active .dock-ic {
+  transform: translateY(-14px) scale(1.14);
+  background: radial-gradient(120% 100% at 50% 20%, var(--dock-bg1, #ffe9c2) 0%, var(--dock-bg2, #ffd98f) 100%);
+  box-shadow:
+    inset 0 3px 0 rgba(255, 255, 255, 0.9),
+    0 5px 0 var(--dock-edge, #e0a94e),
+    0 10px 16px rgba(200, 120, 30, 0.35);
+}
+
+/* ============================================================
+   适配 & 可及性
+   ============================================================ */
+@media (max-width: 560px) {
+  .hud3-chip { min-height: 44px; padding: 3px 11px; font-size: var(--f-sm); }
+  .hud3-avatar { width: 48px; height: 48px; }
+  .coin3 { min-height: 44px; font-size: var(--f-sm); }
+  .hud3-brand { display: none; } /* 小屏：名字让位给数据（岛就是品牌） */
+  .hi-review-fab { width: 68px; height: 68px; }
+}
+/* 竖屏手机：地平线下移、岛按屏宽适配（全部建筑保持可见可点），
+   空出的中段海面交给远景群岛/帆船/热气球去"演" */
+@media (max-aspect-ratio: 3/4) {
+  .hi-scene { --hi-horizon: clamp(240px, 42%, 430px); }
+  .hi-stage { width: clamp(380px, 118vw, 620px); bottom: -10px; }
+  .hi-cloud--2 { top: 15%; }
+  .hi-cloud--3 { top: 30%; }
+  .hi-far-isle--l { width: clamp(150px, 34vw, 240px); opacity: 0.7; }
+  .hi-far-isle--r { width: clamp(160px, 36vw, 250px); opacity: 0.7; }
+  .hi-balloon--a { right: 10%; top: calc(var(--hi-horizon) - 150px); }
+  .hi-balloon--b { left: 12%; top: calc(var(--hi-horizon) - 90px); }
+  .hi-far-boat { width: clamp(56px, 14vw, 88px); }
+  .hi-egg { width: 52px; height: 52px; font-size: 29px; }
+}
+@media (max-height: 480px) {
+  .hi-scene { --hi-horizon: 130px; }
+  .hi-stage { width: clamp(620px, 132vh, 1000px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hi-scene *,
+  .hi-scene *::before,
+  .hi-scene *::after,
+  .hud3 *,
+  .wpk-backdrop *,
+  .wpk-backdrop *::before,
+  .wpk-backdrop *::after,
+  .trail-page *,
+  .trail-page *::before,
+  .trail-page *::after,
+  .dock *,
+  .hi-review-fab {
+    animation: none !important;
+  }
+}
