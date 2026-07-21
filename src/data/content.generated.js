@@ -7,7 +7,7 @@ export const CURRICULUM = [
     "id": "first",
     "name": "我的第一课",
     "emoji": "🔢",
-    "color": "#FF8FB1",
+    "color": "#FF6F9F",
     "lessons": [
       {
         "id": "f1",
@@ -1609,7 +1609,7 @@ export const CURRICULUM = [
     "id": "nature",
     "name": "大自然",
     "emoji": "🌳",
-    "color": "#5CC9A7",
+    "color": "#2FBD8B",
     "lessons": [
       {
         "id": "n1",
@@ -3327,7 +3327,7 @@ export const CURRICULUM = [
     "id": "myself",
     "name": "我自己",
     "emoji": "👀",
-    "color": "#6FA8FF",
+    "color": "#4B90F5",
     "lessons": [
       {
         "id": "m1",
@@ -4969,7 +4969,7 @@ export const CURRICULUM = [
     "id": "things",
     "name": "万物",
     "emoji": "🐱",
-    "color": "#FFB454",
+    "color": "#FF9E2C",
     "lessons": [
       {
         "id": "t1",
@@ -6702,7 +6702,7 @@ export const CURRICULUM = [
     "id": "life",
     "name": "我的生活",
     "emoji": "❤️",
-    "color": "#C08CFF",
+    "color": "#A86BF5",
     "lessons": [
       {
         "id": "l1",

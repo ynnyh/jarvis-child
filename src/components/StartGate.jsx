@@ -78,17 +78,17 @@ export default function StartGate() {
                   <stop offset="1" stopColor="#4d86e0" />
                 </radialGradient>
               </defs>
-              <ellipse cx="50" cy="100" rx="28" ry="6" fill="rgba(60,80,120,0.16)" />
-              <ellipse cx="12" cy="42" rx="7" ry="9" fill="#6fa8ff" />
-              <ellipse cx="88" cy="38" rx="7" ry="9" fill="#6fa8ff" />
-              <path d="M50 10 C74 10 87 30 87 54 C87 78 71 92 50 92 C29 92 13 78 13 54 C13 30 26 10 50 10 Z" fill="url(#sgMoBody)" />
+              <ellipse cx="50" cy="100" rx="28" ry="6" fill="rgba(31,91,120,0.20)" />
+              <ellipse cx="12" cy="42" rx="7" ry="9" fill="#5a95ec" stroke="#294a78" strokeWidth="2.5" />
+              <ellipse cx="88" cy="38" rx="7" ry="9" fill="#5a95ec" stroke="#294a78" strokeWidth="2.5" />
+              <path d="M50 10 C74 10 87 30 87 54 C87 78 71 92 50 92 C29 92 13 78 13 54 C13 30 26 10 50 10 Z" fill="url(#sgMoBody)" stroke="#294a78" strokeWidth="3" />
               <ellipse cx="40" cy="30" rx="16" ry="11" fill="rgba(255,255,255,0.45)" />
-              <circle cx="39" cy="52" r="8" fill="#2f3850" />
-              <circle cx="61" cy="52" r="8" fill="#2f3850" />
+              <circle cx="39" cy="52" r="8" fill="#26303f" />
+              <circle cx="61" cy="52" r="8" fill="#26303f" />
               <circle cx="42" cy="49" r="2.6" fill="#fff" />
               <circle cx="64" cy="49" r="2.6" fill="#fff" />
-              <ellipse cx="28" cy="64" rx="6" ry="4" fill="#ff9db3" opacity="0.8" />
-              <ellipse cx="72" cy="64" rx="6" ry="4" fill="#ff9db3" opacity="0.8" />
+              <ellipse cx="28" cy="64" rx="6" ry="4" fill="#ff9db3" opacity="0.9" />
+              <ellipse cx="72" cy="64" rx="6" ry="4" fill="#ff9db3" opacity="0.9" />
               <path d="M41 65 Q50 74 59 65 Q50 70 41 65 Z" fill="#3a2a3a" />
             </svg>
 

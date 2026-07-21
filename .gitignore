@@ -27,3 +27,4 @@ backend/verify_tmp.db
 .env
 .env.*
 !.env.example
+.qa-shots/

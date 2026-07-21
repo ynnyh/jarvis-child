@@ -2,10 +2,11 @@
 // 一物两用：既是学习中的情感陪伴（表情反馈），也是养成系统里的宠物（成长阶段）。
 //
 // props:
-//   expression: 'happy' | 'cheer' | 'think' | 'encourage' | 'sleep'  表情
+//   expression: 'happy' | 'cheer' | 'think' | 'encourage' | 'sleep' | 'dizzy' | 'celebrate'  表情/状态
+//               cheer=欢呼（弯月眼 + 举手 + 上跳）；dizzy=晕（漩涡眼 + 歪头）；celebrate=庆祝（跳跃循环）
 //   stage: 1 | 2 | 3   成长阶段（幼崽 / 小童 / 少年），影响体型与配饰
 //   size: number       像素尺寸（正方形）
-//   animate: boolean   是否启用待机呼吸/眨眼动效
+//   animate: boolean   是否启用待机呼吸/眨眼动效（也控制 cheer/celebrate 的跳动）
 //
 // 设计说明：所有形态共用同一套基础几何，靠参数微调，保证风格统一、体积小。
 import { motion } from 'framer-motion';
@@ -17,6 +18,8 @@ const FACES = {
   think: { eye: 'look', mouth: 'flat', blush: false },
   encourage: { eye: 'open', mouth: 'smallSmile', blush: true },
   sleep: { eye: 'closed', mouth: 'flat', blush: true },
+  dizzy: { eye: 'dizzy', mouth: 'wavy', blush: false }, // 晕：漩涡眼 + 波浪嘴
+  celebrate: { eye: 'happy', mouth: 'open', blush: true }, // 庆祝：欢呼脸 + 跳跃循环
 };
 
 // 成长阶段：体型比例与是否有配饰。
@@ -29,7 +32,7 @@ const STAGES = {
 function Eyes({ type }) {
   // 熊猫的黑眼圈 + 眼珠。type 控制眼睛神态。
   const patch = (cx) => (
-    <ellipse cx={cx} cy={112} rx={19} ry={24} fill="#2b2b3a" transform={`rotate(${cx < 100 ? -12 : 12} ${cx} 112)`} />
+    <ellipse cx={cx} cy={112} rx={19} ry={24} fill="#26303f" transform={`rotate(${cx < 100 ? -12 : 12} ${cx} 112)`} />
   );
   const eyeball = (cx) => {
     if (type === 'closed') {
@@ -38,6 +41,18 @@ function Eyes({ type }) {
     if (type === 'happy') {
       // 弯月开心眼
       return <path d={`M ${cx - 9} 116 Q ${cx} 104 ${cx + 9} 116`} stroke="#fff" strokeWidth="4" fill="none" strokeLinecap="round" />;
+    }
+    if (type === 'dizzy') {
+      // 漩涡眼：三层嵌套圆弧近似螺旋
+      return (
+        <path
+          d={`M ${cx + 7} 112 a 7 7 0 1 0 -14 0 a 4.5 4.5 0 1 0 9 0 a 2 2 0 1 0 -4 0`}
+          stroke="#fff"
+          strokeWidth="2.5"
+          fill="none"
+          strokeLinecap="round"
+        />
+      );
     }
     const dx = type === 'look' ? 4 : 0;
     return (
@@ -60,14 +75,17 @@ function Eyes({ type }) {
 function Mouth({ type }) {
   switch (type) {
     case 'open':
-      return <path d="M 90 145 Q 100 162 110 145 Q 100 152 90 145 Z" fill="#e8617a" stroke="#2b2b3a" strokeWidth="2" />;
+      return <path d="M 90 145 Q 100 162 110 145 Q 100 152 90 145 Z" fill="#e8617a" stroke="#26303f" strokeWidth="2" />;
     case 'smile':
-      return <path d="M 88 143 Q 100 156 112 143" stroke="#2b2b3a" strokeWidth="3.5" fill="none" strokeLinecap="round" />;
+      return <path d="M 88 143 Q 100 156 112 143" stroke="#26303f" strokeWidth="3.5" fill="none" strokeLinecap="round" />;
     case 'smallSmile':
-      return <path d="M 92 144 Q 100 151 108 144" stroke="#2b2b3a" strokeWidth="3" fill="none" strokeLinecap="round" />;
+      return <path d="M 92 144 Q 100 151 108 144" stroke="#26303f" strokeWidth="3" fill="none" strokeLinecap="round" />;
+    case 'wavy':
+      // 波浪嘴：晕乎乎的感觉
+      return <path d="M 90 146 Q 95 141 100 146 Q 105 151 110 146" stroke="#26303f" strokeWidth="3" fill="none" strokeLinecap="round" />;
     case 'flat':
     default:
-      return <line x1="92" y1="146" x2="108" y2="146" stroke="#2b2b3a" strokeWidth="3" strokeLinecap="round" />;
+      return <line x1="92" y1="146" x2="108" y2="146" stroke="#26303f" strokeWidth="3" strokeLinecap="round" />;
   }
 }
 
@@ -85,6 +103,19 @@ export default function Xiaomo({
     ? { scale: [1, 1.03, 1], transition: { duration: 3, repeat: Infinity, ease: 'easeInOut' } }
     : {};
 
+  // 欢呼/庆祝的跳动：cheer 跳一下，celebrate 循环跳。叠加在呼吸层内层，互不冲突。
+  const hop =
+    animate && expression === 'cheer'
+      ? { y: [0, -14, 0], transition: { duration: 0.5, repeat: 1, ease: 'easeOut' } }
+      : animate && expression === 'celebrate'
+        ? { y: [0, -18, 0], transition: { duration: 0.6, repeat: Infinity, ease: 'easeOut' } }
+        : {};
+
+  // 欢呼/庆祝时把手举起来（平时垂在身体两侧）。
+  const armsUp = expression === 'cheer' || expression === 'celebrate';
+  // 晕：头微微歪向一边。
+  const headTilt = expression === 'dizzy' ? 'rotate(-10 100 118)' : undefined;
+
   return (
     <motion.svg
       width={size}
@@ -95,40 +126,55 @@ export default function Xiaomo({
       animate={breathe}
       style={{ overflow: 'visible' }}
     >
+      {/* 厚涂：脸/身体轻微径向明暗做体积，配色不变但更有立体感 */}
+      <defs>
+        <radialGradient id="moBody" cx="42%" cy="34%" r="72%">
+          <stop offset="0%" stopColor="#ffffff" />
+          <stop offset="100%" stopColor="#eef1f6" />
+        </radialGradient>
+        <radialGradient id="moFace" cx="42%" cy="32%" r="74%">
+          <stop offset="0%" stopColor="#ffffff" />
+          <stop offset="100%" stopColor="#e9edf4" />
+        </radialGradient>
+      </defs>
+
+      {/* 跳动层：cheer/celebrate 时整体上跳 */}
+      <motion.g animate={hop}>
       {/* 身体 */}
       <g transform={`translate(100 175) scale(${st.bodyScale}) translate(-100 -175)`}>
-        <ellipse cx="100" cy="180" rx="46" ry="34" fill="#fff" stroke="#2b2b3a" strokeWidth="3" />
+        <ellipse cx="100" cy="180" rx="46" ry="34" fill="url(#moBody)" stroke="#26303f" strokeWidth="3.5" />
         {/* 手脚（黑） */}
-        <ellipse cx="66" cy="192" rx="14" ry="11" fill="#2b2b3a" />
-        <ellipse cx="134" cy="192" rx="14" ry="11" fill="#2b2b3a" />
-        <ellipse cx="78" cy="150" rx="12" ry="16" fill="#2b2b3a" transform="rotate(-20 78 150)" />
-        <ellipse cx="122" cy="150" rx="12" ry="16" fill="#2b2b3a" transform="rotate(20 122 150)" />
+        <ellipse cx="66" cy="192" rx="14" ry="11" fill="#26303f" />
+        <ellipse cx="134" cy="192" rx="14" ry="11" fill="#26303f" />
+        <ellipse cx="78" cy="150" rx="12" ry="16" fill="#26303f" transform={armsUp ? 'rotate(-115 78 150)' : 'rotate(-20 78 150)'} />
+        <ellipse cx="122" cy="150" rx="12" ry="16" fill="#26303f" transform={armsUp ? 'rotate(115 122 150)' : 'rotate(20 122 150)'} />
       </g>
 
       {/* 围巾（阶段 2、3） */}
       {st.hasScarf && (
-        <path d="M 62 138 Q 100 152 138 138 L 134 126 Q 100 138 66 126 Z" fill="#FF8FB1" stroke="#2b2b3a" strokeWidth="2" />
+        <path d="M 62 138 Q 100 152 138 138 L 134 126 Q 100 138 66 126 Z" fill="#FF7FA6" stroke="#26303f" strokeWidth="2.5" />
       )}
 
       {/* 头 */}
-      <g>
+      <g transform={headTilt}>
         {/* 耳朵（黑） */}
-        <circle cx="62" cy="70" r={18 * st.earScale} fill="#2b2b3a" />
-        <circle cx="138" cy="70" r={18 * st.earScale} fill="#2b2b3a" />
-        {/* 脸（白） */}
-        <ellipse cx="100" cy="110" rx="58" ry="54" fill="#fff" stroke="#2b2b3a" strokeWidth="3" />
-        {/* 腮红 */}
+        <circle cx="62" cy="70" r={18 * st.earScale} fill="#26303f" />
+        <circle cx="138" cy="70" r={18 * st.earScale} fill="#26303f" />
+        {/* 脸（白，径向体积） */}
+        <ellipse cx="100" cy="110" rx="58" ry="54" fill="url(#moFace)" stroke="#26303f" strokeWidth="3.5" />
+        {/* 腮红（对比拉高） */}
         {face.blush && (
           <>
-            <ellipse cx="58" cy="130" rx="10" ry="6" fill="#FFB6C9" opacity="0.8" />
-            <ellipse cx="142" cy="130" rx="10" ry="6" fill="#FFB6C9" opacity="0.8" />
+            <ellipse cx="58" cy="130" rx="11" ry="7" fill="#ff9db7" opacity="0.9" />
+            <ellipse cx="142" cy="130" rx="11" ry="7" fill="#ff9db7" opacity="0.9" />
           </>
         )}
         <Eyes type={face.eye} />
         {/* 鼻子 */}
-        <ellipse cx="100" cy="132" rx="6" ry="4.5" fill="#2b2b3a" />
+        <ellipse cx="100" cy="132" rx="6" ry="4.5" fill="#26303f" />
         <Mouth type={face.mouth} />
       </g>
+      </motion.g>
     </motion.svg>
   );
 }
