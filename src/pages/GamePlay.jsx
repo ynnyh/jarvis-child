@@ -1,10 +1,10 @@
-// 巩固游戏引擎（阶段 2 重构）：3 颗心 + 连击金币 + 星级结算，分发到 5 个舞台化小游戏。
+// 巩固游戏引擎（玩法重构中）：3 颗心 + 连击金币 + 星级结算，分发到舞台化小游戏。
 // 题型（type）：
-//   mole    打地鼠：听音选字（MoleGame）
-//   fish    钓鱼：看图选字（FishGame）
-//   bubble  点泡泡：看字选图（BubbleGame）
+//   feed    投喂小墨：拖字饼干进嘴（FeedGame，取代旧的 mole/fish/bubble 三套点选择题）
 //   match   连连看：字 ↔ 拼音配对（MatchGame，整屏一题）
 //   trace   笔顺描红（TraceGame）
+// 重构说明：旧的打地鼠/钓鱼/点泡泡本质是「同一道选择题套 3 层皮」（选项移动只是装饰、
+//   不参与玩法），已被拖拽式「投喂小墨」取代。后续将继续用拖拽/连续动作类新游戏扩充题库。
 //
 // 规则：
 //   3 颗心：答错扣 1 心 + heartbreak + 演示正确答案（组件高亮正确项 + 朗读），
@@ -29,9 +29,7 @@ import MascotReaction from '../components/MascotReaction.jsx';
 import PlayfulBackground from '../components/PlayfulBackground.jsx';
 import Confetti from '../components/Confetti.jsx';
 import DailyRewardToast from '../components/DailyRewardToast.jsx';
-import MoleGame from '../components/games/MoleGame.jsx';
-import BubbleGame from '../components/games/BubbleGame.jsx';
-import FishGame from '../components/games/FishGame.jsx';
+import FeedGame from '../components/games/FeedGame.jsx';
 import MatchGame from '../components/games/MatchGame.jsx';
 import TraceGame from '../components/games/TraceGame.jsx';
 import { syncSoon } from '../api/sync.js';
@@ -97,17 +95,12 @@ export default function GamePlay({ mode = 'lesson' }) {
   const questions = useMemo(() => {
     if (chars.length === 0) return [];
     const singles = shuffle(chars).map((c) => {
-      const roll = Math.random();
-      // 30% 打地鼠 / 25% 钓鱼 / 25% 点泡泡 / 20% 描红
-      let type;
-      if (roll < 0.3) type = 'mole';
-      else if (roll < 0.55) type = 'fish';
-      else if (roll < 0.8) type = 'bubble';
-      else type = 'trace';
+      // 75% 投喂小墨（拖字饼干）/ 25% 描红。投喂题的饼干始终显示汉字，
+      // 干扰项按字去重；target.emoji 存在时 FeedGame 会显示"想吃什么"的想法气泡（看图选字）。
+      const type = Math.random() < 0.75 ? 'feed' : 'trace';
       const q = { target: c, type };
-      if (type !== 'trace') {
-        const field = type === 'bubble' ? 'emoji' : 'char';
-        q.options = shuffle([c, ...pickDistractors(c, chars, 3, field)]);
+      if (type === 'feed') {
+        q.options = shuffle([c, ...pickDistractors(c, chars, 3, 'char')]);
       }
       return q;
     });
@@ -410,14 +403,8 @@ export default function GamePlay({ mode = 'lesson' }) {
           exit={{ opacity: 0, x: -40 }}
           transition={{ duration: 0.25 }}
         >
-          {current && current.type === 'mole' && (
-            <MoleGame target={current.target} options={current.options} reveal={reveal} onResult={handleResult} onSpeak={speak} onSound={play} />
-          )}
-          {current && current.type === 'bubble' && (
-            <BubbleGame target={current.target} options={current.options} reveal={reveal} onResult={handleResult} onSpeak={speak} onSound={play} />
-          )}
-          {current && current.type === 'fish' && (
-            <FishGame target={current.target} options={current.options} reveal={reveal} onResult={handleResult} onSpeak={speak} onSound={play} />
+          {current && current.type === 'feed' && (
+            <FeedGame target={current.target} options={current.options} reveal={reveal} onResult={handleResult} onSpeak={speak} onSound={play} />
           )}
           {current && current.type === 'match' && (
             <MatchGame chars={chars} onResult={handleResult} onSpeak={speak} onSound={play} />

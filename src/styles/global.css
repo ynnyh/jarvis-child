@@ -775,6 +775,118 @@ button {
   pointer-events: none;
 }
 
+/* ---- 投喂小墨（拖字饼干，阶段一标杆游戏）---- */
+.feed-stage {
+  background: linear-gradient(180deg, #d9f0ff 0%, #eafaf2 46%, var(--land-grass) 100%);
+  touch-action: none; /* 拖拽时禁止页面滚动，避免小手拖饼干时页面跟着滑 */
+}
+/* 小墨头容器：居中，给想法气泡留出上方空间 */
+.feed-panda-wrap {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  margin: var(--s-4) auto var(--s-2);
+  width: max-content;
+}
+.feed-panda {
+  display: block;
+  filter: drop-shadow(0 8px 12px rgba(47, 72, 88, 0.18));
+}
+/* “想吃什么”的想法气泡（看图选字：挂在小墨头顶右上） */
+.feed-thought {
+  position: absolute;
+  top: -8px;
+  right: -18px;
+  width: 62px;
+  height: 62px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 34px;
+  background: var(--c-card);
+  border: var(--stroke-w-sm) solid var(--stroke-ink);
+  border-radius: 50%;
+  box-shadow: var(--sh-float);
+}
+/* 气泡的小尾巴（指向小墨） */
+.feed-thought::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 14px;
+  width: 14px;
+  height: 14px;
+  background: var(--c-card);
+  border-right: var(--stroke-w-sm) solid var(--stroke-ink);
+  border-bottom: var(--stroke-w-sm) solid var(--stroke-ink);
+  transform: rotate(35deg);
+}
+/* 饼干托盘：flex 均分落位（不用绝对定位——framer-motion 拖拽的 transform
+   会覆盖 translateX 居中，故让饼干做普通 flex item，拖拽 x/y 变成纯相对偏移） */
+.feed-tray {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: var(--s-2);
+  min-height: 100px;
+  margin-top: var(--s-3);
+}
+/* 单块字饼干：可拖拽，圆饼底 + 汉字 */
+.feed-cookie {
+  position: relative;
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 78px;
+  height: 78px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: grab;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.feed-cookie:active {
+  cursor: grabbing;
+}
+.feed-cookie-face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 74px;
+  line-height: 1;
+  filter: drop-shadow(0 4px 6px rgba(120, 90, 40, 0.28));
+  pointer-events: none;
+}
+/* 汉字压在饼干中央 */
+.feed-cookie-char {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-kai);
+  font-size: 34px;
+  font-weight: 900;
+  color: #5b3a1a;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+  pointer-events: none;
+}
+/* 演示正确答案：正确饼干绿圈脉冲高亮 */
+.feed-cookie.reveal {
+  animation: feed-reveal-pulse 1s ease-in-out infinite;
+  border-radius: 50%;
+}
+@keyframes feed-reveal-pulse {
+  0%, 100% { box-shadow: 0 0 0 4px rgba(47, 179, 119, 0.5); }
+  50% { box-shadow: 0 0 0 12px rgba(47, 179, 119, 0.18); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .feed-cookie.reveal { animation: none; box-shadow: 0 0 0 6px rgba(47, 179, 119, 0.45); }
+}
+
 /* ---- 点泡泡（看字选图）---- */
 .bubble-stage {
   background: linear-gradient(180deg, #cfeeff 0%, #9edcff 55%, var(--sea-mid) 100%);
