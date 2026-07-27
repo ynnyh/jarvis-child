@@ -23,6 +23,10 @@ backend/verify_tmp.db
 # 设计参考截图（工作素材，不入库）
 .design-frames/
 
+# 音效素材工作区（被否的 Kenney 候选 + 试听页，不入库；最终暖音色在 public/audio/sfx/）
+incoming-audio/
+public/_audition/
+
 # 环境变量
 .env
 .env.*
