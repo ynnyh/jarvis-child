@@ -2133,152 +2133,102 @@ button {
 }
 
 /* ============ 开场欢迎门（StartGate · tap-to-start）============ */
-/* 铺满视口的最上层叠层：一个招手抖动的大糖果喇叭，宝宝点一下解锁音乐+音效。
-   浏览器自动播放策略要求先有用户手势才能出声，这个门把技术限制变成可爱开场。 */
+/* 铺满视口的最上层开场门：整屏铺一张厚涂糖果插画（小墨坐云上 + 大喇叭钮 + 文案
+   都画进图里），宝宝点一下解锁音乐+音效。浏览器自动播放策略要求先有用户手势才能
+   出声，这个门把技术限制变成可爱开场。交互不依赖图里像素，而是叠透明命中区。 */
 .start-gate {
   position: fixed;
   inset: 0;
   z-index: calc(var(--z-toast) + 20); /* 盖过一切，包括护眼/时长锁定层 */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--s-5);
   overflow: hidden;
-  /* 暖色糖果氛围底：顶部暖光 → 底部奶白 */
-  background:
-    radial-gradient(120% 80% at 50% 0%, #fff3d6 0%, transparent 55%),
-    radial-gradient(100% 70% at 50% 100%, #ffe6f0 0%, transparent 60%),
-    linear-gradient(180deg, #fff6e6 0%, #fff1e2 55%, #ffe9d6 100%);
+  /* 底色取图里天空的暖粉紫，图两侧/上下若留边则用它兜底，不露白 */
+  background: linear-gradient(160deg, #ffd9c2 0%, #f4c9e0 50%, #c9b3f0 100%);
 }
 
-/* 漂浮装饰：糖果音符，柔和不抢戏、不拦点击 */
-.sg-decor {
+/* 虚化背景：同图放大 + 高斯模糊铺满，补齐 contain 两侧/上下留白（竖屏手机 vs 横屏
+   平板比例相反，单图无法同时 cover）。scale 稍放大盖住模糊边缘的透明晕，亮度压一档
+   让居中清晰图更跳。纯装饰。 */
+.sg-bg {
   position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(28px) saturate(1.15) brightness(0.96);
+  transform: scale(1.12);
   pointer-events: none;
-  opacity: 0.9;
-  line-height: 1;
-}
-.sg-note { font-weight: 900; color: #ffc44d; opacity: 0.55; }
-.sg-fl { animation: sg-floaty 5s ease-in-out infinite; }
-.sg-fl.a { animation-delay: -1.2s; }
-.sg-fl.b { animation-delay: -2.4s; }
-.sg-fl.c { animation-delay: -3.6s; }
-@keyframes sg-floaty {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-12px); }
 }
 
-.sg-inner {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--s-5);
-}
-
-/* 小墨：大、呼吸 */
-.sg-mo { width: 150px; height: 158px; }
-.sg-breathe { animation: sg-breathe 3s ease-in-out infinite; }
-@keyframes sg-breathe {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-6px) scale(1.02); }
-}
-
-.sg-title {
-  font-weight: 900;
-  font-size: 30px;
-  color: var(--c-brand-deep);
-  text-shadow: 0 2px 0 rgba(255, 255, 255, 0.9);
-  letter-spacing: 1px;
-  margin: 0;
-}
-
-/* C 位大糖果喇叭钮：招手抖动 + 厚底座 */
-.sg-startbtn {
-  position: relative;
-  width: 150px;
-  height: 150px;
+/* 全屏开声命中区：任意点击 = 开声进入（图里「点我，一起玩！」即引导语）。
+   铺在虚化背景之上、舞台之下，「安静玩」按钮再盖其上靠 stopPropagation 拦冒泡。 */
+.sg-hit {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
   border: none;
   padding: 0;
+  margin: 0;
   cursor: pointer;
+  background: transparent;
+}
+
+/* 4:5 舞台：整图完整可见（contain），光环/安静玩按钮锚定其上，
+   任何屏幕比例下都与图里的喇叭、pill 对齐，不会错位。纯展示、不拦点击。 */
+.sg-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  margin: auto;
+  /* 4:5 竖图：在视口内取能完整放下的最大尺寸（min 保证不溢出短边） */
+  width: min(100vw, 80vh);
+  height: min(125vw, 100vh);
+  pointer-events: none; /* 舞台只做视觉锚点，点击穿透到底层命中区（安静玩按钮单独恢复） */
+}
+.sg-art {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* 喇叭中心声波光环：绝对定位在舞台里，对准图中蓝色喇叭钮（约 50% / 66%）。
+   两圈错峰外扩，让静态图「活」起来。纯装饰、不拦点击。 */
+.sg-halo {
+  position: absolute;
+  left: 50%;
+  top: 66%;
+  width: 46%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
   border-radius: 50%;
-  background: radial-gradient(120% 100% at 50% 18%, #a5e2ff 0%, #67c7f5 52%, #3a90cf 100%);
-  box-shadow:
-    inset 0 5px 0 rgba(255, 255, 255, 0.75),
-    inset 0 -12px 20px rgba(30, 90, 140, 0.28),
-    0 12px 0 #3a90cf,
-    0 26px 40px rgba(50, 120, 180, 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.12s var(--ease-juicy), box-shadow 0.12s var(--ease-juicy);
-  animation: sg-wiggle 3.2s ease-in-out infinite;
+  pointer-events: none;
 }
-.sg-startbtn:active {
-  transform: translateY(9px);
-  box-shadow:
-    inset 0 5px 0 rgba(255, 255, 255, 0.7),
-    inset 0 -12px 20px rgba(30, 90, 140, 0.28),
-    0 3px 0 #3a90cf,
-    0 10px 18px rgba(50, 120, 180, 0.34);
-  animation: none;
-}
-.sg-startbtn svg { width: 56%; height: 56%; }
-/* 周期招手抖动：吸引点按 */
-@keyframes sg-wiggle {
-  0%, 82%, 100% { transform: rotate(0); }
-  86% { transform: rotate(-8deg); }
-  90% { transform: rotate(8deg); }
-  94% { transform: rotate(-5deg); }
-}
-/* 喇叭外扩声波光环 */
-.sg-halo { position: absolute; inset: 0; border-radius: 50%; pointer-events: none; }
 .sg-halo::before,
 .sg-halo::after {
   content: "";
   position: absolute;
-  inset: -6px;
+  inset: 0;
   border-radius: 50%;
-  border: 4px solid rgba(103, 199, 245, 0.5);
+  border: 4px solid rgba(120, 200, 255, 0.55);
   animation: sg-ring 2.6s ease-out infinite;
 }
 .sg-halo::after { animation-delay: 1.3s; }
 @keyframes sg-ring {
-  0% { transform: scale(0.9); opacity: 0.75; }
-  100% { transform: scale(1.55); opacity: 0; }
-}
-/* 喇叭里的声波弧轻闪 */
-.sg-wave { animation: sg-spkwave 2.2s ease-in-out infinite; transform-origin: left center; }
-.sg-wave.w2 { animation-delay: 0.3s; }
-@keyframes sg-spkwave {
-  0%, 100% { opacity: 0.4; }
-  40% { opacity: 1; }
+  0% { transform: scale(0.86); opacity: 0.7; }
+  100% { transform: scale(1.4); opacity: 0; }
 }
 
-/* 底部轻提示 pill */
-.sg-hint {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--s-2);
-  padding: 10px 20px;
-  border-radius: var(--r-pill);
-  font-weight: 800;
-  font-size: var(--f-md);
-  color: var(--c-ink-soft);
-  background: rgba(255, 255, 255, 0.8);
-  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.9), 0 4px 12px rgba(160, 120, 60, 0.16);
-}
-.sg-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--c-success); }
-
-/* 角落「安静玩」：无声进入，低调不抢主角 */
+/* 角落「安静玩」：无声进入，盖在图里那颗「安静玩」pill 上（透明命中区）。
+   图里已画好文字，这里给足热区 + 可访问文本，视觉留给插画。 */
 .sg-quiet {
   position: absolute;
-  bottom: calc(var(--s-5) + env(safe-area-inset-bottom, 0px));
-  right: var(--s-5);
+  bottom: calc(6% + env(safe-area-inset-bottom, 0px));
+  right: 8%;
   z-index: 3;
-  min-height: 44px;
+  min-height: 48px;
+  min-width: 96px;
   padding: var(--s-2) var(--s-4);
   border: none;
   cursor: pointer;
@@ -2286,9 +2236,18 @@ button {
   font-family: inherit;
   font-weight: 800;
   font-size: var(--f-sm);
-  color: var(--c-ink-soft);
-  background: rgba(255, 255, 255, 0.7);
-  box-shadow: var(--sh-sm);
+  /* 透明：图里已画好这颗 pill，命中区只负责接点击、不重复渲染 */
+  color: transparent;
+  background: transparent;
+  pointer-events: auto; /* 舞台不拦点击，这颗按钮单独恢复接自己的点 */
+}
+
+/* 减弱动态效果：光环静止（尊重系统偏好，见 home3d.css 同款约定） */
+@media (prefers-reduced-motion: reduce) {
+  .sg-halo::before,
+  .sg-halo::after {
+    animation: none;
+  }
 }
 
 /* ============ 商店页（阶段 3）============ */
