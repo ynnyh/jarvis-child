@@ -29,24 +29,36 @@ const STAGES = {
   3: { bodyScale: 1.08, hasScarf: true, earScale: 0.9 }, // 少年：更修长
 };
 
+// 大头奶团子风：黑眼圈更大更圆、眼珠水汪汪（大高光 + 小高光 + 下缘提亮弧），神态靠 type 切换。
 function Eyes({ type }) {
-  // 熊猫的黑眼圈 + 眼珠。type 控制眼睛神态。
-  const patch = (cx) => (
-    <ellipse cx={cx} cy={112} rx={19} ry={24} fill="#26303f" transform={`rotate(${cx < 100 ? -12 : 12} ${cx} 112)`} />
-  );
+  // 黑眼圈：圆润的桃形斑（不再是生硬椭圆），略微内八朝鼻子。
+  const patch = (cx) => {
+    const dir = cx < 100 ? -1 : 1;
+    return (
+      <ellipse
+        cx={cx}
+        cy={113}
+        rx={24}
+        ry={28}
+        fill="#2b3442"
+        transform={`rotate(${dir * 10} ${cx} 113)`}
+      />
+    );
+  };
   const eyeball = (cx) => {
     if (type === 'closed') {
-      return <path d={`M ${cx - 10} 112 Q ${cx} 120 ${cx + 10} 112`} stroke="#fff" strokeWidth="3" fill="none" strokeLinecap="round" />;
+      // 睡觉/满足：下弯的月牙闭眼，睫毛感更软
+      return <path d={`M ${cx - 12} 110 Q ${cx} 121 ${cx + 12} 110`} stroke="#fff" strokeWidth="3.5" fill="none" strokeLinecap="round" />;
     }
     if (type === 'happy') {
-      // 弯月开心眼
-      return <path d={`M ${cx - 9} 116 Q ${cx} 104 ${cx + 9} 116`} stroke="#fff" strokeWidth="4" fill="none" strokeLinecap="round" />;
+      // 上弯月牙开心眼（更圆润的笑眼）
+      return <path d={`M ${cx - 11} 118 Q ${cx} 103 ${cx + 11} 118`} stroke="#fff" strokeWidth="4.5" fill="none" strokeLinecap="round" />;
     }
     if (type === 'dizzy') {
-      // 漩涡眼：三层嵌套圆弧近似螺旋
+      // 漩涡眼
       return (
         <path
-          d={`M ${cx + 7} 112 a 7 7 0 1 0 -14 0 a 4.5 4.5 0 1 0 9 0 a 2 2 0 1 0 -4 0`}
+          d={`M ${cx + 8} 113 a 8 8 0 1 0 -16 0 a 5 5 0 1 0 10 0 a 2.2 2.2 0 1 0 -4.4 0`}
           stroke="#fff"
           strokeWidth="2.5"
           fill="none"
@@ -54,38 +66,50 @@ function Eyes({ type }) {
         />
       );
     }
+    // 睁眼（open/look）：水汪汪大眼珠 —— 大眼白 + 大高光 + 小高光 + 下缘反光弧。
     const dx = type === 'look' ? 4 : 0;
     return (
-      <>
-        <circle cx={cx + dx} cy={112} r={7} fill="#fff" />
-        <circle cx={cx + dx + 2} cy={110} r={2.2} fill="#fff" opacity="0.9" />
-      </>
+      <g>
+        <circle cx={cx + dx} cy={114} r={10.5} fill="#fff" />
+        {/* 主高光（大，左上） */}
+        <circle cx={cx + dx - 3} cy={109} r={4} fill="#fff" opacity="0.95" />
+        {/* 副高光（小，右下）——两点高光是「水汪汪」的关键 */}
+        <circle cx={cx + dx + 4} cy={118} r={2} fill="#fff" opacity="0.8" />
+        {/* 下缘反光弧：眼珠底部一抹提亮，显得眼睛湿润有神 */}
+        <path d={`M ${cx + dx - 6} 120 Q ${cx + dx} 124 ${cx + dx + 6} 120`} stroke="#fff" strokeWidth="1.6" fill="none" strokeLinecap="round" opacity="0.55" />
+      </g>
     );
   };
   return (
     <g>
-      {patch(78)}
-      {patch(122)}
-      {eyeball(78)}
-      {eyeball(122)}
+      {patch(74)}
+      {patch(126)}
+      {eyeball(74)}
+      {eyeball(126)}
     </g>
   );
 }
 
+// 嘴：小巧圆润，配合大头奶团子。
 function Mouth({ type }) {
   switch (type) {
     case 'open':
-      return <path d="M 90 145 Q 100 162 110 145 Q 100 152 90 145 Z" fill="#e8617a" stroke="#26303f" strokeWidth="2" />;
+      // 张嘴：圆润的小口 + 舌头
+      return (
+        <g>
+          <path d="M 88 150 Q 100 168 112 150 Q 100 158 88 150 Z" fill="#e8617a" stroke="#2b3442" strokeWidth="2" />
+          <ellipse cx="100" cy="158" rx="6" ry="3.5" fill="#ff9db7" />
+        </g>
+      );
     case 'smile':
-      return <path d="M 88 143 Q 100 156 112 143" stroke="#26303f" strokeWidth="3.5" fill="none" strokeLinecap="round" />;
+      return <path d="M 89 148 Q 100 160 111 148" stroke="#2b3442" strokeWidth="3.5" fill="none" strokeLinecap="round" />;
     case 'smallSmile':
-      return <path d="M 92 144 Q 100 151 108 144" stroke="#26303f" strokeWidth="3" fill="none" strokeLinecap="round" />;
+      return <path d="M 93 149 Q 100 155 107 149" stroke="#2b3442" strokeWidth="3" fill="none" strokeLinecap="round" />;
     case 'wavy':
-      // 波浪嘴：晕乎乎的感觉
-      return <path d="M 90 146 Q 95 141 100 146 Q 105 151 110 146" stroke="#26303f" strokeWidth="3" fill="none" strokeLinecap="round" />;
+      return <path d="M 90 151 Q 95 146 100 151 Q 105 156 110 151" stroke="#2b3442" strokeWidth="3" fill="none" strokeLinecap="round" />;
     case 'flat':
     default:
-      return <line x1="92" y1="146" x2="108" y2="146" stroke="#26303f" strokeWidth="3" strokeLinecap="round" />;
+      return <path d="M 93 151 Q 100 154 107 151" stroke="#2b3442" strokeWidth="3" fill="none" strokeLinecap="round" />;
   }
 }
 
@@ -140,38 +164,41 @@ export default function Xiaomo({
 
       {/* 跳动层：cheer/celebrate 时整体上跳 */}
       <motion.g animate={hop}>
-      {/* 身体 */}
-      <g transform={`translate(100 175) scale(${st.bodyScale}) translate(-100 -175)`}>
-        <ellipse cx="100" cy="180" rx="46" ry="34" fill="url(#moBody)" stroke="#26303f" strokeWidth="3.5" />
-        {/* 手脚（黑） */}
-        <ellipse cx="66" cy="192" rx="14" ry="11" fill="#26303f" />
-        <ellipse cx="134" cy="192" rx="14" ry="11" fill="#26303f" />
-        <ellipse cx="78" cy="150" rx="12" ry="16" fill="#26303f" transform={armsUp ? 'rotate(-115 78 150)' : 'rotate(-20 78 150)'} />
-        <ellipse cx="122" cy="150" rx="12" ry="16" fill="#26303f" transform={armsUp ? 'rotate(115 122 150)' : 'rotate(20 122 150)'} />
+      {/* 身体：矮圆奶团子（比头小一圈，头大身小才萌） */}
+      <g transform={`translate(100 182) scale(${st.bodyScale}) translate(-100 -182)`}>
+        <ellipse cx="100" cy="184" rx="42" ry="32" fill="url(#moBody)" stroke="#2b3442" strokeWidth="3.5" />
+        {/* 脚（黑，短圆） */}
+        <ellipse cx="76" cy="200" rx="15" ry="11" fill="#2b3442" />
+        <ellipse cx="124" cy="200" rx="15" ry="11" fill="#2b3442" />
+        {/* 手（黑，短圆；举手时抬起） */}
+        <ellipse cx="66" cy="168" rx="13" ry="15" fill="#2b3442" transform={armsUp ? 'rotate(-118 66 168)' : 'rotate(-14 66 168)'} />
+        <ellipse cx="134" cy="168" rx="13" ry="15" fill="#2b3442" transform={armsUp ? 'rotate(118 134 168)' : 'rotate(14 134 168)'} />
       </g>
 
       {/* 围巾（阶段 2、3） */}
       {st.hasScarf && (
-        <path d="M 62 138 Q 100 152 138 138 L 134 126 Q 100 138 66 126 Z" fill="#FF7FA6" stroke="#26303f" strokeWidth="2.5" />
+        <path d="M 60 148 Q 100 162 140 148 L 136 135 Q 100 148 64 135 Z" fill="#FF7FA6" stroke="#2b3442" strokeWidth="2.5" />
       )}
 
-      {/* 头 */}
+      {/* 头：大而圆（奶团子的核心——头几乎和身体一样宽，占画面主体） */}
       <g transform={headTilt}>
-        {/* 耳朵（黑） */}
-        <circle cx="62" cy="70" r={18 * st.earScale} fill="#26303f" />
-        <circle cx="138" cy="70" r={18 * st.earScale} fill="#26303f" />
-        {/* 脸（白，径向体积） */}
-        <ellipse cx="100" cy="110" rx="58" ry="54" fill="url(#moFace)" stroke="#26303f" strokeWidth="3.5" />
-        {/* 腮红（对比拉高） */}
+        {/* 耳朵（黑，大而圆，带内耳浅色让它软一点） */}
+        <circle cx="58" cy="62" r={21 * st.earScale} fill="#2b3442" />
+        <circle cx="142" cy="62" r={21 * st.earScale} fill="#2b3442" />
+        <circle cx="58" cy="64" r={10 * st.earScale} fill="#3d4a5c" />
+        <circle cx="142" cy="64" r={10 * st.earScale} fill="#3d4a5c" />
+        {/* 脸（白，大圆脸，径向体积） */}
+        <ellipse cx="100" cy="108" rx="66" ry="62" fill="url(#moFace)" stroke="#2b3442" strokeWidth="3.5" />
+        {/* 腮红（大眼下方，软糖粉） */}
         {face.blush && (
           <>
-            <ellipse cx="58" cy="130" rx="11" ry="7" fill="#ff9db7" opacity="0.9" />
-            <ellipse cx="142" cy="130" rx="11" ry="7" fill="#ff9db7" opacity="0.9" />
+            <ellipse cx="52" cy="132" rx="13" ry="8" fill="#ffabc4" opacity="0.85" />
+            <ellipse cx="148" cy="132" rx="13" ry="8" fill="#ffabc4" opacity="0.85" />
           </>
         )}
         <Eyes type={face.eye} />
-        {/* 鼻子 */}
-        <ellipse cx="100" cy="132" rx="6" ry="4.5" fill="#26303f" />
+        {/* 鼻子：小圆钮 */}
+        <ellipse cx="100" cy="138" rx="6.5" ry="5" fill="#2b3442" />
         <Mouth type={face.mouth} />
       </g>
       </motion.g>

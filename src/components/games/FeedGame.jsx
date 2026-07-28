@@ -277,13 +277,14 @@ function Treat({ opt, index, eaten, reveal, onDrag, onDragEnd, onDragStart }) {
   );
 }
 
-// ---- 可交互的小墨（投喂专用全身 SVG，不复用通用 Xiaomo：需要张望/前倾/躲避/吞咽/鼓肚） ----
+// ---- 可交互的小墨（投喂专用全身 SVG，「大头奶团子」调性，与官方 Xiaomo 一致；
+//      不复用 Xiaomo 是因为要支持张望/前倾/躲避/吞咽/鼓肚这些游戏专属动作） ----
 function FeedPanda({ mood, gaze, fullness, mouthRef }) {
   // 眼珠横向偏移：追着拖拽的糖看；拒绝时反向「别过脸」。
   let ex = Math.max(-7, Math.min(7, gaze * 7));
   if (mood === 'reject') ex = gaze > 0 ? -6 : 6;
 
-  // 头部：随注视轻转；渴望时上抬前倾；拒绝时扭头躲开。
+  // 头部：随注视轻转；渴望时上抬前倾；拒绝时扭头躲开。绕新脸心 (120,110)。
   let headX = gaze * 6;
   let headY = 0;
   let headRot = gaze * 5;
@@ -298,8 +299,8 @@ function FeedPanda({ mood, gaze, fullness, mouthRef }) {
   // 手臂：渴望时举起来「要」；拒绝时张开「不要」；平时垂放。
   const armUp = mood === 'eager';
   const armOut = mood === 'reject';
-  const leftArm = armUp ? 'rotate(-118 78 176)' : armOut ? 'rotate(-52 78 176)' : 'rotate(-16 78 176)';
-  const rightArm = armUp ? 'rotate(118 162 176)' : armOut ? 'rotate(52 162 176)' : 'rotate(16 162 176)';
+  const leftArm = armUp ? 'rotate(-120 80 188)' : armOut ? 'rotate(-54 80 188)' : 'rotate(-14 80 188)';
+  const rightArm = armUp ? 'rotate(120 160 188)' : armOut ? 'rotate(54 160 188)' : 'rotate(14 160 188)';
 
   // 肚子鼓度：喂越多越圆（封顶）。
   const bellyScale = 1 + Math.min(fullness, 5) * 0.05;
@@ -323,12 +324,17 @@ function FeedPanda({ mood, gaze, fullness, mouthRef }) {
   const eyeStar = mood === 'eager';
   const eyeSquint = mood === 'reject';
 
+  // 大眼中心：脸更大更靠中，双眼间距收窄一点更萌。
+  const EYE_L = 94;
+  const EYE_R = 146;
+  const EYE_CY = 110;
+
   return (
     <motion.svg
       className="feed-panda"
-      width="230"
-      height="250"
-      viewBox="0 0 240 260"
+      width="236"
+      height="256"
+      viewBox="0 0 240 268"
       role="img"
       aria-label="饿肚子的小墨在等你喂"
       animate={bodyAnim}
@@ -345,64 +351,64 @@ function FeedPanda({ mood, gaze, fullness, mouthRef }) {
         </radialGradient>
       </defs>
 
-      {/* 脚 */}
-      <ellipse cx="94" cy="238" rx="18" ry="12" fill="#26303f" />
-      <ellipse cx="146" cy="238" rx="18" ry="12" fill="#26303f" />
+      {/* 脚（短圆） */}
+      <ellipse cx="96" cy="250" rx="19" ry="13" fill="#2b3442" />
+      <ellipse cx="144" cy="250" rx="19" ry="13" fill="#2b3442" />
 
-      {/* 身体（肚子随吃饱度鼓起） */}
-      <g transform={`translate(120 186) scale(${bellyScale}) translate(-120 -186)`}>
-        <ellipse cx="120" cy="186" rx="60" ry="58" fill="url(#feedBody)" stroke="#26303f" strokeWidth="4" />
+      {/* 身体（矮圆奶团子，肚子随吃饱度鼓起） */}
+      <g transform={`translate(120 200) scale(${bellyScale}) translate(-120 -200)`}>
+        <ellipse cx="120" cy="200" rx="58" ry="52" fill="url(#feedBody)" stroke="#2b3442" strokeWidth="4" />
         {/* 肚皮浅色块 */}
-        <ellipse cx="120" cy="196" rx="34" ry="34" fill="#fff" opacity="0.7" />
+        <ellipse cx="120" cy="208" rx="32" ry="30" fill="#fff" opacity="0.7" />
       </g>
 
-      {/* 手臂（黑，举/张/垂三态） */}
-      <ellipse cx="78" cy="176" rx="15" ry="20" fill="#26303f" transform={leftArm} />
-      <ellipse cx="162" cy="176" rx="15" ry="20" fill="#26303f" transform={rightArm} />
+      {/* 手臂（黑，短圆，举/张/垂三态） */}
+      <ellipse cx="80" cy="188" rx="14" ry="18" fill="#2b3442" transform={leftArm} />
+      <ellipse cx="160" cy="188" rx="14" ry="18" fill="#2b3442" transform={rightArm} />
 
-      {/* 头（随注视/心情平移旋转） */}
-      <g transform={`translate(${headX} ${headY}) rotate(${headRot} 120 96)`}>
-        {/* 耳朵 */}
-        <circle cx="76" cy="60" r="23" fill="#26303f" />
-        <circle cx="164" cy="60" r="23" fill="#26303f" />
-        {/* 脸 */}
-        <ellipse cx="120" cy="98" rx="72" ry="67" fill="url(#feedFace)" stroke="#26303f" strokeWidth="4" />
+      {/* 头（大而圆，随注视/心情平移旋转，绕脸心 120,110） */}
+      <g transform={`translate(${headX} ${headY}) rotate(${headRot} 120 110)`}>
+        {/* 耳朵（黑，大而圆，带内耳浅色） */}
+        <circle cx="70" cy="64" r="25" fill="#2b3442" />
+        <circle cx="170" cy="64" r="25" fill="#2b3442" />
+        <circle cx="70" cy="66" r="12" fill="#3d4a5c" />
+        <circle cx="170" cy="66" r="12" fill="#3d4a5c" />
+        {/* 脸（白，大圆脸，径向体积） */}
+        <ellipse cx="120" cy="110" rx="80" ry="74" fill="url(#feedFace)" stroke="#2b3442" strokeWidth="4" />
 
-        {/* 黑眼圈 */}
-        <ellipse cx="92" cy="88" rx="22" ry="27" fill="#26303f" transform="rotate(-12 92 88)" />
-        <ellipse cx="148" cy="88" rx="22" ry="27" fill="#26303f" transform="rotate(12 148 88)" />
+        {/* 黑眼圈（大而圆润的桃形，略微内八） */}
+        <ellipse cx={EYE_L} cy={EYE_CY} rx="27" ry="31" fill="#2b3442" transform={`rotate(-10 ${EYE_L} ${EYE_CY})`} />
+        <ellipse cx={EYE_R} cy={EYE_CY} rx="27" ry="31" fill="#2b3442" transform={`rotate(10 ${EYE_R} ${EYE_CY})`} />
 
-        {/* 眼珠：普通/追物/星星/开心/眯眼 */}
+        {/* 眼珠：眯眼(拒绝)/开心月牙/星星(渴望)/水汪汪大眼(默认追物) */}
         {eyeSquint ? (
           <>
-            <path d="M 84 90 L 100 90" stroke="#fff" strokeWidth="4.5" strokeLinecap="round" />
-            <path d="M 140 90 L 156 90" stroke="#fff" strokeWidth="4.5" strokeLinecap="round" />
+            <path d={`M ${EYE_L - 11} ${EYE_CY} Q ${EYE_L} ${EYE_CY + 5} ${EYE_L + 11} ${EYE_CY}`} stroke="#fff" strokeWidth="4.5" fill="none" strokeLinecap="round" />
+            <path d={`M ${EYE_R - 11} ${EYE_CY} Q ${EYE_R} ${EYE_CY + 5} ${EYE_R + 11} ${EYE_CY}`} stroke="#fff" strokeWidth="4.5" fill="none" strokeLinecap="round" />
           </>
         ) : eyeHappy ? (
           <>
-            <path d="M 83 92 Q 92 80 101 92" stroke="#fff" strokeWidth="4.5" fill="none" strokeLinecap="round" />
-            <path d="M 139 92 Q 148 80 157 92" stroke="#fff" strokeWidth="4.5" fill="none" strokeLinecap="round" />
+            <path d={`M ${EYE_L - 12} ${EYE_CY + 6} Q ${EYE_L} ${EYE_CY - 10} ${EYE_L + 12} ${EYE_CY + 6}`} stroke="#fff" strokeWidth="5" fill="none" strokeLinecap="round" />
+            <path d={`M ${EYE_R - 12} ${EYE_CY + 6} Q ${EYE_R} ${EYE_CY - 10} ${EYE_R + 12} ${EYE_CY + 6}`} stroke="#fff" strokeWidth="5" fill="none" strokeLinecap="round" />
           </>
         ) : eyeStar ? (
           <>
-            <Sparkle cx={92 + ex} cy={88} />
-            <Sparkle cx={148 + ex} cy={88} />
+            <Sparkle cx={EYE_L + ex} cy={EYE_CY} />
+            <Sparkle cx={EYE_R + ex} cy={EYE_CY} />
           </>
         ) : (
           <>
-            <circle cx={92 + ex} cy="90" r="9" fill="#fff" />
-            <circle cx={94 + ex} cy="86" r="2.8" fill="#fff" opacity="0.9" />
-            <circle cx={148 + ex} cy="90" r="9" fill="#fff" />
-            <circle cx={150 + ex} cy="86" r="2.8" fill="#fff" opacity="0.9" />
+            <WateryEye cx={EYE_L + ex} cy={EYE_CY} />
+            <WateryEye cx={EYE_R + ex} cy={EYE_CY} />
           </>
         )}
 
-        {/* 腮红 */}
-        <ellipse cx="68" cy="116" rx="13" ry="8" fill="#ff9db7" opacity="0.9" />
-        <ellipse cx="172" cy="116" rx="13" ry="8" fill="#ff9db7" opacity="0.9" />
+        {/* 腮红（软糖粉，大眼下方脸颊） */}
+        <ellipse cx="56" cy="138" rx="14" ry="9" fill="#ffabc4" opacity="0.85" />
+        <ellipse cx="184" cy="138" rx="14" ry="9" fill="#ffabc4" opacity="0.85" />
 
-        {/* 鼻子 */}
-        <ellipse cx="120" cy="116" rx="7" ry="5" fill="#26303f" />
+        {/* 鼻子（小圆钮） */}
+        <ellipse cx="120" cy="142" rx="7" ry="5.5" fill="#2b3442" />
 
         {/* 嘴（命中热区锚这里） */}
         <g ref={mouthRef}>
@@ -410,43 +416,43 @@ function FeedPanda({ mood, gaze, fullness, mouthRef }) {
             <>
               <motion.ellipse
                 cx="120"
-                cy="140"
+                cy="164"
                 rx={mood === 'eager' ? 30 : 20}
                 fill="#e8617a"
-                stroke="#26303f"
+                stroke="#2b3442"
                 strokeWidth="3"
                 initial={{ ry: 6 }}
                 animate={{ ry: mood === 'eager' ? 27 : 16 }}
                 transition={{ type: 'spring', stiffness: 380, damping: 17 }}
               />
               {/* 舌头 */}
-              <ellipse cx="120" cy={mood === 'eager' ? 154 : 148} rx="13" ry="8" fill="#ff9db7" />
+              <ellipse cx="120" cy={mood === 'eager' ? 178 : 172} rx="13" ry="8" fill="#ff9db7" />
             </>
           ) : mouthTight ? (
-            <path d="M 104 140 L 136 140" stroke="#26303f" strokeWidth="4.5" fill="none" strokeLinecap="round" />
+            <path d="M 106 164 Q 120 168 134 164" stroke="#2b3442" strokeWidth="4.5" fill="none" strokeLinecap="round" />
           ) : (
-            <path d="M 100 134 Q 120 152 140 134" stroke="#26303f" strokeWidth="4" fill="none" strokeLinecap="round" />
+            <path d="M 102 158 Q 120 174 138 158" stroke="#2b3442" strokeWidth="4" fill="none" strokeLinecap="round" />
           )}
         </g>
 
         {/* 口水（饿肚子待机时挂在嘴角，随呼吸一滴滴渗出） */}
         {(mood === 'idle') && (
           <motion.path
-            d="M 137 143 q 3 10 0 17 q -5 4 -7 -2 q -2 -8 2 -15 Z"
+            d="M 138 166 q 3 10 0 17 q -5 4 -7 -2 q -2 -8 2 -15 Z"
             fill="#bfe6ff"
             stroke="#8fc9ee"
             strokeWidth="1.5"
             initial={{ opacity: 0, scaleY: 0.4 }}
             animate={{ opacity: [0.4, 1, 0.4], scaleY: [0.5, 1, 0.5] }}
             transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
-            style={{ transformOrigin: '137px 143px' }}
+            style={{ transformOrigin: '138px 166px' }}
           />
         )}
 
         {/* 汗珠（拒绝时冒） */}
         {mood === 'reject' && (
           <motion.path
-            d="M 176 70 q 4 10 0 16 q -7 3 -8 -3 q -1 -8 8 -13 Z"
+            d="M 190 74 q 4 10 0 16 q -7 3 -8 -3 q -1 -8 8 -13 Z"
             fill="#bfe6ff"
             stroke="#8fc9ee"
             strokeWidth="1.5"
@@ -459,11 +465,26 @@ function FeedPanda({ mood, gaze, fullness, mouthRef }) {
   );
 }
 
+// 水汪汪大眼珠：大眼白 + 大高光 + 小高光 + 下缘反光弧（与官方 Xiaomo 同款「湿润有神」）。
+function WateryEye({ cx, cy }) {
+  return (
+    <g>
+      <circle cx={cx} cy={cy} r="11" fill="#fff" />
+      {/* 主高光（大，左上） */}
+      <circle cx={cx - 3.5} cy={cy - 5} r="4.2" fill="#fff" opacity="0.95" />
+      {/* 副高光（小，右下）——两点高光是「水汪汪」的关键 */}
+      <circle cx={cx + 4.5} cy={cy + 5} r="2.2" fill="#fff" opacity="0.8" />
+      {/* 下缘反光弧 */}
+      <path d={`M ${cx - 6.5} ${cy + 7} Q ${cx} ${cy + 11} ${cx + 6.5} ${cy + 7}`} stroke="#fff" strokeWidth="1.6" fill="none" strokeLinecap="round" opacity="0.55" />
+    </g>
+  );
+}
+
 // 星星眼（渴望时）
 function Sparkle({ cx, cy }) {
   return (
     <path
-      d={`M ${cx} ${cy - 10} L ${cx + 3} ${cy - 3} L ${cx + 10} ${cy} L ${cx + 3} ${cy + 3} L ${cx} ${cy + 10} L ${cx - 3} ${cy + 3} L ${cx - 10} ${cy} L ${cx - 3} ${cy - 3} Z`}
+      d={`M ${cx} ${cy - 11} L ${cx + 3.5} ${cy - 3.5} L ${cx + 11} ${cy} L ${cx + 3.5} ${cy + 3.5} L ${cx} ${cy + 11} L ${cx - 3.5} ${cy + 3.5} L ${cx - 11} ${cy} L ${cx - 3.5} ${cy - 3.5} Z`}
       fill="#fff"
     />
   );
