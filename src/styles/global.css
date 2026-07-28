@@ -775,12 +775,14 @@ button {
   pointer-events: none;
 }
 
-/* ---- 投喂小墨（拖字饼干，阶段一标杆游戏）---- */
+/* ---- 投喂小墨（拖字糖果，阶段一标杆游戏 v2）---- */
 .feed-stage {
-  background: linear-gradient(180deg, #d9f0ff 0%, #eafaf2 46%, var(--land-grass) 100%);
-  touch-action: none; /* 拖拽时禁止页面滚动，避免小手拖饼干时页面跟着滑 */
+  background:
+    radial-gradient(120% 80% at 50% 0%, #eafaff 0%, transparent 60%),
+    linear-gradient(180deg, #d9f0ff 0%, #eafaf2 46%, var(--land-grass) 100%);
+  touch-action: none; /* 拖拽时禁止页面滚动，避免小手拖糖时页面跟着滑 */
 }
-/* 小墨头容器：居中，给想法气泡留出上方空间 */
+/* 小墨容器：居中，给想法气泡/庆祝层留出上方空间 */
 .feed-panda-wrap {
   position: relative;
   display: flex;
@@ -790,23 +792,24 @@ button {
 }
 .feed-panda {
   display: block;
-  filter: drop-shadow(0 8px 12px rgba(47, 72, 88, 0.18));
+  filter: drop-shadow(0 10px 14px rgba(47, 72, 88, 0.2));
 }
 /* “想吃什么”的想法气泡（看图选字：挂在小墨头顶右上） */
 .feed-thought {
   position: absolute;
-  top: -8px;
-  right: -18px;
-  width: 62px;
-  height: 62px;
+  top: -6px;
+  right: -14px;
+  width: 64px;
+  height: 64px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 34px;
+  font-size: 36px;
   background: var(--c-card);
   border: var(--stroke-w-sm) solid var(--stroke-ink);
   border-radius: 50%;
   box-shadow: var(--sh-float);
+  z-index: 4;
 }
 /* 气泡的小尾巴（指向小墨） */
 .feed-thought::after {
@@ -821,70 +824,134 @@ button {
   border-bottom: var(--stroke-w-sm) solid var(--stroke-ink);
   transform: rotate(35deg);
 }
-/* 饼干托盘：flex 均分落位（不用绝对定位——framer-motion 拖拽的 transform
-   会覆盖 translateX 居中，故让饼干做普通 flex item，拖拽 x/y 变成纯相对偏移） */
-.feed-tray {
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  gap: var(--s-2);
-  min-height: 100px;
-  margin-top: var(--s-3);
-}
-/* 单块字饼干：可拖拽，圆饼底 + 汉字 */
-.feed-cookie {
-  position: relative;
-  flex: 0 0 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 78px;
-  height: 78px;
-  padding: 0;
-  border: none;
-  background: none;
-  cursor: grab;
-  touch-action: none;
-  -webkit-user-select: none;
-  user-select: none;
-}
-.feed-cookie:active {
-  cursor: grabbing;
-}
-.feed-cookie-face {
+/* 喂对庆祝层：爱心/星星 + “好吃~” 从小墨身上升起 */
+.feed-yum-layer {
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 74px;
-  line-height: 1;
-  filter: drop-shadow(0 4px 6px rgba(120, 90, 40, 0.28));
   pointer-events: none;
+  z-index: 5;
 }
-/* 汉字压在饼干中央 */
-.feed-cookie-char {
+.feed-yum-heart {
+  position: absolute;
+  top: 30%;
+  font-size: 30px;
+}
+.feed-yum-word {
+  position: absolute;
+  top: 12%;
+  font-family: var(--font-ui);
+  font-weight: 900;
+  font-size: var(--f-lg);
+  color: var(--c-brand-deep);
+  text-shadow: 0 2px 0 #fff, 0 0 10px rgba(255, 200, 90, 0.6);
+}
+/* 糖果托盘：flex 均分落位（不用绝对定位——framer-motion 拖拽的 transform
+   会覆盖 translateX 居中，故让糖果做普通 flex item，拖拽 x/y 变成纯相对偏移） */
+.feed-tray {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: var(--s-3);
+  min-height: 108px;
+  margin-top: var(--s-3);
+}
+/* 每颗糖一个 slot：容纳糖果 + 落地影子 */
+.feed-treat-slot {
+  position: relative;
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+/* 落地影子：糖果拖起时下方留个影，制造深度 */
+.feed-treat-shadow {
+  position: absolute;
+  bottom: -6px;
+  width: 54px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(47, 72, 88, 0.18);
+  filter: blur(3px);
+  z-index: 0;
+}
+/* 单颗字糖果：可拖拽，圆润糖体 + 光泽 + 糖屑 + 汉字 */
+.feed-treat {
   position: relative;
   z-index: 1;
-  font-family: var(--font-kai);
-  font-size: 34px;
-  font-weight: 900;
-  color: #5b3a1a;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 82px;
+  height: 82px;
+  padding: 0;
+  border: 3px solid rgba(255, 255, 255, 0.9);
+  border-radius: 42% 58% 54% 46% / 52% 48% 52% 48%; /* 微不规则圆，像手作糖 */
+  background:
+    radial-gradient(circle at 34% 26%, #ffffff 0 8%, var(--treat-base) 34%, var(--treat-deep) 100%);
+  box-shadow:
+    inset 0 -6px 10px rgba(0, 0, 0, 0.12),
+    inset 0 4px 8px rgba(255, 255, 255, 0.5),
+    0 6px 12px rgba(120, 90, 40, 0.24);
+  cursor: grab;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.feed-treat:active {
+  cursor: grabbing;
+}
+/* 高光：左上角一抹亮斑 */
+.feed-treat-shine {
+  position: absolute;
+  top: 12%;
+  left: 16%;
+  width: 30%;
+  height: 24%;
+  border-radius: 50%;
+  background: linear-gradient(140deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0));
   pointer-events: none;
 }
-/* 演示正确答案：正确饼干绿圈脉冲高亮 */
-.feed-cookie.reveal {
-  animation: feed-reveal-pulse 1s ease-in-out infinite;
+/* 汉字压在糖果中央 */
+.feed-treat-char {
+  position: relative;
+  z-index: 2;
+  font-family: var(--font-kai);
+  font-size: 36px;
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 2px 3px rgba(0, 0, 0, 0.28);
+  pointer-events: none;
+}
+/* 糖屑点缀：三粒小点散在糖面上 */
+.feed-treat-crumbs {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.feed-treat-crumbs i {
+  position: absolute;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
+  background: var(--treat-crumb);
+  opacity: 0.85;
+}
+.feed-treat-crumbs i:nth-child(1) { top: 24%; right: 20%; }
+.feed-treat-crumbs i:nth-child(2) { bottom: 22%; left: 22%; width: 5px; height: 5px; }
+.feed-treat-crumbs i:nth-child(3) { bottom: 30%; right: 26%; width: 4px; height: 4px; }
+/* 演示正确答案：正确糖果绿圈脉冲高亮 */
+.feed-treat.reveal {
+  animation: feed-reveal-pulse 1s ease-in-out infinite;
 }
 @keyframes feed-reveal-pulse {
-  0%, 100% { box-shadow: 0 0 0 4px rgba(47, 179, 119, 0.5); }
-  50% { box-shadow: 0 0 0 12px rgba(47, 179, 119, 0.18); }
+  0%, 100% { box-shadow: inset 0 -6px 10px rgba(0,0,0,0.12), 0 0 0 4px rgba(47, 179, 119, 0.55); }
+  50% { box-shadow: inset 0 -6px 10px rgba(0,0,0,0.12), 0 0 0 13px rgba(47, 179, 119, 0.16); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .feed-cookie.reveal { animation: none; box-shadow: 0 0 0 6px rgba(47, 179, 119, 0.45); }
+  .feed-treat.reveal { animation: none; box-shadow: 0 0 0 6px rgba(47, 179, 119, 0.45); }
 }
 
 /* ---- 点泡泡（看字选图）---- */
