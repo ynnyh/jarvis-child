@@ -8,6 +8,7 @@
 //   label: 无障碍标签，默认「播放读音」
 //   wiggle: 是否周期性招手（默认开；同屏多只时可关避免吵）
 import { motion } from 'framer-motion';
+import { useReducedMotion } from '../../hooks/useReducedMotion.js';
 
 // 装饰用小喇叭字形（非按钮）：给本身已可点读的元素（词条 pill 等）做「会出声」暗示。
 // 跟随 currentColor，尺寸小、不抢戏；不可嵌套按钮时用它替代 SpeakerButton。
@@ -52,15 +53,18 @@ export default function SpeakerButton({
   wiggle = true,
   className = '',
 }) {
+  // 尊重系统「减弱动态效果」：开启时关掉无限循环的招手动画。
+  const reducedMotion = useReducedMotion();
+  const doWiggle = wiggle && !reducedMotion;
   return (
     <motion.button
       type="button"
       className={`spk-btn spk-btn--${size} ${className}`}
       aria-label={label}
       onClick={onClick}
-      animate={wiggle ? { rotate: [0, -10, 8, -5, 0], scale: [1, 1.08, 1.05, 1.07, 1] } : undefined}
+      animate={doWiggle ? { rotate: [0, -10, 8, -5, 0], scale: [1, 1.08, 1.05, 1.07, 1] } : undefined}
       transition={
-        wiggle
+        doWiggle
           ? { duration: 0.7, repeat: Infinity, repeatDelay: 2, ease: 'easeInOut' }
           : undefined
       }

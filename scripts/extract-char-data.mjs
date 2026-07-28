@@ -33,8 +33,13 @@ for (const char of CHAR_LIST) {
     continue;
   }
   const content = await readFile(src, 'utf8');
-  // 校验一下是合法 JSON，避免拷进坏数据。
-  JSON.parse(content);
+  // 校验一下是合法 JSON，避免拷进坏数据；坏 JSON 归入 missing 而非直接崩溃。
+  try {
+    JSON.parse(content);
+  } catch {
+    missing.push(char);
+    continue;
+  }
   await writeFile(join(outDir, `${char}.json`), content, 'utf8');
   written += 1;
 }
