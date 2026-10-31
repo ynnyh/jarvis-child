@@ -19,6 +19,8 @@ import PageTransition from '../components/ui/PageTransition.jsx';
 import PlayfulBackground from '../components/PlayfulBackground.jsx';
 import StarReward from '../components/StarReward.jsx';
 import MascotReaction from '../components/MascotReaction.jsx';
+import Confetti from '../components/Confetti.jsx';
+import DailyRewardToast from '../components/DailyRewardToast.jsx';
 import { useSpeech } from '../hooks/useSpeech.js';
 import { useSound } from '../hooks/useSound.js';
 import { useGameStore } from '../store/useGameStore.js';
@@ -44,6 +46,20 @@ function starsForMistakes(m) {
   return 1;
 }
 const COINS_BY_STARS = { 1: 5, 2: 8, 3: 12 };
+
+// 「下一步」按钮：加大 + 弹簧 scale 入场，减少步骤间的停滞感（样式见 global.css 学习闭环页分区）。
+function NextButton({ children, onClick }) {
+  return (
+    <motion.div
+      className="flow-next"
+      initial={{ scale: 0.6, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{ delay: 0.25, type: 'spring', stiffness: 300, damping: 14 }}
+    >
+      <Button size="lg" onClick={onClick}>{children}</Button>
+    </motion.div>
+  );
+}
 
 // 洗牌
 function shuffle(arr) {
@@ -81,6 +97,7 @@ export default function LearnFlow() {
   const recordChar = useGameStore((s) => s.recordChar);
   const addCoins = useGameStore((s) => s.addCoins);
   const checkIn = useGameStore((s) => s.checkIn);
+  const trackDaily = useGameStore((s) => s.trackDaily);
   const completeLesson = useGameStore((s) => s.completeLesson);
   const getCharStars = useGameStore((s) => s.getCharStars);
 
@@ -90,6 +107,8 @@ export default function LearnFlow() {
   const [reward, setReward] = useState(null);
   const [checkWrong, setCheckWrong] = useState(null); // 即时检查答错的选项
   const [reaction, setReaction] = useState(null); // 小墨反应
+  const [dailyReward, setDailyReward] = useState(null); // 每日任务完成通知
+  const [writeBurst, setWriteBurst] = useState(false); // 描红完成的星星爆（页面级，跨步骤存活）
 
   const step = STEPS[stepIdx];
 
@@ -122,7 +141,12 @@ export default function LearnFlow() {
       const total = summary?.totalMistakes ?? mistakes;
       setMistakes(total);
       play('correct');
+      play('levelup');
       speak('写得好棒');
+      // 星星爆即时庆祝：页面级渲染（马上切到 check 步，挂在 write 步内会随步骤卸载），
+      // 粒子约 1.5s 放完后卸载。
+      setWriteBurst(true);
+      setTimeout(() => setWriteBurst(false), 1600);
       // 进入 check 步骤。
       setStepIdx(STEPS.indexOf('check'));
     },
@@ -144,12 +168,19 @@ export default function LearnFlow() {
       recordChar(char, stars);
       checkIn();
       addCoins(COINS_BY_STARS[stars]);
+      // 每日任务「学字」计数 +1；达成时弹通知（等星奖励关掉后再显示）。
+      const dr = trackDaily('learn');
+      if (dr.completed.length) setDailyReward(dr);
+      play('correct');
       play('star');
       speak('太棒啦');
+      // 即时反馈：小墨从底角弹出欢呼（与星奖励弹层并行，不阻塞流程）。
+      setReaction(null);
+      requestAnimationFrame(() => setReaction('cheer'));
       setReward(stars);
       syncSoon();
     },
-    [char, mistakes, recordChar, checkIn, addCoins, play, speak]
+    [char, mistakes, recordChar, checkIn, trackDaily, addCoins, play, speak]
   );
 
   if (!data || !lesson) {
@@ -220,7 +251,7 @@ export default function LearnFlow() {
                 />
               </div>
             </div>
-            <Button size="lg" onClick={next}>开始学「{char}」</Button>
+            <NextButton onClick={next}>开始学「{char}」</NextButton>
           </div>
         )}
 
@@ -228,7 +259,7 @@ export default function LearnFlow() {
         {step === 'etym' && (
           <div className="flow-etym">
             <Etymology data={data} onSpeak={speak} />
-            <Button size="lg" onClick={next}>我知道啦 →</Button>
+            <NextButton onClick={next}>我知道啦 →</NextButton>
           </div>
         )}
 
@@ -250,7 +281,7 @@ export default function LearnFlow() {
             </div>
             <SpeakerButton size="md" onClick={() => speak(char)} />
             <p className="flow-tip">点一点，听小墨怎么读</p>
-            <Button size="lg" onClick={next}>会读啦 →</Button>
+            <NextButton onClick={next}>会读啦 →</NextButton>
           </div>
         )}
 
@@ -280,7 +311,7 @@ export default function LearnFlow() {
                 </motion.button>
               ))}
             </div>
-            <Button size="lg" onClick={next}>学会啦 →</Button>
+            <NextButton onClick={next}>学会啦 →</NextButton>
           </div>
         )}
 
@@ -298,7 +329,7 @@ export default function LearnFlow() {
               {renderSentence(data.sentence, char, (c) => speak(c))}
             </motion.div>
             <SpeakerButton size="md" label="听句子" onClick={() => speak(data.sentence)} />
-            <Button size="lg" onClick={next}>会读句子啦 →</Button>
+            <NextButton onClick={next}>会读句子啦 →</NextButton>
           </div>
         )}
 
@@ -373,7 +404,33 @@ export default function LearnFlow() {
             }}
           />
         )}
+
+        {/* 字卡收入囊中：星级结算出现时，字卡从屏幕中央缩小飞向右下角（暗示飞入收集册）。
+            纯动效层不拦点击，出现 + 飞行 1s 内完成，不阻塞流程。 */}
+        {reward !== null && (
+          <motion.div
+            className="char-fly"
+            aria-hidden="true"
+            initial={{ x: 0, y: 0, scale: 0.9, opacity: 0 }}
+            animate={{
+              x: (typeof window !== 'undefined' ? window.innerWidth : 400) / 2 - 60,
+              y: (typeof window !== 'undefined' ? window.innerHeight : 700) * 0.5,
+              scale: 0.22,
+              opacity: [0, 1, 1, 0],
+            }}
+            transition={{ delay: 1.15, duration: 0.75, ease: 'easeInOut' }}
+          >
+            {char}
+          </motion.div>
+        )}
+
+        {/* 描红完成的星星爆：页面级渲染，进入 check 步后仍能放完 */}
+        {writeBurst && <Confetti preset="stars" />}
         <MascotReaction type={reaction} onHide={() => setReaction(null)} />
+        {/* 每日任务完成通知：星奖励关掉后再弹，避免两层奖励叠一起 */}
+        {reward === null && dailyReward && (
+          <DailyRewardToast reward={dailyReward} onDone={() => setDailyReward(null)} />
+        )}
       </div>
     </PageTransition>
   );

@@ -14,6 +14,7 @@ import PageTransition from '../components/ui/PageTransition.jsx';
 import PlayfulBackground from '../components/PlayfulBackground.jsx';
 import Confetti from '../components/Confetti.jsx';
 import Xiaomo from '../components/mascot/Xiaomo.jsx';
+import DailyRewardToast from '../components/DailyRewardToast.jsx';
 
 const STORY_REWARD = 10; // 读完一本绘本奖励金币
 
@@ -49,9 +50,12 @@ export default function StoryReader() {
   const { speak } = useSpeech();
   const sound = useSound();
   const addCoins = useGameStore((s) => s.addCoins);
+  const checkIn = useGameStore((s) => s.checkIn);
+  const trackDaily = useGameStore((s) => s.trackDaily);
 
   const [index, setIndex] = useState(0);
   const [done, setDone] = useState(false);
+  const [dailyReward, setDailyReward] = useState(null); // 每日任务完成通知
   const rewardedRef = useRef(false);
 
   const total = story ? story.pages.length : 0;
@@ -62,14 +66,18 @@ export default function StoryReader() {
     if (page) speak(page.text);
   }, [page, speak]);
 
-  // 读完结算：撒花 + 一次性金币奖励。
+  // 读完结算：撒花 + 一次性金币奖励 + 打卡（打卡修复：此前读完绘本不打卡）+
+  // 每日任务「读绘本」计数 +1，达成时弹通知。
   useEffect(() => {
     if (done && !rewardedRef.current) {
       rewardedRef.current = true;
       sound.chest();
       addCoins(STORY_REWARD);
+      checkIn();
+      const dr = trackDaily('story');
+      if (dr.completed.length) setDailyReward(dr);
     }
-  }, [done, sound, addCoins]);
+  }, [done, sound, addCoins, checkIn, trackDaily]);
 
   const goNext = useCallback(() => {
     if (index < total - 1) {
@@ -187,6 +195,7 @@ export default function StoryReader() {
             </div>
           </motion.div>
         )}
+        {dailyReward && <DailyRewardToast reward={dailyReward} onDone={() => setDailyReward(null)} />}
       </div>
     </PageTransition>
   );
